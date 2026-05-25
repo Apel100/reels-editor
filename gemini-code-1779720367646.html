@@ -7,99 +7,210 @@
     <style>
         :root {
             --bg-color: #05050b;
-            --panel-color: #111124;
+            --panel-color: #0f111a;
+            --card-color: #1a1d29;
             --accent-color: #38bdf8;
-            --text-color: #f8fafc;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-color: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border-color: #2d334a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
 
         /* Left Control Panel */
         .controls {
-            width: 450px;
+            width: 420px;
             background-color: var(--panel-color);
-            padding: 25px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+
+        .header-area { margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        h2 { font-size: 1.2rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .sub-header { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+
+        /* Card System */
+        .card {
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            overflow-y: auto;
-            border-right: 1px solid #1e293b;
-            scrollbar-width: thin;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: #3b4261; }
+        .card-title { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--text-color); 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        h2 { font-size: 1.3rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .section-title { font-size: 0.9rem; color: #94a3b8; font-weight: bold; margin-top: 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px;}
-
-        .control-group { display: flex; flex-direction: column; gap: 6px; }
-        .row-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; }
-        label span.val { color: #38bdf8; font-weight: bold; }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .row-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
+        label { font-size: 0.75rem; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+        label span.val { color: var(--accent-color); font-weight: 700; background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+        
+        /* Inputs Styling */
         input[type="file"], select, input[type="color"] {
-            width: 100%; padding: 10px; background: #0b0f19; border: 1px solid #334155; border-radius: 6px; color: white; outline: none;
+            width: 100%; padding: 10px; background: #0b0f19; border: 1px solid var(--border-color); border-radius: 8px; color: white; outline: none; font-size: 0.85rem; transition: all 0.2s;
         }
-        input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
+        select:focus, input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-glow); }
+        
+        input[type="range"] { 
+            width: 100%; accent-color: var(--accent-color); cursor: pointer; height: 6px; border-radius: 3px; background: #0b0f19; outline: none; -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--accent-color); margin-top: -5px; box-shadow: 0 0 10px var(--accent-glow); }
 
         /* Action Buttons */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        .btn { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; color: white;}
-        .btn-play { background-color: #10b981; }
-        .btn-reset { background-color: #475569; }
-        .btn-random { background-color: #8b5cf6; grid-column: span 2; font-size: 1.1rem; padding: 15px;}
-        .btn-export { background-color: #f59e0b; grid-column: span 2; font-size: 1.05rem; padding: 14px; }
-        .btn:hover { opacity: 0.8; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; color: white; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-play { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .btn-reset { background: #334155; }
+        .btn-random { background: linear-gradient(135deg, #8b5cf6, #7c3aed); grid-column: span 2; font-size: 1rem; padding: 14px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .btn-export { background: linear-gradient(135deg, #f59e0b, #d97706); grid-column: span 2; font-size: 0.95rem; padding: 14px; margin-top: 5px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
+        .btn:hover { transform: translateY(-2px); opacity: 0.95; }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* Workspace and Canvas */
-        .workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: repeating-conic-gradient(#1e1e1e 0% 25%, #121212 0% 50%) 50% / 20px 20px; }
-        .canvas-container { position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); border-radius: 8px; overflow: hidden; background-color: transparent;}
+        .workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); }
+        .canvas-container { position: relative; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8); border: 4px solid #1e293b; border-radius: 12px; overflow: hidden; }
         canvas { display: block; max-width: 100%; max-height: 85vh; }
-        .timeline-bar { width: 100%; height: 6px; background: #1e293b; position: relative; border-radius: 3px; overflow: hidden;}
-        .timeline-progress { height: 100%; width: 0%; background: #38bdf8; transition: width 0.05s linear; }
+        
+        .timeline-container { width: 100%; padding: 0 5px; }
+        .timeline-bar { width: 100%; height: 8px; background: #1e293b; position: relative; border-radius: 4px; overflow: hidden; margin-top: 10px;}
+        .timeline-progress { height: 100%; width: 0%; background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); transition: width 0.05s linear; }
 
-        /* Toggle Switch Overlay */
-        .toggle-container { display: flex; align-items: center; gap: 10px; background: #0b0f19; padding: 10px; border-radius: 6px; border: 1px solid #334155; }
-        .toggle-container input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #38bdf8; }
+        /* Custom Toggle */
+        .toggle-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Custom Color and Random Buttons */
+        .input-with-btn { display: flex; gap: 8px; align-items: center; }
+        .mini-btn { padding: 8px 12px; background: #334155; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .mini-btn:hover { background: #475569; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <div>
-            <h2>Motion Engine v5.0</h2>
-            <p style="font-size: 0.75rem; color: #64748b;">CFR Pro Smooth Premiere Export</p>
+        <div class="header-area">
+            <h2>🚀 Motion Engine <span style="font-size: 0.8rem; background: var(--accent-color); color: #000; padding: 2px 6px; border-radius: 4px;">V5.1</span></h2>
+            <div class="sub-header">CFR Smooth Export • Premiere Pro Optimized</div>
         </div>
 
-        <div class="action-grid">
-            <button class="btn btn-random" id="randomBtn">🎲 Auto Magic Style</button>
-            <button class="btn btn-play" id="playBtn">▶ Play Motion</button>
-            <button class="btn btn-reset" id="resetBtn">🔄 Reset</button>
-            <button class="btn btn-export" id="exportBtn">💾 Export Smooth Transparent Video</button>
-        </div>
-        <div class="timeline-bar"><div class="timeline-progress" id="timeProgress"></div></div>
-
-        <div class="section-title">১. কন্টেন্ট</div>
-        <div class="control-group">
-            <label>সাবজেক্ট ছবি (Transparent PNG)</label>
-            <input type="file" id="imageLoader" accept="image/*">
+        <div class="action-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <button class="btn btn-random" id="randomBtn" style="grid-column: span 1; font-size: 0.85rem; padding: 10px;">🎲 Random</button>
+            <button class="btn btn-play" id="playBtn" style="padding: 10px;">▶ Play</button>
+            <button class="btn btn-reset" id="resetBtn" style="padding: 10px;">🔄 Reset</button>
         </div>
 
-        <div class="section-title">২. গ্লোবাল সেটিংস</div>
-        <div class="row-group">
-            <div class="control-group">
-                <label>ব্যাকগ্রাউন্ড থিম</label>
-                <div style="display: flex; gap: 5px; align-items: center;">
-                    <input type="color" id="bgColor" value="#0f172a">
-                    <div style="display: flex; align-items: center; gap: 4px; background: #0b0f19; padding: 5px 8px; border-radius: 6px; border: 1px solid #334155;">
-                        <input type="checkbox" id="lockBGColor" style="width: 15px; height: 15px; cursor: pointer;">
-                        <label for="lockBGColor" style="font-size: 0.65rem; color: #94a3b8; cursor: pointer; white-space: nowrap;">🔒 Lock</label>
+        <div class="card" style="padding: 10px; border-color: var(--accent-color); background: rgba(56, 189, 248, 0.05);">
+            <div class="row-group" style="grid-template-columns: 1.5fr 1fr; align-items: end;">
+                <div class="control-group">
+                    <label>📸 Select Subject</label>
+                    <input type="file" id="imageLoader" accept="image/*" style="padding: 6px; font-size: 0.75rem;">
+                </div>
+                <button class="btn btn-export" id="exportBtn" style="margin: 0; padding: 10px; height: 38px;">💾 Export</button>
+            </div>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-bar"><div class="timeline-progress" id="timeProgress"></div></div>
+        </div>
+
+        <!-- Section 1: Transformation & Layout (Moved to Top) -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <div class="card-title" style="margin-bottom: 0;">📏 Transform & Layout</div>
+                <button class="mini-btn" id="resetTransformBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);">↺ Reset All</button>
+            </div>
+            
+            <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <div class="card-title" style="font-size: 0.7rem; color: var(--accent-color);">Shape Transformation</div>
+                <div class="control-group">
+                    <label>Scale <span class="val" id="shapeScaleVal">700</span></label>
+                    <input type="range" id="shapeScaleSlider" min="200" max="1500" value="700">
+                </div>
+                <div class="row-group" style="margin-top: 5px;">
+                    <div class="control-group">
+                        <label>Pos X <span class="val" id="shapeXVal">0</span></label>
+                        <input type="range" id="shapeXSlider" min="-500" max="500" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Pos Y <span class="val" id="shapeYVal">0</span></label>
+                        <input type="range" id="shapeYSlider" min="-500" max="500" value="0">
                     </div>
                 </div>
             </div>
+
+            <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <div class="card-title" style="font-size: 0.7rem; color: #fb7185;">Photo Transformation</div>
+                <div class="control-group">
+                    <label>Scale <span class="val" id="photoScaleVal">100%</span></label>
+                    <input type="range" id="photoScale" min="30" max="300" value="100">
+                </div>
+                <div class="row-group" style="margin-top: 5px;">
+                    <div class="control-group">
+                        <label>Pos X <span class="val" id="photoXVal">0</span></label>
+                        <input type="range" id="photoXSlider" min="-500" max="500" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Pos Y <span class="val" id="photoYVal">0</span></label>
+                        <input type="range" id="photoYSlider" min="-200" max="800" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Environment -->
+        <div class="card">
+            <div class="card-title">🌍 Environment</div>
+            <div class="row-group">
+                <div class="control-group">
+                    <label>BG Color</label>
+                    <div class="input-with-btn">
+                        <input type="color" id="bgColor" value="#0f172a">
+                        <label class="switch" title="Lock Color">
+                            <input type="checkbox" id="lockBGColor">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Clip Mode</label>
+                    <select id="clipMode">
+                        <option value="clip">Pop-out (Clip)</option>
+                        <option value="no_clip">Float (No Clip)</option>
+                    </select>
+                </div>
+            </div>
             <div class="control-group">
-                <label>ব্যাকগ্রাউন্ড স্টাইল</label>
-                <div style="display: flex; gap: 5px; align-items: center;">
+                <label>Background Style</label>
+                <div class="input-with-btn">
                     <select id="bgStyle">
                         <option value="solid">Solid Color</option>
                         <option value="grid">Grid Pattern</option>
@@ -108,110 +219,79 @@
                         <option value="diag">Diagonal Stripes</option>
                         <option value="mesh">Mesh Gradient</option>
                     </select>
-                    <button class="btn" id="randomBGBtn" style="padding: 5px 10px; font-size: 0.8rem; background: #334155;">🎲</button>
+                    <button class="mini-btn" id="randomBGBtn" title="Random Style">🎲</button>
                 </div>
             </div>
         </div>
-        <div class="row-group">
+
+        <!-- Section 3: Shape Styling -->
+        <div class="card">
+            <div class="card-title">🎨 Style & Geometry</div>
+            <div class="row-group">
+                <div class="control-group">
+                    <label>Shape Type</label>
+                    <select id="shapeType">
+                        <option value="circle">Circle</option>
+                        <option value="vertical_strip">Vertical Strip</option>
+                        <option value="horizontal_strip">Horizontal Strip</option>
+                        <option value="square">Square</option>
+                        <option value="diamond">Diamond</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Motion</label>
+                    <select id="motionStyle">
+                        <option value="classic">Classic Scale</option>
+                        <option value="fade_pulse">Fade & Pulse</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row-group">
+                <div class="control-group">
+                    <label>Render</label>
+                    <select id="renderStyle">
+                        <option value="fill">Solid Fill</option>
+                        <option value="outline">Neon Outline</option>
+                        <option value="both">Fill + Glow</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Glow <span class="val" id="glowVal">15</span></label>
+                    <input type="range" id="glowSizeSlider" min="5" max="60" value="15">
+                </div>
+            </div>
+
             <div class="control-group">
-                <label>ক্লিপ মোড</label>
-                <select id="clipMode">
-                    <option value="clip">Clip (Pop-out)</option>
-                    <option value="no_clip">No Clip (Float)</option>
+                <label>Color & Texture Layout</label>
+                <select id="shapeLayout">
+                    <option value="auto_solid">Auto Solid (Contrast)</option>
+                    <option value="auto_gradient">Auto Neon Gradient</option>
+                    <option value="auto_solid_dots">Auto Solid + Dots</option>
+                    <option value="auto_solid_lines">Auto Solid + Grid</option>
+                    <option value="auto_gradient_dots">Auto Neon + Dots</option>
+                    <option value="auto_gradient_lines">Auto Neon + Grid</option>
+                    <option value="pattern_dots">Pattern - Dots Only</option>
+                    <option value="pattern_lines">Pattern - Grid Only</option>
+                    <option value="custom">Custom Color</option>
                 </select>
             </div>
-        </div>
-
-        <div class="section-title">৩. শেপ কাস্টমাইজেশন</div>
-        <div class="control-group">
-            <label>মোশন স্টাইল</label>
-            <select id="motionStyle">
-                <option value="classic">Classic (Scale Up)</option>
-                <option value="fade_pulse">Fade & Pulse</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label>রেন্ডার স্টাইল</label>
-            <select id="renderStyle">
-                <option value="fill">Solid / Gradient Fill</option>
-                <option value="outline">Neon Glow Outline</option>
-                <option value="both">Fill + Outline (Double Layer)</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label>কালার / টেক্সচার ফিল</label>
-            <select id="shapeLayout">
-                <option value="auto_solid">Auto Solid (Contrast)</option>
-                <option value="auto_gradient">Auto Neon Gradient</option>
-                <option value="auto_solid_dots">Auto Solid + Dots</option>
-                <option value="auto_solid_lines">Auto Solid + Grid</option>
-                <option value="auto_gradient_dots">Auto Neon + Dots</option>
-                <option value="auto_gradient_lines">Auto Neon + Grid</option>
-                <option value="pattern_dots">Pattern - Dots Only</option>
-                <option value="pattern_lines">Pattern - Grid Only</option>
-                <option value="custom">Custom Color</option>
-            </select>
-        </div>
-        <div class="control-group" id="customColorGroup" style="display: none;">
-            <label>কাস্টম শেপ কালার</label>
-            <input type="color" id="shapeColor" value="#3b82f6">
-        </div>
-
-        <div class="control-group">
-            <div class="toggle-container">
-                <input type="checkbox" id="comboToggle">
-                <label for="comboToggle" style="cursor:pointer; font-weight: bold; color: #38bdf8;">ডুয়াল-শেপ মোড (Circle Combo Backend)</label>
+            <div class="control-group" id="customColorGroup" style="display: none;">
+                <label>Custom Color</label>
+                <input type="color" id="shapeColor" value="#3b82f6">
+            </div>
+            
+            <div class="card toggle-card" style="padding: 10px; background: rgba(255,255,255,0.02);" onclick="document.getElementById('comboToggle').click(); event.stopPropagation();">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-size:0.75rem; font-weight:700;">Dual-Shape Combo</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="comboToggle">
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
-
-        <div class="control-group">
-            <label>১ম শেপ স্টাইল</label>
-            <select id="shapeType">
-                <option value="circle">Circle</option>
-                <option value="vertical_strip">Vertical Strip</option>
-                <option value="horizontal_strip">Horizontal Strip</option>
-                <option value="square">Square</option>
-                <option value="diamond">Diamond (45°)</option>
-            </select>
-        </div>
-
-        <div class="row-group">
-            <div class="control-group">
-                <label>শেপ সাইজ <span class="val" id="shapeScaleVal">700</span></label>
-                <input type="range" id="shapeScaleSlider" min="200" max="1500" value="700">
-            </div>
-            <div class="control-group">
-                <label>শেপ বর্ডার গ্লো <span class="val" id="glowVal">15</span></label>
-                <input type="range" id="glowSizeSlider" min="5" max="60" value="15">
-            </div>
-        </div>
-
-        <div class="row-group">
-            <div class="control-group">
-                <label>শেপ পজিশন X <span class="val" id="shapeXVal">0</span></label>
-                <input type="range" id="shapeXSlider" min="-500" max="500" value="0">
-            </div>
-            <div class="control-group">
-                <label>শেপ পজিশন Y <span class="val" id="shapeYVal">0</span></label>
-                <input type="range" id="shapeYSlider" min="-500" max="500" value="0">
-            </div>
-        </div>
-
-        <div class="section-title">৪. ফটো অ্যাডজাস্টমেন্ট</div>
-        <div class="control-group">
-            <label>ফটো স্কেল <span class="val" id="photoScaleVal">100%</span></label>
-            <input type="range" id="photoScale" min="30" max="300" value="100">
-        </div>
-        <div class="row-group">
-            <div class="control-group">
-                <label>ফটো পজিশন X <span class="val" id="photoXVal">0</span></label>
-                <input type="range" id="photoXSlider" min="-500" max="500" value="0">
-            </div>
-            <div class="control-group">
-                <label>ফটো পজিশন Y <span class="val" id="photoYVal">0</span></label>
-                <input type="range" id="photoYSlider" min="-200" max="800" value="0">
-            </div>
-        </div>
+    </div>
     </div>
 
     <div class="workspace">
@@ -251,6 +331,7 @@
         const playBtn = document.getElementById('playBtn');
         const resetBtn = document.getElementById('resetBtn');
         const randomBtn = document.getElementById('randomBtn');
+        const resetTransformBtn = document.getElementById('resetTransformBtn');
         const exportBtn = document.getElementById('exportBtn');
         const timeProgress = document.getElementById('timeProgress');
 
@@ -276,7 +357,60 @@
         let dynamicPulse = 1;
         let motionPhotoXOffset = 0;
         let motionPhotoYOffset = 0;
+        let dynamicPhotoZoom = 1.0;
         let entryDirection = 'bottom';
+        let colorVariationSeed = Math.random();
+
+        function hexToHsl(hex) {
+            if (hex.indexOf('#') === 0) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            let r = parseInt(hex.slice(0, 2), 16) / 255, g = parseInt(hex.slice(2, 4), 16) / 255, b = parseInt(hex.slice(4, 6), 16) / 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+        }
+
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function getContrastColor(hex, type = 'solid') {
+            const [h, s, l] = hexToHsl(hex);
+            
+            // Logic: Variety via Hue Offsets (Complementary, Triadic, Split-Comp)
+            const offsets = [180, 150, 210, 120, 240, 90, 270];
+            const chosenOffset = offsets[Math.floor(colorVariationSeed * offsets.length)];
+            const targetHue = (h + chosenOffset) % 360;
+            
+            // Contrast logic: If BG is dark, make shape very bright/neon. If light, make it dark/vivid.
+            const targetLightness = l < 50 ? (70 + colorVariationSeed * 20) : (10 + colorVariationSeed * 20);
+            const targetSaturation = 95; 
+
+            if (type === 'gradient') {
+                const col1 = hslToHex(targetHue, targetSaturation, targetLightness);
+                const col2 = hslToHex((targetHue + 30) % 360, targetSaturation, targetLightness - 5);
+                return [col1, col2];
+            }
+            
+            return hslToHex(targetHue, targetSaturation, targetLightness);
+        }
 
         function hexToRgba(hex, alpha) {
             if (hex.indexOf('#') === 0) hex = hex.slice(1);
@@ -386,6 +520,9 @@
         function generateRandomStyle() {
             if (!uploadedImg) { alert("দয়া করে প্রথমে একটি ইমেজ আপলোড করুন!"); return; }
 
+            // Randomize color variation seed for different harmonious results
+            colorVariationSeed = Math.random();
+
             const shapes = ['circle', 'vertical_strip', 'horizontal_strip', 'square', 'diamond'];
             const layouts = [
                 'auto_solid', 'auto_gradient', 
@@ -423,7 +560,7 @@
             updateLabels();
             resetAnimation();
             isPlaying = true;
-            playBtn.innerText = "⏸ Pause Motion";
+            playBtn.innerText = "⏸ Pause";
         }
 
         function updateLabels() {
@@ -442,6 +579,7 @@
             dynamicRotation = 0;
             dynamicOpacity = 0;
             dynamicPulse = 1;
+            dynamicPhotoZoom = 1.0;
             
             // Logic: Left/Right only works in 'no_clip' mode. 
             // In 'clip' mode, it always starts from 'bottom' for a clean entry.
@@ -468,35 +606,36 @@
                 currentFrame++;
                 
                 if (currentFrame > totalDuration) {
-                    if (isExporting) {
-                        // Export done handling will trigger at ticker boundary
-                        return;
-                    }
+                    if (isExporting) return;
                     isPlaying = false;
-                    playBtn.innerText = "▶ Play Motion";
+                    playBtn.innerText = "▶ Play";
                     return;
                 }
                 
-                // Physics Calculations per frame (CFR standard)
-                if (currentFrame < 45) {
-                    // Intro Phase
-                    dynamicScale += (1.0 - dynamicScale) * 0.12;
-                    dynamicRotation += ((360 * Math.PI / 180) - dynamicRotation) * 0.10;
-                    dynamicOpacity += (1.0 - dynamicOpacity) * 0.12;
-                    if (currentFrame > 8) {
-                        motionPhotoXOffset += (0 - motionPhotoXOffset) * 0.14;
-                        motionPhotoYOffset += (0 - motionPhotoYOffset) * 0.14;
-                    }
+                // 1. Shape Dynamics (Settles at Frame 22)
+                if (currentFrame < 22) {
+                    dynamicScale += (1.0 - dynamicScale) * 0.22;
+                    dynamicRotation += ((360 * Math.PI / 180) - dynamicRotation) * 0.20;
+                    dynamicOpacity += (1.0 - dynamicOpacity) * 0.22;
                 } else {
-                    // Loop / Pulse Phase
                     dynamicScale = 1.0;
                     dynamicRotation = 360 * Math.PI / 180;
                     dynamicOpacity = 1.0;
+                }
+
+                // 2. Photo Dynamics (Settles at Frame 30)
+                if (currentFrame < 30) {
+                    if (currentFrame > 6) {
+                        motionPhotoXOffset += (0 - motionPhotoXOffset) * 0.18;
+                        motionPhotoYOffset += (0 - motionPhotoYOffset) * 0.18;
+                    }
+                } else {
                     motionPhotoXOffset = 0;
                     motionPhotoYOffset = 0;
                     
-                    // Subtle dynamic looping pulse
-                    dynamicPulse = 1.0 + Math.sin((currentFrame - 45) * 0.08) * 0.025;
+                    // Post-Intro Effects
+                    dynamicPhotoZoom = 1.0 + (currentFrame - 30) * 0.0006;
+                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025;
                 }
                 
                 timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
@@ -632,13 +771,13 @@
 
             // Render subject overlay
             if (uploadedImg) {
-                const userScale = parseInt(photoScale.value) / 100;
+                const userScale = (parseInt(photoScale.value) / 100) * dynamicPhotoZoom;
                 const baseScale = Math.min((canvas.width * 0.85) / uploadedImg.width, (canvas.height * 0.75) / uploadedImg.height);
                 const iw = uploadedImg.width * baseScale * userScale;
                 const ih = uploadedImg.height * baseScale * userScale;
                 
-                const actualXOffset = isPlaying && currentFrame < 45 ? motionPhotoXOffset : 0;
-                const actualYOffset = isPlaying && currentFrame < 45 ? motionPhotoYOffset : 0;
+                const actualXOffset = isPlaying && currentFrame < 30 ? motionPhotoXOffset : 0;
+                const actualYOffset = isPlaying && currentFrame < 30 ? motionPhotoYOffset : 0;
 
                 const px = (canvas.width / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
                 const py = (canvas.height / 2) + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
@@ -650,9 +789,6 @@
                     targetCtx.shadowColor = 'transparent';
                     targetCtx.setLineDash([]);
                     
-                    if (isPlaying && currentFrame < 45) {
-                        targetCtx.globalAlpha = dynamicOpacity;
-                    }
                     targetCtx.drawImage(uploadedImg, px, py, iw, ih);
                     targetCtx.restore();
                 };
@@ -665,7 +801,7 @@
                         horizonY = cy + (baseShapeSize * 0.15);
                     }
 
-                    const isIntroSideEntry = isPlaying && currentFrame < 45 && (entryDirection === 'left' || entryDirection === 'right');
+                    const isIntroSideEntry = isPlaying && currentFrame < 30 && (entryDirection === 'left' || entryDirection === 'right');
 
                     ctx.save();
                     // Unified Clipping Strategy: Combine shape and pop-out rect into ONE path
@@ -734,9 +870,10 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
                 
-                exportBtn.innerText = "💾 Export Smooth Transparent Video";
+                exportBtn.innerText = "💾 Export";
                 exportBtn.disabled = false;
                 playBtn.disabled = false;
+                playBtn.innerText = "▶ Play";
                 randomBtn.disabled = false;
                 isExporting = false;
                 isPlaying = false;
@@ -754,29 +891,29 @@
                 currentFrame = f;
                 
                 // Physics sync
-                if (currentFrame < 45) {
-                    const progress = currentFrame / 45;
-                    dynamicScale = 0.0 + progress * 1.0; 
-                    dynamicRotation = progress * (360 * Math.PI / 180);
-                    dynamicOpacity = progress * 1.0;
-                    
+                const shapeProgress = Math.min(1.0, currentFrame / 22);
+                const photoProgress = Math.min(1.0, currentFrame / 30);
+
+                dynamicScale = shapeProgress;
+                dynamicRotation = shapeProgress * (360 * Math.PI / 180);
+                dynamicOpacity = shapeProgress;
+
+                if (currentFrame < 30) {
                     if (entryDirection === 'bottom') {
-                        motionPhotoYOffset = 1000 * (1.0 - progress);
+                        motionPhotoYOffset = 1000 * (1.0 - photoProgress);
                         motionPhotoXOffset = 0;
                     } else if (entryDirection === 'left') {
-                        motionPhotoXOffset = -1000 * (1.0 - progress);
+                        motionPhotoXOffset = -1000 * (1.0 - photoProgress);
                         motionPhotoYOffset = 0;
                     } else if (entryDirection === 'right') {
-                        motionPhotoXOffset = 1000 * (1.0 - progress);
+                        motionPhotoXOffset = 1000 * (1.0 - photoProgress);
                         motionPhotoYOffset = 0;
                     }
                 } else {
-                    dynamicScale = 1.0;
-                    dynamicRotation = 360 * Math.PI / 180;
-                    dynamicOpacity = 1.0;
                     motionPhotoXOffset = 0;
                     motionPhotoYOffset = 0;
-                    dynamicPulse = 1.0 + Math.sin((currentFrame - 45) * 0.08) * 0.025;
+                    dynamicPhotoZoom = 1.0 + (currentFrame - 30) * 0.0006;
+                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025;
                 }
 
                 timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
@@ -834,16 +971,27 @@
             if (!uploadedImg) { alert("দয়া করে প্রথমে একটি ইমেজ আপলোড করুন!"); return; }
             if (currentFrame >= totalDuration) resetAnimation();
             isPlaying = !isPlaying;
-            playBtn.innerText = isPlaying ? "⏸ Pause Motion" : "▶ Play Motion";
+            playBtn.innerText = isPlaying ? "⏸ Pause" : "▶ Play";
         });
 
         resetBtn.addEventListener('click', () => {
             isPlaying = false;
-            playBtn.innerText = "▶ Play Motion";
+            playBtn.innerText = "▶ Play";
             resetAnimation();
         });
 
         randomBtn.addEventListener('click', generateRandomStyle);
+
+        resetTransformBtn.addEventListener('click', () => {
+            shapeScaleSlider.value = 700;
+            shapeXSlider.value = 0;
+            shapeYSlider.value = 0;
+            photoScale.value = 100;
+            photoXSlider.value = 0;
+            photoYSlider.value = 0;
+            updateLabels();
+            drawFrame();
+        });
 
         randomBGBtn.addEventListener('click', () => {
             const bgStyles = ['solid', 'grid', 'dots', 'rad_c', 'diag', 'mesh'];
