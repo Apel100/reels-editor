@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Reels Motion Engine - Pro v5.0</title>
+    <style>
+        :root {
+            --bg-color: #05050b;
+            --panel-color: #111124;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Left Control Panel */
+        .controls {
+            width: 450px;
+            background-color: var(--panel-color);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            border-right: 1px solid #1e293b;
+            scrollbar-width: thin;
+        }
+
+        h2 { font-size: 1.3rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-title { font-size: 0.9rem; color: #94a3b8; font-weight: bold; margin-top: 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px;}
+
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .row-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; }
+        label span.val { color: #38bdf8; font-weight: bold; }
+        
+        input[type="file"], select, input[type="color"] {
+            width: 100%; padding: 10px; background: #0b0f19; border: 1px solid #334155; border-radius: 6px; color: white; outline: none;
+        }
+        input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
+
+        /* Action Buttons */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .btn { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; color: white;}
+        .btn-play { background-color: #10b981; }
+        .btn-reset { background-color: #475569; }
+        .btn-random { background-color: #8b5cf6; grid-column: span 2; font-size: 1.1rem; padding: 15px;}
+        .btn-export { background-color: #f59e0b; grid-column: span 2; font-size: 1.05rem; padding: 14px; }
+        .btn:hover { opacity: 0.8; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Workspace and Canvas */
+        .workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: repeating-conic-gradient(#1e1e1e 0% 25%, #121212 0% 50%) 50% / 20px 20px; }
+        .canvas-container { position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); border-radius: 8px; overflow: hidden; background-color: transparent;}
+        canvas { display: block; max-width: 100%; max-height: 85vh; }
+        .timeline-bar { width: 100%; height: 6px; background: #1e293b; position: relative; border-radius: 3px; overflow: hidden;}
+        .timeline-progress { height: 100%; width: 0%; background: #38bdf8; transition: width 0.05s linear; }
+
+        /* Toggle Switch Overlay */
+        .toggle-container { display: flex; align-items: center; gap: 10px; background: #0b0f19; padding: 10px; border-radius: 6px; border: 1px solid #334155; }
+        .toggle-container input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <div>
+            <h2>Motion Engine v5.0</h2>
+            <p style="font-size: 0.75rem; color: #64748b;">CFR Pro Smooth Premiere Export</p>
+        </div>
+
+        <div class="action-grid">
+            <button class="btn btn-random" id="randomBtn">🎲 Auto Magic Style</button>
+            <button class="btn btn-play" id="playBtn">▶ Play Motion</button>
+            <button class="btn btn-reset" id="resetBtn">🔄 Reset</button>
+            <button class="btn btn-export" id="exportBtn">💾 Export Smooth Transparent Video</button>
+        </div>
+        <div class="timeline-bar"><div class="timeline-progress" id="timeProgress"></div></div>
+
+        <div class="section-title">১. কন্টেন্ট</div>
+        <div class="control-group">
+            <label>সাবজেক্ট ছবি (Transparent PNG)</label>
+            <input type="file" id="imageLoader" accept="image/*">
+        </div>
+
+        <div class="section-title">২. গ্লোবাল সেটিংস</div>
+        <div class="row-group">
+            <div class="control-group">
+                <label>ব্যাকগ্রাউন্ড থিম</label>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <input type="color" id="bgColor" value="#0f172a">
+                    <div style="display: flex; align-items: center; gap: 4px; background: #0b0f19; padding: 5px 8px; border-radius: 6px; border: 1px solid #334155;">
+                        <input type="checkbox" id="lockBGColor" style="width: 15px; height: 15px; cursor: pointer;">
+                        <label for="lockBGColor" style="font-size: 0.65rem; color: #94a3b8; cursor: pointer; white-space: nowrap;">🔒 Lock</label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>ব্যাকগ্রাউন্ড স্টাইল</label>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <select id="bgStyle">
+                        <option value="solid">Solid Color</option>
+                        <option value="grid">Grid Pattern</option>
+                        <option value="dots">Dot Matrix</option>
+                        <option value="rad_c">Radial Glow</option>
+                        <option value="diag">Diagonal Stripes</option>
+                        <option value="mesh">Mesh Gradient</option>
+                    </select>
+                    <button class="btn" id="randomBGBtn" style="padding: 5px 10px; font-size: 0.8rem; background: #334155;">🎲</button>
+                </div>
+            </div>
+        </div>
+        <div class="row-group">
+            <div class="control-group">
+                <label>ক্লিপ মোড</label>
+                <select id="clipMode">
+                    <option value="clip">Clip (Pop-out)</option>
+                    <option value="no_clip">No Clip (Float)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">৩. শেপ কাস্টমাইজেশন</div>
+        <div class="control-group">
+            <label>মোশন স্টাইল</label>
+            <select id="motionStyle">
+                <option value="classic">Classic (Scale Up)</option>
+                <option value="fade_pulse">Fade & Pulse</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>রেন্ডার স্টাইল</label>
+            <select id="renderStyle">
+                <option value="fill">Solid / Gradient Fill</option>
+                <option value="outline">Neon Glow Outline</option>
+                <option value="both">Fill + Outline (Double Layer)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>কালার / টেক্সচার ফিল</label>
+            <select id="shapeLayout">
+                <option value="auto_solid">Auto Solid (Contrast)</option>
+                <option value="auto_gradient">Auto Neon Gradient</option>
+                <option value="auto_solid_dots">Auto Solid + Dots</option>
+                <option value="auto_solid_lines">Auto Solid + Grid</option>
+                <option value="auto_gradient_dots">Auto Neon + Dots</option>
+                <option value="auto_gradient_lines">Auto Neon + Grid</option>
+                <option value="pattern_dots">Pattern - Dots Only</option>
+                <option value="pattern_lines">Pattern - Grid Only</option>
+                <option value="custom">Custom Color</option>
+            </select>
+        </div>
+        <div class="control-group" id="customColorGroup" style="display: none;">
+            <label>কাস্টম শেপ কালার</label>
+            <input type="color" id="shapeColor" value="#3b82f6">
+        </div>
+
+        <div class="control-group">
+            <div class="toggle-container">
+                <input type="checkbox" id="comboToggle">
+                <label for="comboToggle" style="cursor:pointer; font-weight: bold; color: #38bdf8;">ডুয়াল-শেপ মোড (Circle Combo Backend)</label>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>১ম শেপ স্টাইল</label>
+            <select id="shapeType">
+                <option value="circle">Circle</option>
+                <option value="vertical_strip">Vertical Strip</option>
+                <option value="horizontal_strip">Horizontal Strip</option>
+                <option value="square">Square</option>
+                <option value="diamond">Diamond (45°)</option>
+            </select>
+        </div>
+
+        <div class="row-group">
+            <div class="control-group">
+                <label>শেপ সাইজ <span class="val" id="shapeScaleVal">700</span></label>
+                <input type="range" id="shapeScaleSlider" min="200" max="1500" value="700">
+            </div>
+            <div class="control-group">
+                <label>শেপ বর্ডার গ্লো <span class="val" id="glowVal">15</span></label>
+                <input type="range" id="glowSizeSlider" min="5" max="60" value="15">
+            </div>
+        </div>
+
+        <div class="row-group">
+            <div class="control-group">
+                <label>শেপ পজিশন X <span class="val" id="shapeXVal">0</span></label>
+                <input type="range" id="shapeXSlider" min="-500" max="500" value="0">
+            </div>
+            <div class="control-group">
+                <label>শেপ পজিশন Y <span class="val" id="shapeYVal">0</span></label>
+                <input type="range" id="shapeYSlider" min="-500" max="500" value="0">
+            </div>
+        </div>
+
+        <div class="section-title">৪. ফটো অ্যাডজাস্টমেন্ট</div>
+        <div class="control-group">
+            <label>ফটো স্কেল <span class="val" id="photoScaleVal">100%</span></label>
+            <input type="range" id="photoScale" min="30" max="300" value="100">
+        </div>
+        <div class="row-group">
+            <div class="control-group">
+                <label>ফটো পজিশন X <span class="val" id="photoXVal">0</span></label>
+                <input type="range" id="photoXSlider" min="-500" max="500" value="0">
+            </div>
+            <div class="control-group">
+                <label>ফটো পজিশন Y <span class="val" id="photoYVal">0</span></label>
+                <input type="range" id="photoYSlider" min="-200" max="800" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="canvas-container">
+            <canvas id="motionCanvas" width="1080" height="1920"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('motionCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI Controls elements
+        const imageLoader = document.getElementById('imageLoader');
+        const bgColor = document.getElementById('bgColor');
+        const bgStyle = document.getElementById('bgStyle');
+        const lockBGColor = document.getElementById('lockBGColor');
+        const randomBGBtn = document.getElementById('randomBGBtn');
+        const clipMode = document.getElementById('clipMode');
+        const motionStyle = document.getElementById('motionStyle');
+        const renderStyle = document.getElementById('renderStyle');
+        const shapeLayout = document.getElementById('shapeLayout');
+        const shapeColor = document.getElementById('shapeColor');
+        const customColorGroup = document.getElementById('customColorGroup');
+        const comboToggle = document.getElementById('comboToggle');
+        const shapeType = document.getElementById('shapeType');
+        
+        const shapeScaleSlider = document.getElementById('shapeScaleSlider');
+        const glowSizeSlider = document.getElementById('glowSizeSlider');
+        const shapeXSlider = document.getElementById('shapeXSlider');
+        const shapeYSlider = document.getElementById('shapeYSlider');
+        
+        const photoScale = document.getElementById('photoScale');
+        const photoXSlider = document.getElementById('photoXSlider');
+        const photoYSlider = document.getElementById('photoYSlider');
+        
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const timeProgress = document.getElementById('timeProgress');
+
+        // Value elements for labels
+        const shapeScaleVal = document.getElementById('shapeScaleVal');
+        const glowVal = document.getElementById('glowVal');
+        const shapeXVal = document.getElementById('shapeXVal');
+        const shapeYVal = document.getElementById('shapeYVal');
+        const photoScaleVal = document.getElementById('photoScaleVal');
+        const photoXVal = document.getElementById('photoXVal');
+        const photoYVal = document.getElementById('photoYVal');
+
+        let uploadedImg = null;
+        let currentFrame = 0;
+        let isPlaying = false;
+        let isExporting = false;
+        const totalDuration = 150; // 5 Seconds at 30fps
+
+        // State dynamics
+        let dynamicScale = 0;
+        let dynamicRotation = 0;
+        let dynamicOpacity = 0;
+        let dynamicPulse = 1;
+        let motionPhotoXOffset = 0;
+        let motionPhotoYOffset = 0;
+        let entryDirection = 'bottom';
+
+        function hexToRgba(hex, alpha) {
+            if (hex.indexOf('#') === 0) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            let r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+
+        function renderBackground(t = 0) {
+            const style = bgStyle.value;
+            const baseColor = bgColor.value;
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // Base fill for all non-transparent styles
+            ctx.fillStyle = baseColor;
+            ctx.fillRect(0, 0, W, H);
+
+            if (style === 'solid') return;
+
+            ctx.save();
+            
+            if (style === 'grid') {
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.1;
+                const gs = 60;
+                const offX = (t * 0.5) % gs;
+                const offY = (t * 0.3) % gs;
+                for (let x = offX; x < W; x += gs) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+                }
+                for (let y = offY; y < H; y += gs) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+                }
+            } else if (style === 'dots') {
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = 0.15;
+                const sp = 40;
+                const dr = 3;
+                const offX = (t * 0.4) % sp;
+                const offY = (t * 0.2) % sp;
+                for (let x = offX; x < W; x += sp) {
+                    for (let y = offY; y < H; y += sp) {
+                        ctx.beginPath(); ctx.arc(x, y, dr, 0, Math.PI * 2); ctx.fill();
+                    }
+                }
+            } else if (style === 'rad_c') {
+                const g = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, H * 0.9);
+                const colors = getContrastColor(baseColor, 'gradient');
+                g.addColorStop(0, hexToRgba(colors[0], 0.3));
+                g.addColorStop(1, 'transparent');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, W, H);
+            } else if (style === 'diag') {
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = 0.08;
+                const sw = 40;
+                const off = (t * 0.6) % (sw * 2);
+                for (let i = -H + off; i < W; i += sw * 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0); ctx.lineTo(i + sw, 0);
+                    ctx.lineTo(i + sw + H, H); ctx.lineTo(i + H, H);
+                    ctx.closePath(); ctx.fill();
+                }
+            } else if (style === 'mesh') {
+                const colors = getContrastColor(baseColor, 'gradient');
+                [[W * 0.2 + Math.sin(t * 0.01) * 150, H * 0.3 + Math.cos(t * 0.01) * 100, colors[0]],
+                 [W * 0.8 + Math.cos(t * 0.012) * 150, H * 0.7 + Math.sin(t * 0.012) * 100, colors[1]]].forEach(([px, py, col]) => {
+                    const g = ctx.createRadialGradient(px, py, 0, px, py, W * 0.7);
+                    g.addColorStop(0, hexToRgba(col, 0.25));
+                    g.addColorStop(1, 'transparent');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, W, H);
+                });
+            }
+            
+            ctx.restore();
+        }
+
+        function getContrastColor(hex, type = 'solid') {
+            if (hex.indexOf('#') === 0) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            let r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+            let brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            
+            if (b > 200 && r < 100 && g < 150) return type === 'gradient' ? ['#ffea00', '#ff5722'] : '#ffea00';
+            if (type === 'gradient') return brightness > 128 ? ['#1e293b', '#0f172a'] : ['#38bdf8', '#c084fc'];
+            return brightness > 128 ? '#0f172a' : '#ffffff';
+        }
+
+        // Patterns implementation
+        function getPatternStyle(type, baseColor) {
+            const pCtx = document.createElement('canvas').getContext('2d');
+            if (type === 'pattern_dots') {
+                pCtx.canvas.width = 15; pCtx.canvas.height = 15;
+                pCtx.fillStyle = baseColor;
+                pCtx.beginPath(); pCtx.arc(7, 7, 2, 0, Math.PI * 2); pCtx.fill();
+            } else if (type === 'pattern_lines') {
+                pCtx.canvas.width = 30; pCtx.canvas.height = 30;
+                pCtx.strokeStyle = baseColor; pCtx.lineWidth = 2;
+                pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(30, 0); pCtx.moveTo(0, 0); pCtx.lineTo(0, 30); pCtx.stroke();
+            }
+            return ctx.createPattern(pCtx.canvas, 'repeat');
+        }
+
+        function generateRandomStyle() {
+            if (!uploadedImg) { alert("দয়া করে প্রথমে একটি ইমেজ আপলোড করুন!"); return; }
+
+            const shapes = ['circle', 'vertical_strip', 'horizontal_strip', 'square', 'diamond'];
+            const layouts = [
+                'auto_solid', 'auto_gradient', 
+                'auto_solid_dots', 'auto_solid_lines', 
+                'auto_gradient_dots', 'auto_gradient_lines',
+                'pattern_dots', 'pattern_lines', 'custom'
+            ];
+            const motions = ['classic', 'fade_pulse'];
+            const renders = ['fill', 'outline', 'both'];
+            const bgStyles = ['solid', 'grid', 'dots', 'rad_c', 'diag', 'mesh'];
+
+            shapeType.value = shapes[Math.floor(Math.random() * shapes.length)];
+            shapeLayout.value = layouts[Math.floor(Math.random() * layouts.length)];
+            motionStyle.value = motions[Math.floor(Math.random() * motions.length)];
+            renderStyle.value = renders[Math.floor(Math.random() * renders.length)];
+            bgStyle.value = bgStyles[Math.floor(Math.random() * bgStyles.length)];
+            comboToggle.checked = Math.random() > 0.5;
+            
+            shapeScaleSlider.value = Math.floor(Math.random() * (900 - 400 + 1)) + 400;
+            glowSizeSlider.value = Math.floor(Math.random() * (35 - 10 + 1)) + 10;
+            shapeXSlider.value = 0;
+            shapeYSlider.value = 0;
+
+            photoScale.value = Math.floor(Math.random() * (130 - 80 + 1)) + 80;
+            photoXSlider.value = 0;
+            photoYSlider.value = 0;
+
+            if (!lockBGColor.checked) {
+                bgColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            }
+            shapeColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+
+            customColorGroup.style.display = shapeLayout.value === 'custom' ? 'flex' : 'none';
+
+            updateLabels();
+            resetAnimation();
+            isPlaying = true;
+            playBtn.innerText = "⏸ Pause Motion";
+        }
+
+        function updateLabels() {
+            shapeScaleVal.innerText = shapeScaleSlider.value;
+            glowVal.innerText = glowSizeSlider.value;
+            shapeXVal.innerText = shapeXSlider.value;
+            shapeYVal.innerText = shapeYSlider.value;
+            photoScaleVal.innerText = photoScale.value + '%';
+            photoXVal.innerText = photoXSlider.value;
+            photoYVal.innerText = photoYSlider.value;
+        }
+
+        function resetAnimation() {
+            currentFrame = 0;
+            dynamicScale = 0;
+            dynamicRotation = 0;
+            dynamicOpacity = 0;
+            dynamicPulse = 1;
+            
+            // Logic: Left/Right only works in 'no_clip' mode. 
+            // In 'clip' mode, it always starts from 'bottom' for a clean entry.
+            if (clipMode.value === 'clip') {
+                entryDirection = 'bottom';
+            } else {
+                const directions = ['bottom', 'left', 'right'];
+                entryDirection = directions[Math.floor(Math.random() * directions.length)];
+            }
+            
+            motionPhotoXOffset = 0;
+            motionPhotoYOffset = 0;
+            
+            if (entryDirection === 'bottom') motionPhotoYOffset = 1000;
+            else if (entryDirection === 'left') motionPhotoXOffset = -1000;
+            else if (entryDirection === 'right') motionPhotoXOffset = 1000;
+
+            timeProgress.style.width = '0%';
+            drawFrame();
+        }
+
+        function updatePhysics() {
+            if (isPlaying) {
+                currentFrame++;
+                
+                if (currentFrame > totalDuration) {
+                    if (isExporting) {
+                        // Export done handling will trigger at ticker boundary
+                        return;
+                    }
+                    isPlaying = false;
+                    playBtn.innerText = "▶ Play Motion";
+                    return;
+                }
+                
+                // Physics Calculations per frame (CFR standard)
+                if (currentFrame < 45) {
+                    // Intro Phase
+                    dynamicScale += (1.0 - dynamicScale) * 0.12;
+                    dynamicRotation += ((360 * Math.PI / 180) - dynamicRotation) * 0.10;
+                    dynamicOpacity += (1.0 - dynamicOpacity) * 0.12;
+                    if (currentFrame > 8) {
+                        motionPhotoXOffset += (0 - motionPhotoXOffset) * 0.14;
+                        motionPhotoYOffset += (0 - motionPhotoYOffset) * 0.14;
+                    }
+                } else {
+                    // Loop / Pulse Phase
+                    dynamicScale = 1.0;
+                    dynamicRotation = 360 * Math.PI / 180;
+                    dynamicOpacity = 1.0;
+                    motionPhotoXOffset = 0;
+                    motionPhotoYOffset = 0;
+                    
+                    // Subtle dynamic looping pulse
+                    dynamicPulse = 1.0 + Math.sin((currentFrame - 45) * 0.08) * 0.025;
+                }
+                
+                timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
+            }
+        }
+
+        function defineShapePath(context, cx, cy, size, type) {
+            context.beginPath();
+            if (type === 'circle') {
+                context.arc(cx, cy, size / 2, 0, Math.PI * 2);
+            } else if (type === 'square') {
+                context.rect(cx - size / 2, cy - size / 2, size, size);
+            } else if (type === 'diamond') {
+                context.moveTo(cx, cy - size / 2);
+                context.lineTo(cx + size / 2, cy);
+                context.lineTo(cx, cy + size / 2);
+                context.lineTo(cx - size / 2, cy);
+                context.closePath();
+            } else if (type === 'vertical_strip') {
+                context.rect(cx - size / 2, 0, size, canvas.height);
+            } else if (type === 'horizontal_strip') {
+                context.rect(0, cy - size / 2, canvas.width, size);
+            }
+        }
+
+        function applyShapeStyle(context, cx, cy, size, designColor) {
+            const layout = shapeLayout.value;
+            
+            if (layout.startsWith('auto_solid')) {
+                context.fillStyle = designColor;
+            } else if (layout.startsWith('auto_gradient')) {
+                const colors = getContrastColor(bgColor.value, 'gradient');
+                let grad = context.createLinearGradient(cx - size/2, cy - size/2, cx + size/2, cy + size/2);
+                grad.addColorStop(0, colors[0]);
+                grad.addColorStop(1, colors[1]);
+                context.fillStyle = grad;
+            } else {
+                context.fillStyle = shapeColor.value;
+            }
+        }
+
+        function drawShapePipeline(context, cx, cy, baseSize, type, designColor) {
+            const rMode = renderStyle.value;
+            const glowSize = parseInt(glowSizeSlider.value);
+            const layout = shapeLayout.value;
+
+            context.save();
+            
+            // Apply motion kinematics
+            if (motionStyle.value === 'rotation' && type !== 'circle') {
+                context.translate(cx, cy);
+                context.rotate(isPlaying ? dynamicRotation : 0);
+                context.translate(-cx, -cy);
+            }
+            
+            if (motionStyle.value === 'fade_pulse') {
+                context.globalAlpha = isPlaying ? dynamicOpacity : 1.0;
+                baseSize = baseSize * (isPlaying ? dynamicPulse : 1.0);
+            }
+
+            // Draw Core Render Strategy
+            if (rMode === 'fill' || rMode === 'both') {
+                const isPatternOnly = layout.startsWith('pattern_');
+
+                // Layer 1: Base Color (Solid or Gradient) - Skip if pattern only
+                if (!isPatternOnly) {
+                    applyShapeStyle(context, cx, cy, baseSize, designColor);
+                    defineShapePath(context, cx, cy, baseSize, type);
+                    context.fill();
+                }
+
+                // Layer 2: Pattern Overlay
+                if (layout.includes('dots') || layout.includes('lines')) {
+                    context.save();
+                    // If it's pattern only, use full opacity (or slightly subtle), if combined, use 0.3
+                    context.globalAlpha *= isPatternOnly ? 0.7 : 0.3; 
+                    const patternType = layout.includes('dots') ? 'pattern_dots' : 'pattern_lines';
+                    // Use white for combined patterns, designColor for standalone
+                    context.fillStyle = getPatternStyle(patternType, isPatternOnly ? designColor : '#ffffff');
+                    defineShapePath(context, cx, cy, baseSize, type);
+                    context.fill();
+                    context.restore();
+                }
+            }
+
+            if (rMode === 'outline' || rMode === 'both') {
+                const strokeSize = rMode === 'both' ? baseSize * 1.1 : baseSize;
+                context.shadowColor = shapeLayout.value === 'custom' ? shapeColor.value : designColor;
+                context.shadowBlur = glowSize;
+                context.strokeStyle = shapeLayout.value === 'custom' ? shapeColor.value : designColor;
+                context.lineWidth = 6;
+                defineShapePath(context, cx, cy, strokeSize, type);
+                context.stroke();
+            }
+
+            context.restore();
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Reset context state to prevent persistent styles (like dash or shadows)
+            ctx.setLineDash([]);
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+            
+            renderBackground(currentFrame);
+
+            // Calculation setups
+            const cx = (canvas.width / 2) + parseInt(shapeXSlider.value);
+            const cy = (canvas.height / 2) + parseInt(shapeYSlider.value); 
+
+            const userShapeSize = parseInt(shapeScaleSlider.value);
+            const classicScale = isPlaying ? dynamicScale : 1.0;
+            const actualScale = motionStyle.value === 'classic' ? classicScale : 1.0;
+            const baseShapeSize = userShapeSize * actualScale;
+
+            const primaryContrastColor = getContrastColor(bgColor.value, 'solid');
+
+            if (baseShapeSize > 0) {
+                // Scenario 1: Dual-Shape / Combo Mode Active
+                if (comboToggle.checked) {
+                    // Background Circle combo layer
+                    const comboSize = baseShapeSize * 0.85;
+                    drawShapePipeline(ctx, cx, cy, comboSize, 'circle', '#ff3b30');
+                    // Foreground user defined shape layout
+                    drawShapePipeline(ctx, cx, cy, baseShapeSize, shapeType.value, primaryContrastColor);
+                } else {
+                    // Scenario 2: Standard single shape layout
+                    drawShapePipeline(ctx, cx, cy, baseShapeSize, shapeType.value, primaryContrastColor);
+                }
+            }
+
+            // Render subject overlay
+            if (uploadedImg) {
+                const userScale = parseInt(photoScale.value) / 100;
+                const baseScale = Math.min((canvas.width * 0.85) / uploadedImg.width, (canvas.height * 0.75) / uploadedImg.height);
+                const iw = uploadedImg.width * baseScale * userScale;
+                const ih = uploadedImg.height * baseScale * userScale;
+                
+                const actualXOffset = isPlaying && currentFrame < 45 ? motionPhotoXOffset : 0;
+                const actualYOffset = isPlaying && currentFrame < 45 ? motionPhotoYOffset : 0;
+
+                const px = (canvas.width / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
+                const py = (canvas.height / 2) + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
+
+                const drawSubject = (targetCtx) => {
+                    targetCtx.save();
+                    // Explicitly reset shadow and dash before drawing image to avoid artifacts
+                    targetCtx.shadowBlur = 0;
+                    targetCtx.shadowColor = 'transparent';
+                    targetCtx.setLineDash([]);
+                    
+                    if (isPlaying && currentFrame < 45) {
+                        targetCtx.globalAlpha = dynamicOpacity;
+                    }
+                    targetCtx.drawImage(uploadedImg, px, py, iw, ih);
+                    targetCtx.restore();
+                };
+
+                if (clipMode.value === 'clip') {
+                    let horizonY = cy + 20; 
+                    if (shapeType.value === 'horizontal_strip') {
+                        horizonY = cy - (baseShapeSize / 2) + 20;
+                    } else if (shapeType.value === 'square' || shapeType.value === 'diamond') {
+                        horizonY = cy + (baseShapeSize * 0.15);
+                    }
+
+                    const isIntroSideEntry = isPlaying && currentFrame < 45 && (entryDirection === 'left' || entryDirection === 'right');
+
+                    ctx.save();
+                    // Unified Clipping Strategy: Combine shape and pop-out rect into ONE path
+                    // This prevents double-rendering the subject and eliminates "dark lines" during transparency
+                    defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
+                    
+                    if (!isIntroSideEntry) {
+                        // Add the pop-out area (top half) to the current clipping path
+                        ctx.rect(0, 0, canvas.width, horizonY);
+                    }
+                    
+                    ctx.clip();
+                    drawSubject(ctx);
+                    ctx.restore();
+                } else {
+                    ctx.save();
+                    drawSubject(ctx);
+                    ctx.restore();
+                }
+            } else {
+                // Placeholder guide lines
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([15, 15]);
+                ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2 + 150, 150, 0, Math.PI * 2); ctx.stroke();
+            }
+        }
+
+        // CFR Sequential frame by frame pipeline exporter
+        async function startExport() {
+            if (!uploadedImg) { alert("এক্সপোর্ট করার জন্য একটি ইমেজ আপলোড করুন!"); return; }
+            
+            isExporting = true;
+            isPlaying = true;
+            let recordedChunks = [];
+            resetAnimation();
+
+            // Setup manual frame programmatic capture stream
+            const stream = canvas.captureStream(0); 
+            const videoTrack = stream.getVideoTracks()[0];
+
+            // Auto-detect best supported format
+            let types = [
+                'video/mp4;codecs=avc1',
+                'video/webm;codecs=vp8',
+                'video/webm;codecs=vp9'
+            ];
+            let supportedType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+            let extension = supportedType.includes('mp4') ? 'mp4' : 'webm';
+
+            let options = { mimeType: supportedType, videoBitsPerSecond: 30000000 };
+            let mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) recordedChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: supportedType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `reels_export_${Date.now()}.${extension}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                exportBtn.innerText = "💾 Export Smooth Transparent Video";
+                exportBtn.disabled = false;
+                playBtn.disabled = false;
+                randomBtn.disabled = false;
+                isExporting = false;
+                isPlaying = false;
+                resetAnimation();
+            };
+
+            mediaRecorder.start();
+            exportBtn.innerText = "⏳ Recording 0%...";
+            exportBtn.disabled = true;
+            playBtn.disabled = true;
+            randomBtn.disabled = true;
+
+            // Frame-by-Frame deterministic execution loop logic for Premiere Pro CFR matching
+            for (let f = 0; f <= totalDuration; f++) {
+                currentFrame = f;
+                
+                // Physics sync
+                if (currentFrame < 45) {
+                    const progress = currentFrame / 45;
+                    dynamicScale = 0.0 + progress * 1.0; 
+                    dynamicRotation = progress * (360 * Math.PI / 180);
+                    dynamicOpacity = progress * 1.0;
+                    
+                    if (entryDirection === 'bottom') {
+                        motionPhotoYOffset = 1000 * (1.0 - progress);
+                        motionPhotoXOffset = 0;
+                    } else if (entryDirection === 'left') {
+                        motionPhotoXOffset = -1000 * (1.0 - progress);
+                        motionPhotoYOffset = 0;
+                    } else if (entryDirection === 'right') {
+                        motionPhotoXOffset = 1000 * (1.0 - progress);
+                        motionPhotoYOffset = 0;
+                    }
+                } else {
+                    dynamicScale = 1.0;
+                    dynamicRotation = 360 * Math.PI / 180;
+                    dynamicOpacity = 1.0;
+                    motionPhotoXOffset = 0;
+                    motionPhotoYOffset = 0;
+                    dynamicPulse = 1.0 + Math.sin((currentFrame - 45) * 0.08) * 0.025;
+                }
+
+                timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
+                
+                // Draw framework pipeline
+                drawFrame();
+                
+                // CRITICAL for Premiere Smoothness: Wait for paint before capturing
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                
+                // Track push execution request
+                if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                    videoTrack.requestFrame();
+                }
+                
+                // Inform process state via UI metrics
+                let progressPercent = Math.round((currentFrame / totalDuration) * 100);
+                exportBtn.innerText = `⏳ Recording ${progressPercent}%...`;
+
+                // Add a tiny delay to give the encoder room
+                await new Promise(resolve => setTimeout(resolve, 16));
+            }
+
+            mediaRecorder.stop();
+        }
+
+        // Action and sliders binding routines
+        exportBtn.addEventListener('click', startExport);
+
+        shapeLayout.addEventListener('change', () => {
+            customColorGroup.style.display = shapeLayout.value === 'custom' ? 'flex' : 'none';
+            drawFrame();
+        });
+
+        imageLoader.addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                uploadedImg = new Image();
+                uploadedImg.onload = () => resetAnimation();
+                uploadedImg.src = event.target.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        const inputTriggers = [
+            bgColor, clipMode, motionStyle, renderStyle, shapeLayout, shapeColor, comboToggle, shapeType,
+            shapeScaleSlider, glowSizeSlider, shapeXSlider, shapeYSlider, photoScale, photoXSlider, photoYSlider
+        ];
+        inputTriggers.forEach(el => el.addEventListener('input', () => {
+            updateLabels();
+            drawFrame();
+        }));
+
+        playBtn.addEventListener('click', () => {
+            if (!uploadedImg) { alert("দয়া করে প্রথমে একটি ইমেজ আপলোড করুন!"); return; }
+            if (currentFrame >= totalDuration) resetAnimation();
+            isPlaying = !isPlaying;
+            playBtn.innerText = isPlaying ? "⏸ Pause Motion" : "▶ Play Motion";
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isPlaying = false;
+            playBtn.innerText = "▶ Play Motion";
+            resetAnimation();
+        });
+
+        randomBtn.addEventListener('click', generateRandomStyle);
+
+        randomBGBtn.addEventListener('click', () => {
+            const bgStyles = ['solid', 'grid', 'dots', 'rad_c', 'diag', 'mesh'];
+            bgStyle.value = bgStyles[Math.floor(Math.random() * bgStyles.length)];
+            if (!lockBGColor.checked) {
+                bgColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            }
+            drawFrame();
+        });
+
+        // Main preview thread runner loop
+        let lastTime = 0;
+        const fpsInterval = 1000 / 30; // 30 FPS sync
+
+        function mainLoop(timestamp) {
+            if (isPlaying && !isExporting) {
+                const elapsed = timestamp - lastTime;
+                if (elapsed > fpsInterval) {
+                    lastTime = timestamp - (elapsed % fpsInterval);
+                    updatePhysics();
+                    drawFrame();
+                }
+            } else if (!isPlaying) {
+                drawFrame(); // Keep rendering for static changes
+            }
+            requestAnimationFrame(mainLoop);
+        }
+
+        // Initialize setup variables
+        updateLabels();
+        requestAnimationFrame(mainLoop);
+    </script>
+</body>
+</html>
