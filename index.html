@@ -2724,27 +2724,66 @@
             totalWidth += spaceWidth * (words.length - 1);
             ctx.restore();
 
-            // 3. Calculate base (unscaled, 100% scale) anchors to decouple word scaling positions
+            // 3. Calculate base (unscaled, 100% scale, using default font) anchors with auto-wrapping to decouple word positions
             let baseWordWidths = [];
-            let baseTotalWidth = 0;
             ctx.save();
-            words.forEach((word, idx) => {
-                const override = textWordsOverride[idx] || { highlight: 'none' };
-                if (override.highlight === 'ashton') {
-                    ctx.font = `${baseFontSize}px 'Satisfy', cursive`;
-                } else if (override.highlight === 'garamond') {
-                    ctx.font = `italic bold ${baseFontSize}px 'EB Garamond', serif`;
-                } else {
-                    ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
-                }
+            ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
+            words.forEach((word) => {
                 const w = ctx.measureText(word).width;
                 baseWordWidths.push(w);
-                baseTotalWidth += w;
             });
-            baseTotalWidth += spaceWidth * (words.length - 1);
+            
+            // Wrap words into lines based on canvas width constraints
+            const maxLineWidth = INTERNAL_W - 160; // 80px padding on left/right sides
+            let lines = []; // array of lines, each line is an array of word indices
+            let currentLine = [];
+            let currentLineWidth = 0;
+            
+            words.forEach((word, idx) => {
+                const wordW = baseWordWidths[idx];
+                const spaceW = (currentLine.length > 0) ? spaceWidth : 0;
+                
+                if (currentLineWidth + spaceW + wordW > maxLineWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = [idx];
+                    currentLineWidth = wordW;
+                } else {
+                    currentLine.push(idx);
+                    currentLineWidth += spaceW + wordW;
+                }
+            });
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+            
+            // Calculate base anchors (X and Y offsets) for each word
+            let baseWordAnchors = [];
+            const lineHeight = baseFontSize * 1.35; // standard spacing
+            const totalLinesHeight = (lines.length - 1) * lineHeight;
+            const startYOffset = -totalLinesHeight / 2; // Center the line block vertically around textGlobalY
+            
+            lines.forEach((line, lineIdx) => {
+                let lineW = 0;
+                line.forEach((wordIdx, i) => {
+                    lineW += baseWordWidths[wordIdx];
+                    if (i < line.length - 1) {
+                        lineW += spaceWidth;
+                    }
+                });
+                
+                let lineX = (INTERNAL_W - lineW) / 2;
+                const lineY = startYOffset + (lineIdx * lineHeight);
+                
+                line.forEach((wordIdx) => {
+                    baseWordAnchors[wordIdx] = {
+                        x: lineX,
+                        y: lineY
+                    };
+                    lineX += baseWordWidths[wordIdx] + spaceWidth;
+                });
+            });
             ctx.restore();
 
-            let baseCurrentX = (INTERNAL_W - baseTotalWidth) / 2;
             wordBoundingBoxes = []; // Clear current bounding boxes before calculation
 
             words.forEach((word, idx) => {
@@ -2759,9 +2798,7 @@
                 const userX = override.x;
                 const userY = override.y;
 
-                // Compute base anchor for this word (constant, does not change with other words' scales)
-                const baseAnchorX = baseCurrentX;
-                baseCurrentX += baseWordWidths[idx] + spaceWidth;
+                const baseAnchor = baseWordAnchors[idx];
 
                 // Staggered entry animation calculation (starts at textStartFrame)
                 const startFrame = textStartFrame + idx * 6;
@@ -2800,8 +2837,8 @@
                     ctx.globalAlpha = opacity;
 
                     // Compute final coordinates using decoupled base anchor
-                    const finalX = baseAnchorX + userX + animX;
-                    const finalY = textGlobalY + userY + animY;
+                    const finalX = baseAnchor.x + userX + animX;
+                    const finalY = textGlobalY + baseAnchor.y + userY + animY;
                     const wordWidth = wordWidths[idx];
 
                     // Determine background-aware coloring under this specific word's actual position
