@@ -134,6 +134,7 @@
         .workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); }
         .canvas-container { position: relative; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8); border: 4px solid #1e293b; border-radius: 12px; overflow: hidden; }
         canvas { display: block; max-width: 100%; max-height: 85vh; }
+        #safeZoneCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
         
         .timeline-container { width: 100%; padding: 0 5px; }
         .timeline-bar { width: 100%; height: 8px; background: #1e293b; position: relative; border-radius: 4px; overflow: hidden; margin-top: 10px;}
@@ -364,6 +365,36 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Match properties tools -->
+                <div style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 700; color: #38bdf8; font-size: 0.7rem;">Match Logic (Format Painter)</label>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: -2px;">
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-size:0.65rem; color: var(--text-dim);">
+                            <input type="checkbox" id="matchScaleCheck" checked style="width:12px; height:12px; accent-color: var(--accent-color);"> Scale
+                        </label>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-size:0.65rem; color: var(--text-dim);">
+                            <input type="checkbox" id="matchYCheck" checked style="width:12px; height:12px; accent-color: var(--accent-color);"> Y-Pos
+                        </label>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-size:0.65rem; color: var(--text-dim);">
+                            <input type="checkbox" id="matchHighlightCheck" style="width:12px; height:12px; accent-color: var(--accent-color);"> Highlight
+                        </label>
+                    </div>
+
+                    <button class="btn" id="matchPainterBtn" style="padding: 6px; font-size: 0.75rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: var(--accent-color); font-weight: bold; width: 100%; border-radius: 6px; transition: all 0.2s;">
+                        🎨 Format Painter (Off)
+                    </button>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="mini-btn" id="applyScaleToAllBtn" style="padding: 6px; font-size: 0.65rem; background: #2d334a; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;" title="Copy current scale to all words">
+                            ↔ Scale to All
+                        </button>
+                        <button class="mini-btn" id="applyYToAllBtn" style="padding: 6px; font-size: 0.65rem; background: #2d334a; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;" title="Align all words to current Y position">
+                            ↕ Y-Pos to All
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Global Text Settings Sub-card -->
@@ -371,8 +402,8 @@
                 <div class="card-title" style="font-size: 0.7rem; color: #fb7185;">Global Text Settings</div>
                 
                 <div class="control-group">
-                    <label>Global Y Position <span class="val" id="textGlobalYVal">1400</span></label>
-                    <input type="range" id="textGlobalYSlider" min="200" max="1800" value="1400">
+                    <label>Global Y Position <span class="val" id="textGlobalYVal">450</span></label>
+                    <input type="range" id="textGlobalYSlider" min="200" max="1800" value="450">
                 </div>
 
                 <div class="control-group" style="margin-top: 5px;">
@@ -393,6 +424,29 @@
                     <span style="font-size:0.75rem; font-weight:700;">Highlight Gradient Fill</span>
                     <label class="switch">
                         <input type="checkbox" id="textGradientToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="control-group" id="gradientStyleGroup" style="margin-top: 5px;">
+                    <label>Highlight Gradient Style</label>
+                    <select id="textGradientStyleSelect">
+                        <option value="auto" selected>✨ Auto-Match Theme</option>
+                        <option value="sunset">🌅 Sunset Blaze</option>
+                        <option value="cyber">👾 Cyber Magenta</option>
+                        <option value="teal">⚡ Electric Teal</option>
+                        <option value="toxic">🍃 Toxic Neon</option>
+                        <option value="blood">🩸 Blood Moon</option>
+                    </select>
+                </div>
+
+                <div class="card toggle-card" style="padding: 6px 10px; background: rgba(255, 215, 0, 0.06); border: 1px solid rgba(255,215,0,0.25); margin-top: 8px; border-radius: 8px;" onclick="document.getElementById('safeZoneToggle').click(); event.stopPropagation();">
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:0.75rem; font-weight:700; color:#ffd700;">📐 Safe Zone Overlay</span>
+                        <span style="font-size:0.65rem; color:#94a3b8;">YouTube Shorts guide (preview only)</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="safeZoneToggle">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -657,9 +711,12 @@
     <div class="workspace">
         <div class="canvas-container">
             <canvas id="motionCanvas" width="1080" height="1920"></canvas>
+            <canvas id="safeZoneCanvas" width="1080" height="1920"></canvas>
         </div>
     </div>
 
+    <script src="https://unpkg.com/mp4-muxer/build/mp4-muxer.js"></script>
+    <script src="https://unpkg.com/webm-muxer/build/webm-muxer.js"></script>
     <script>
         const canvas = document.getElementById('motionCanvas');
         const ctx = canvas.getContext('2d');
@@ -735,7 +792,45 @@
             {n:'Deep Magenta',   bg:'#1a0010',c1:'#800040',c2:'#aa0055',c3:'#cc006a',acc:'#FFFF00'},
             {n:'Stone Cold',     bg:'#0d0d0d',c1:'#1a1a1a',c2:'#2a2a2a',c3:'#3a3a3a',acc:'#00BFFF'},
             {n:'Crimson Night',  bg:'#0a0005',c1:'#3d001a',c2:'#660033',c3:'#8c0044',acc:'#FF6600'},
-            {n:'Emerald Dark',   bg:'#001a0d',c1:'#003d1f',c2:'#005929',c3:'#006633',acc:'#FF4500'}
+            {n:'Emerald Dark',   bg:'#001a0d',c1:'#003d1f',c2:'#005929',c3:'#006633',acc:'#FF4500'},
+            {n:'Peach Cotton',    bg:'#2d181c',c1:'#f8a5c2',c2:'#f7d794',c3:'#f5cd79',acc:'#E66767'},
+            {n:'Cosmic Nebula',   bg:'#0b001a',c1:'#3b0066',c2:'#570099',c3:'#7e00e6',acc:'#00E5FF'},
+            {n:'Mint Breeze',     bg:'#0a1f1d',c1:'#1abc9c',c2:'#2ecc71',c3:'#34495e',acc:'#16a085'},
+            {n:'Lemon Lime',      bg:'#1b2005',c1:'#d4fc79',c2:'#96e6a1',c3:'#84f5aa',acc:'#a6ff00'},
+            {n:'Cherry Blossom',  bg:'#1d0e14',c1:'#ff758c',c2:'#ff7eb3',c3:'#fa98ab',acc:'#ff4b60'},
+            {n:'Sunset Lilac',    bg:'#1d0f2a',c1:'#fbc2eb',c2:'#a6c1ee',c3:'#8b9dec',acc:'#d498ff'},
+            {n:'Ocean Spray',     bg:'#031926',c1:'#4682b4',c2:'#b0c4de',c3:'#add8e6',acc:'#00ffff'},
+            {n:'Desert Sands',    bg:'#1e150f',c1:'#edc9af',c2:'#d2b48c',c3:'#c19a6b',acc:'#ff8c00'},
+            {n:'Forest Moss',     bg:'#0c170d',c1:'#556b2f',c2:'#6b8e23',c3:'#8fbc8f',acc:'#adff2f'},
+            {n:'Royal Velvet',    bg:'#15051a',c1:'#8a2be2',c2:'#9400d3',c3:'#ba55d3',acc:'#da70d6'},
+            {n:'Amber Glow',      bg:'#1a0f02',c1:'#ffbf00',c2:'#ff7e00',c3:'#ff4500',acc:'#ffd700'},
+            {n:'Coral Reefs',     bg:'#1e0e0a',c1:'#ff6f61',c2:'#ff8e53',c3:'#ffa07a',acc:'#ff4f33'},
+            {n:'Orchid Paradise', bg:'#1c071a',c1:'#da70d6',c2:'#ff00ff',c3:'#ee82ee',acc:'#ff80df'},
+            {n:'Silver Mist',     bg:'#1c2326',c1:'#708090',c2:'#778899',c3:'#b0c4de',acc:'#e6f2ff'},
+            {n:'Autumn Woods',    bg:'#180c05',c1:'#8b4513',c2:'#cd853f',c3:'#d2691e',acc:'#ff7f50'},
+            {n:'Steel Blue',      bg:'#0e141d',c1:'#4682b4',c2:'#5f9ea0',c3:'#6495ed',acc:'#00bfff'},
+            {n:'Grape Soda',      bg:'#12041c',c1:'#4b0082',c2:'#6f42c1',c3:'#8a2be2',acc:'#ff00ff'},
+            {n:'Matcha Green',    bg:'#10170a',c1:'#808000',c2:'#9acd32',c3:'#556b2f',acc:'#adff2f'},
+            {n:'Ice Castle',      bg:'#081a24',c1:'#afeeee',c2:'#e0ffff',c3:'#add8e6',acc:'#ffffff'},
+            {n:'Plum Wine',       bg:'#180512',c1:'#4a0e2e',c2:'#800080',c3:'#8b008b',acc:'#ff00aa'},
+            {n:'Terracotta',      bg:'#1e0d07',c1:'#e2725b',c2:'#c04000',c3:'#cd5c5c',acc:'#ff8c00'},
+            {n:'Deep Cyan',       bg:'#02181d',c1:'#008b8b',c2:'#20b2aa',c3:'#008080',acc:'#00ffff'},
+            {n:'Sweet Lavender',  bg:'#100a1d',c1:'#e6e6fa',c2:'#d8bfd8',c3:'#dda0dd',acc:'#dda0dd'},
+            {n:'Rich Mahogany',   bg:'#180404',c1:'#c0392b',c2:'#962d2d',c3:'#7d1f1f',acc:'#ff5252'},
+            {n:'Citrus Blast',    bg:'#1e1505',c1:'#ffa500',c2:'#ff8c00',c3:'#ffd700',acc:'#ffea00'},
+            {n:'Teal Lagoon',     bg:'#031a1a',c1:'#008080',c2:'#20b2aa',c3:'#00ced1',acc:'#40e0d0'},
+            {n:'Vintage Gold',    bg:'#1a1608',c1:'#cfb53b',c2:'#d4af37',c3:'#b5a642',acc:'#ffd700'},
+            {n:'Charcoal Orange', bg:'#141416',c1:'#e65c00',c2:'#f9d423',c3:'#ffb347',acc:'#ff6f00'},
+            {n:'Neon Lime',       bg:'#081a02',c1:'#39ff14',c2:'#7fff00',c3:'#adff2f',acc:'#a6ff00'},
+            {n:'Slate Teal',      bg:'#0e1c24',c1:'#5f9ea0',c2:'#2f4f4f',c3:'#008080',acc:'#00ffd8'},
+            {n:'Raspberry Jam',   bg:'#1c030d',c1:'#e30b5d',c2:'#c21e56',c3:'#b03060',acc:'#ff6bb3'},
+            {n:'Olive Harvest',   bg:'#14190c',c1:'#6b8e23',c2:'#556b2f',c3:'#808000',acc:'#adff2f'},
+            {n:'Deep Amethyst',   bg:'#0f051c',c1:'#9966cc',c2:'#8a2be2',c3:'#4b0082',acc:'#ff00ff'},
+            {n:'Burnt Sienna',    bg:'#1b0b05',c1:'#e97451',c2:'#c04000',c3:'#cd5c5c',acc:'#ff5c33'},
+            {n:'Cyber Mint',      bg:'#041c18',c1:'#00ffcc',c2:'#00cc99',c3:'#00ffff',acc:'#00ffd2'},
+            {n:'Electric Indigo', bg:'#0b0424',c1:'#4b0082',c2:'#6a0dad',c3:'#8a2be2',acc:'#a020f0'},
+            {n:'Ruby Glow',       bg:'#1c0407',c1:'#e0115f',c2:'#9b111e',c3:'#800020',acc:'#ff4d6d'},
+            {n:'Desert Dusk',     bg:'#19101c',c1:'#c71585',c2:'#7b1fa2',c3:'#8e24aa',acc:'#e040fb'}
         ];
 
         // Film grain noise pattern generated once for maximum performance
@@ -901,12 +996,87 @@
 
         // Text Engine State
         let textWordsOverride = {};
-        let textGlobalY = 1400;
+        let textGlobalY = 450;
         let textStartSec = 1;
         let textStartFrameOffset = 5;
         let textStartFrame = 35;
         let textGradientEnabled = true;
+        let textGradientStyle = 'auto';
         let textRandomDirections = [];
+
+        // Interactive Word Drag/Scale State
+        let wordBoundingBoxes = [];
+        let hoveredWordIdx = null;
+        let draggedWordIdx = null;
+        let isDraggingWord = false;
+        let dragStartOffsetX = 0;
+        let dragStartOffsetY = 0;
+        let isMatchMode = false;
+        let matchSourceWordIdx = null;
+
+        // Safe Zone Overlay � hardcoded canvas drawing (instant, no image needed)
+        const safeZoneCanvas = document.getElementById('safeZoneCanvas');
+        const safeZoneCtx = safeZoneCanvas.getContext('2d');
+        (function drawSafeZone() {
+            const W = 1080, H = 1920;
+            const sc = safeZoneCtx;
+            sc.clearRect(0, 0, W, H);
+
+            // YouTube Shorts safe zones (1080x1920)
+            // Right-side UI zone: like/comment/share/follow buttons
+            const rightZoneW = 200, rightZoneTop = 880, rightZoneH = 700;
+            // Bottom zone: title/description/hashtags
+            const bottomZoneH = 380;
+            // Top zone: app bar
+            const topZoneH = 160;
+
+            // Dim the unsafe areas
+            sc.fillStyle = 'rgba(0,0,0,0.42)';
+            sc.fillRect(0, 0, W, topZoneH);
+            sc.fillRect(0, H - bottomZoneH, W, bottomZoneH);
+            sc.fillRect(W - rightZoneW, rightZoneTop, rightZoneW, rightZoneH);
+
+            // Safe zone border (dashed)
+            const sx = 72, sy = topZoneH + 20, sw = W - 72 - rightZoneW - 20, sh = H - topZoneH - bottomZoneH - 40;
+            sc.save();
+            sc.strokeStyle = 'rgba(255,255,0,0.85)';
+            sc.lineWidth = 5;
+            sc.setLineDash([28, 14]);
+            sc.strokeRect(sx, sy, sw, sh);
+            sc.restore();
+
+            // Labels
+            sc.font = 'bold 36px Arial';
+            sc.fillStyle = 'rgba(255,255,255,0.9)';
+            sc.textAlign = 'center';
+
+            // Top label
+            sc.fillRect(W/2 - 200, topZoneH/2 - 24, 400, 48);
+            sc.fillStyle = 'rgba(0,0,0,0.85)';
+            sc.fillText('⚠ Top Bar Zone', W/2, topZoneH/2 + 12);
+
+            // Bottom label
+            sc.fillStyle = 'rgba(255,255,255,0.9)';
+            sc.fillRect(W/2 - 270, H - bottomZoneH/2 - 24, 540, 48);
+            sc.fillStyle = 'rgba(0,0,0,0.85)';
+            sc.fillText('⚠ Title / Caption Zone', W/2, H - bottomZoneH/2 + 12);
+
+            // Right label (rotated)
+            sc.save();
+            sc.translate(W - rightZoneW/2, rightZoneTop + rightZoneH/2);
+            sc.rotate(-Math.PI / 2);
+            sc.fillStyle = 'rgba(255,255,255,0.9)';
+            sc.fillRect(-160, -24, 320, 48);
+            sc.fillStyle = 'rgba(0,0,0,0.85)';
+            sc.fillText('⚠ Buttons Zone', 0, 12);
+            sc.restore();
+
+            // Safe zone label
+            sc.fillStyle = 'rgba(255,255,0,0.9)';
+            sc.font = 'bold 42px Arial';
+            sc.textAlign = 'center';
+            sc.fillText('✅ SAFE ZONE', W/2, sy + 60);
+        })();
 
         function hexToHsl(hex) {
             if (hex.indexOf('#') === 0) hex = hex.slice(1);
@@ -999,8 +1169,8 @@
 
             function getMidwayColor(hex) {
                 const [h, s, l] = hexToHsl(hex);
-                const midL = l + (100 - l) * 0.55; 
-                const midS = s * 0.85;             
+                const midL = l + (100 - l) * 0.45; // Softer, more gradual transition to white
+                const midS = s * 0.90;             
                 return hslToHex(h, midS, midL);
             }
             const midC2 = getMidwayColor(gradC2);
@@ -1008,10 +1178,9 @@
             // 2. Draw diagonal linear gradient: gradC1 (top-left) -> gradC2 -> midC2 -> white (bottom-right)
             const gradient = context.createLinearGradient(0, 0, W, H);
             gradient.addColorStop(0, gradC1);
-            gradient.addColorStop(0.20, gradC2);
-            gradient.addColorStop(0.45, midC2);
-            gradient.addColorStop(0.70, '#ffffff');
-            gradient.addColorStop(1, '#ffffff');
+            gradient.addColorStop(0.40, gradC2); // Widened from 0.20 to prevent abrupt line
+            gradient.addColorStop(0.75, midC2);  // Widened from 0.45 to prevent abrupt line
+            gradient.addColorStop(1, '#ffffff'); // Smooth end stop at the bottom-right corner
             context.fillStyle = gradient;
             context.fillRect(0, 0, W, H);
 
@@ -1090,8 +1259,6 @@
         }
 
         function generateRandomStyle() {
-            if (!uploadedImg) { alert("দয়া করে প্রথমে একটি ইমেজ আপলোড করুন!"); return; }
-
             // Randomize color variation seed for different harmonious results
             colorVariationSeed = Math.random();
 
@@ -1413,7 +1580,7 @@
                 drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
 
                 const cx = INTERNAL_W / 2;
-                const cy = INTERNAL_H / 2 - 80;
+                const cy = INTERNAL_H / 2 + 40;
 
                 // Get layout slider values
                 const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
@@ -1556,7 +1723,7 @@
                 drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
 
                 const cx = INTERNAL_W / 2;
-                const cy = INTERNAL_H / 2;
+                const cy = INTERNAL_H / 2 + 120;
 
                 // Get layout slider values
                 const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
@@ -1683,7 +1850,7 @@
 
             // Calculation setups using fixed resolution
             const cx = (INTERNAL_W / 2) + parseInt(shapeXSlider.value);
-            const cy = (INTERNAL_H / 2) + parseInt(shapeYSlider.value); 
+            const cy = (INTERNAL_H / 2) + 120 + parseInt(shapeYSlider.value); 
 
             const userShapeSize = parseInt(shapeScaleSlider.value);
             const classicScale = isPlaying ? dynamicScale : 1.0;
@@ -1717,7 +1884,7 @@
                 const actualYOffset = currentFrame < 30 ? motionPhotoYOffset : 0;
 
                 const px = (INTERNAL_W / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
-                const py = (INTERNAL_H / 2) + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
+                const py = (INTERNAL_H / 2) + 120 + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
 
                 const drawSubject = (targetCtx) => {
                     targetCtx.save();
@@ -1814,65 +1981,181 @@
 
         async function startExport() {
             if (!uploadedImg) { alert("দয়া করে একটি ইমেজ আপলোড করুন!"); return; }
-            
+            if (isExporting) return;
+
+            if (typeof VideoEncoder === 'undefined') {
+                alert("আপনার ব্রাউজারে WebCodecs সাপোর্ট নেই। অনুগ্রহ করে গুগল ক্রোম বা আধুনিক কোনো ব্রাউজার ব্যবহার করুন।");
+                return;
+            }
+
             resetAnimation();
             isPlaying = true;
             isExporting = true;
             currentFrame = 0;
-            
+
             exportBtn.disabled = true;
-            exportBtn.innerText = "⏺ Recording...";
+            exportBtn.innerText = "⏺ Preparing export...";
 
             // Force internal resolution and draw first frame
             canvas.width = INTERNAL_W;
             canvas.height = INTERNAL_H;
             drawFrame();
 
-            const stream = canvas.captureStream(30);
+            // Determine if MP4 is supported on this browser/machine
+            let useMp4 = true;
+            let videoCodec = 'avc1.4d0034'; // H.264 Main Profile, Level 5.2
             
-            let mimeType = 'video/mp4; codecs=avc1';
-            if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = 'video/webm; codecs=h264';
-            }
-            if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = 'video/webm';
-            }
-
-            const recorder = new MediaRecorder(stream, {
-                mimeType: mimeType,
-                videoBitsPerSecond: 12000000 // 12Mbps
-            });
-
-            const chunks = [];
-            recorder.ondataavailable = e => chunks.push(e.data);
-            recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: mimeType });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `reels-export-${Date.now()}.mp4`;
-                a.click();
+            try {
+                let support = await VideoEncoder.isConfigSupported({
+                    codec: videoCodec,
+                    width: INTERNAL_W,
+                    height: INTERNAL_H,
+                    bitrate: 12000000,
+                    framerate: 30
+                });
                 
+                if (!support.supported) {
+                    videoCodec = 'avc1.42e01f'; // H.264 Baseline Profile
+                    support = await VideoEncoder.isConfigSupported({
+                        codec: videoCodec,
+                        width: INTERNAL_W,
+                        height: INTERNAL_H,
+                        bitrate: 12000000,
+                        framerate: 30
+                    });
+                }
+                
+                if (!support.supported) {
+                    useMp4 = false;
+                }
+            } catch (err) {
+                console.warn("Failed checking MP4 configuration:", err);
+                useMp4 = false;
+            }
+
+            // Fallback to WebM if MP4 is not supported or libraries failed
+            if (!useMp4 || !window.Mp4Muxer) {
+                useMp4 = false;
+                videoCodec = 'vp09.00.10.08'; // VP9 Profile 0, Level 1, 8-bit
+                try {
+                    const support = await VideoEncoder.isConfigSupported({
+                        codec: videoCodec,
+                        width: INTERNAL_W,
+                        height: INTERNAL_H,
+                        bitrate: 12000000,
+                        framerate: 30
+                    });
+                    if (!support.supported) {
+                        videoCodec = 'vp8';
+                    }
+                } catch (err) {
+                    videoCodec = 'vp8';
+                }
+            }
+
+            // Initialize Muxer and Encoder based on format
+            let muxer, videoEncoder;
+            
+            try {
+                if (useMp4) {
+                    muxer = new window.Mp4Muxer.Muxer({
+                        target: new window.Mp4Muxer.ArrayBufferTarget(),
+                        video: {
+                            codec: 'avc',
+                            width: INTERNAL_W,
+                            height: INTERNAL_H
+                        },
+                        fastStart: 'in-memory'
+                    });
+                } else {
+                    muxer = new window.WebMMuxer.Muxer({
+                        target: new window.WebMMuxer.ArrayBufferTarget(),
+                        video: {
+                            codec: videoCodec === 'vp8' ? 'V_VP8' : 'V_VP9',
+                            width: INTERNAL_W,
+                            height: INTERNAL_H
+                        }
+                    });
+                }
+
+                videoEncoder = new VideoEncoder({
+                    output: (chunk, meta) => {
+                        muxer.addVideoChunk(chunk, meta);
+                    },
+                    error: (e) => {
+                        console.error("VideoEncoder error:", e);
+                        alert("ভিডিও এনকোড করার সময় একটি ত্রুটি ঘটেছে: " + e.message);
+                        resetExportUI();
+                    }
+                });
+
+                videoEncoder.configure({
+                    codec: videoCodec,
+                    width: INTERNAL_W,
+                    height: INTERNAL_H,
+                    bitrate: 12000000,
+                    framerate: 30
+                });
+            } catch (err) {
+                alert("এনকোডার চালু করতে সমস্যা হয়েছে: " + err.message);
+                resetExportUI();
+                return;
+            }
+
+            function resetExportUI() {
                 isExporting = false;
                 exportBtn.disabled = false;
                 exportBtn.innerText = "💾 Export";
                 resetBtn.click();
-            };
+            }
 
-            recorder.start();
+            // Offline rendering and encoding loop
+            try {
+                for (let f = 0; f < totalDuration; f++) {
+                    currentFrame = f;
+                    if (f > 0) {
+                        updatePhysics();
+                    }
+                    drawFrame();
 
-            // Frame-by-frame recording loop
-            const renderInterval = setInterval(() => {
-                updatePhysics();
-                drawFrame();
-                
-                if (currentFrame >= totalDuration) {
-                    clearInterval(renderInterval);
-                    // Stop stream tracks immediately so no extra frames are captured
-                    stream.getVideoTracks().forEach(track => track.stop());
-                    recorder.stop();
+                    // Create VideoFrame from Canvas
+                    const timestampUs = f * (1000000 / 30); // 30 FPS constant intervals
+                    const frame = new VideoFrame(canvas, { timestamp: timestampUs });
+                    
+                    const isKeyframe = (f % 30 === 0);
+                    videoEncoder.encode(frame, { keyFrame: isKeyframe });
+                    frame.close();
+
+                    // Yield to browser UI thread periodically and update progress
+                    if (f % 5 === 0) {
+                        const progress = Math.round((f / totalDuration) * 100);
+                        exportBtn.innerText = `⏺ Exporting (${progress}%)...`;
+                        await new Promise(resolve => requestAnimationFrame(resolve));
+                    }
                 }
-            }, 33.33);
+
+                // Finalize encoding
+                exportBtn.innerText = `⏺ Finalizing video...`;
+                await videoEncoder.flush();
+                videoEncoder.close();
+                muxer.finalize();
+
+                // Download file
+                const buffer = muxer.target.buffer;
+                const fileType = useMp4 ? 'video/mp4' : 'video/webm';
+                const fileExt = useMp4 ? 'mp4' : 'webm';
+                const blob = new Blob([buffer], { type: fileType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reels-export-${Date.now()}.${fileExt}`;
+                a.click();
+            } catch (err) {
+                console.error("Export process failed:", err);
+                alert("রপ্তানি প্রক্রিয়া ব্যর্থ হয়েছে: " + err.message);
+            } finally {
+                resetExportUI();
+            }
         }
 
         // ── Mode switcher logic ──
@@ -2287,9 +2570,68 @@
             }
         }
 
+        function getAutoGradientStyle() {
+            // Find current background color in hex
+            let hex = '#05050b'; // default dark
+            if (appMode === 'shape') {
+                const preset = document.getElementById('bgPreset').value;
+                if (preset === 'custom') {
+                    hex = bgColor.value;
+                } else {
+                    const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
+                    if (p) hex = p.bg;
+                }
+            } else {
+                const preset = document.getElementById('photoAnimBgPreset').value;
+                if (preset === 'custom') {
+                    hex = document.getElementById('photoAnimBgColor').value;
+                } else {
+                    const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
+                    if (p) hex = p.bg;
+                }
+            }
+            
+            // Get Hue of the background
+            const [h, s, l] = hexToHsl(hex);
+            
+            // Complementary Hue Contrast Selection (chooses opposing hue for legibility)
+            if (h >= 75 && h < 160) {
+                return 'cyber'; // Green background -> Cyber Magenta (Purple/Pink) contrast
+            } else if (h >= 160 && h < 260) {
+                return 'sunset'; // Blue/Cyan background -> Sunset Blaze (Gold/Orange) contrast
+            } else if (h >= 260 && h < 320) {
+                return 'toxic'; // Purple background -> Toxic Neon (Green/Yellow) contrast
+            } else {
+                return 'teal'; // Red/Orange/Yellow background -> Electric Teal (Cyan/Blue) contrast
+            }
+        }
+
         function drawTextOverlay() {
             const words = getWordsList();
             if (words.length === 0) return;
+
+            const gradientPalettes = {
+                sunset: {
+                    dark: ['#ffd200', '#ff6a00'],
+                    light: ['#e65100', '#bf360c']
+                },
+                cyber: {
+                    dark: ['#7f00ff', '#e100ff'],
+                    light: ['#4a148c', '#880e4f']
+                },
+                teal: {
+                    dark: ['#00f2fe', '#4facfe'],
+                    light: ['#006064', '#0d47a1']
+                },
+                toxic: {
+                    dark: ['#00ff87', '#ffd200'],
+                    light: ['#1b5e20', '#e65100']
+                },
+                blood: {
+                    dark: ['#ff3366', '#ff6a00'],
+                    light: ['#b71c1c', '#e65100']
+                }
+            };
 
             // 1. Determine background-aware coloring
             const luminance = getBackgroundLuminance(textGlobalY);
@@ -2339,8 +2681,28 @@
             totalWidth += spaceWidth * (words.length - 1);
             ctx.restore();
 
-            // 3. Draw each word
-            let currentX = (INTERNAL_W - totalWidth) / 2;
+            // 3. Calculate base (unscaled, 100% scale) anchors to decouple word scaling positions
+            let baseWordWidths = [];
+            let baseTotalWidth = 0;
+            ctx.save();
+            words.forEach((word, idx) => {
+                const override = textWordsOverride[idx] || { highlight: 'none' };
+                if (override.highlight === 'ashton') {
+                    ctx.font = `${baseFontSize}px 'Satisfy', cursive`;
+                } else if (override.highlight === 'garamond') {
+                    ctx.font = `italic bold ${baseFontSize}px 'EB Garamond', serif`;
+                } else {
+                    ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
+                }
+                const w = ctx.measureText(word).width;
+                baseWordWidths.push(w);
+                baseTotalWidth += w;
+            });
+            baseTotalWidth += spaceWidth * (words.length - 1);
+            ctx.restore();
+
+            let baseCurrentX = (INTERNAL_W - baseTotalWidth) / 2;
+            wordBoundingBoxes = []; // Clear current bounding boxes before calculation
 
             words.forEach((word, idx) => {
                 const override = textWordsOverride[idx] || {
@@ -2353,6 +2715,10 @@
                 const scaleMult = override.scale / 100;
                 const userX = override.x;
                 const userY = override.y;
+
+                // Compute base anchor for this word (constant, does not change with other words' scales)
+                const baseAnchorX = baseCurrentX;
+                baseCurrentX += baseWordWidths[idx] + spaceWidth;
 
                 // Staggered entry animation calculation (starts at textStartFrame)
                 const startFrame = textStartFrame + idx * 6;
@@ -2390,10 +2756,21 @@
                     ctx.save();
                     ctx.globalAlpha = opacity;
 
-                    // Compute final coordinates
-                    const finalX = currentX + userX + animX;
+                    // Compute final coordinates using decoupled base anchor
+                    const finalX = baseAnchorX + userX + animX;
                     const finalY = textGlobalY + userY + animY;
                     const wordWidth = wordWidths[idx];
+
+                    // Store bounding box in internal canvas resolution
+                    const textHeight = baseFontSize * scaleMult;
+                    wordBoundingBoxes.push({
+                        idx: idx,
+                        word: word,
+                        x1: finalX,
+                        y1: finalY - textHeight,
+                        x2: finalX + wordWidth,
+                        y2: finalY + (textHeight * 0.15)
+                    });
 
                     // Set font style
                     if (override.highlight === 'ashton') {
@@ -2413,22 +2790,30 @@
                     // Fill style selection
                     let fillStyle = defaultColor;
                     if (override.highlight !== 'none') {
+                        let activeStyle = textGradientStyle;
+                        if (activeStyle === 'auto') {
+                            activeStyle = getAutoGradientStyle();
+                        }
+
                         if (textGradientEnabled) {
                             // Create gradient fill
                             let grad = ctx.createLinearGradient(finalX, finalY - (baseFontSize * scaleMult * 0.7), finalX + wordWidth, finalY);
-                            if (isDarkBg) {
-                                // Bright neon gradient (e.g. yellow-orange)
-                                grad.addColorStop(0, '#ffd200');
-                                grad.addColorStop(1, '#ff6a00');
-                            } else {
-                                // Dark vibrant gradient (e.g. violet-pink)
-                                grad.addColorStop(0, '#7f00ff');
-                                grad.addColorStop(1, '#e100ff');
-                            }
+                            const palette = gradientPalettes[activeStyle] || gradientPalettes.sunset;
+                            const colors = isDarkBg ? palette.dark : palette.light;
+                            grad.addColorStop(0, colors[0]);
+                            grad.addColorStop(1, colors[1]);
                             fillStyle = grad;
                         } else {
-                            // Solid accent fill
-                            fillStyle = isDarkBg ? '#ffd200' : '#d5006d';
+                            // Solid accent fill matching the chosen color scheme
+                            const solidAccents = {
+                                sunset: { dark: '#ffd200', light: '#e65100' },
+                                cyber: { dark: '#e100ff', light: '#880e4f' },
+                                teal: { dark: '#00ffff', light: '#006064' },
+                                toxic: { dark: '#39ff14', light: '#1b5e20' },
+                                blood: { dark: '#ff3366', light: '#b71c1c' }
+                            };
+                            const accentColors = solidAccents[activeStyle] || solidAccents.sunset;
+                            fillStyle = isDarkBg ? accentColors.dark : accentColors.light;
                         }
                     }
 
@@ -2436,10 +2821,128 @@
                     ctx.fillText(word, finalX, finalY);
                     ctx.restore();
                 }
-
-                // Advance X position for the next word
-                currentX += wordWidths[idx] + spaceWidth;
             });
+
+            // Draw bounding boxes, handles and tooltip guides on preview (skip when exporting)
+            if (!isExporting) {
+                const activeWordIdx = parseInt(textWordSelect.value);
+                
+                // Draw Match Mode Banner if active
+                if (isMatchMode) {
+                    ctx.save();
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.95)'; // Amber/orange background
+                    ctx.beginPath();
+                    ctx.roundRect(50, 40, INTERNAL_W - 100, 70, 8);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = "bold 24px 'Inter', sans-serif";
+                    ctx.textAlign = 'center';
+                    ctx.fillText("🎨 MATCH MODE ACTIVE: Click words to copy format. Click Painter again to Exit.", INTERNAL_W/2, 82);
+                    ctx.restore();
+                }
+
+                wordBoundingBoxes.forEach(box => {
+                    const isSelected = box.idx === activeWordIdx;
+                    const isHovered = box.idx === hoveredWordIdx;
+                    const isSource = isMatchMode && box.idx === matchSourceWordIdx;
+                    
+                    if (isSelected || isHovered || isSource) {
+                        ctx.save();
+                        
+                        // Set style properties based on selection vs hover vs source
+                        if (isSource) {
+                            ctx.strokeStyle = '#f59e0b'; // Amber/orange for Format Painter Source
+                            ctx.lineWidth = 3;
+                            ctx.setLineDash([4, 4]);
+                        } else if (isSelected) {
+                            ctx.strokeStyle = isMatchMode ? '#f59e0b' : '#38bdf8'; // Accent color
+                            ctx.lineWidth = 3;
+                            ctx.setLineDash([]);
+                        } else {
+                            ctx.strokeStyle = isMatchMode ? 'rgba(245, 158, 11, 0.6)' : 'rgba(56, 189, 248, 0.6)'; // Hover color
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([8, 6]);
+                        }
+                        
+                        // Rectangle bounding box with small padding
+                        const pad = 6;
+                        const bx = box.x1 - pad;
+                        const by = box.y1 - pad;
+                        const bw = (box.x2 - box.x1) + pad * 2;
+                        const bh = (box.y2 - box.y1) + pad * 2;
+                        
+                        ctx.strokeRect(bx, by, bw, bh);
+                        
+                        if (isSource) {
+                            // Draw corner handles (Amber)
+                            ctx.fillStyle = '#f59e0b';
+                            const hs = 10; // Handle size
+                            ctx.fillRect(bx - hs/2, by - hs/2, hs, hs);
+                            ctx.fillRect(bx + bw - hs/2, by - hs/2, hs, hs);
+                            ctx.fillRect(bx - hs/2, by + bh - hs/2, hs, hs);
+                            ctx.fillRect(bx + bw - hs/2, by + bh - hs/2, hs, hs);
+                            
+                            // Draw elegant helper tooltip bubble
+                            ctx.shadowBlur = 15;
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                            ctx.fillStyle = 'rgba(15, 17, 26, 0.9)';
+                            ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
+                            ctx.lineWidth = 1.5;
+                            
+                            const tooltipText = "🎨 Format Source Word";
+                            ctx.font = "bold 22px 'Inter', sans-serif";
+                            const tw = ctx.measureText(tooltipText).width;
+                            const tx = bx + bw/2 - tw/2;
+                            const ty = by - 30; // above the word
+                            
+                            ctx.beginPath();
+                            ctx.roundRect(tx - 15, ty - 24, tw + 30, 36, 6);
+                            ctx.fill();
+                            ctx.stroke();
+                            
+                            ctx.fillStyle = '#ffffff';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(tooltipText, tx, ty - 8);
+                        } else if (isSelected && !isMatchMode) {
+                            // Draw corner handles
+                            ctx.fillStyle = '#38bdf8';
+                            const hs = 10; // Handle size
+                            ctx.fillRect(bx - hs/2, by - hs/2, hs, hs);
+                            ctx.fillRect(bx + bw - hs/2, by - hs/2, hs, hs);
+                            ctx.fillRect(bx - hs/2, by + bh - hs/2, hs, hs);
+                            ctx.fillRect(bx + bw - hs/2, by + bh - hs/2, hs, hs);
+                            
+                            // Draw elegant helper tooltip bubble
+                            ctx.shadowBlur = 15;
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                            ctx.fillStyle = 'rgba(15, 17, 26, 0.9)';
+                            ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+                            ctx.lineWidth = 1.5;
+                            
+                            const tooltipText = "↔ Drag to Move | ↕ Scroll to Scale";
+                            ctx.font = "bold 22px 'Inter', sans-serif";
+                            const tw = ctx.measureText(tooltipText).width;
+                            const tx = bx + bw/2 - tw/2;
+                            const ty = by + bh + 36;
+                            
+                            ctx.beginPath();
+                            ctx.roundRect(tx - 15, ty - 24, tw + 30, 36, 6);
+                            ctx.fill();
+                            ctx.stroke();
+                            
+                            // Text inside tooltip
+                            ctx.fillStyle = '#ffffff';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(tooltipText, tx, ty + 2);
+                        }
+                        
+                        ctx.restore();
+                    }
+                });
+            }
         }
 
         function getWordsList() {
@@ -2448,22 +2951,27 @@
 
         function populateWordSelect() {
             const words = getWordsList();
-            const currentSelectedIdx = parseInt(textWordSelect.value) || 0;
+            
+            // Validate and bounds-check the selected index
+            let targetIdx = parseInt(textWordSelect.value);
+            if (isNaN(targetIdx) || targetIdx < 0 || targetIdx >= words.length) {
+                targetIdx = 0;
+            }
+            
             textWordSelect.innerHTML = '';
             
             words.forEach((word, idx) => {
                 const opt = document.createElement('option');
                 opt.value = idx;
                 opt.textContent = `Word ${idx + 1}: "${word}"`;
+                if (idx === targetIdx) {
+                    opt.selected = true;
+                }
                 textWordSelect.appendChild(opt);
             });
 
             if (words.length > 0) {
-                if (currentSelectedIdx < words.length) {
-                    textWordSelect.value = currentSelectedIdx;
-                } else {
-                    textWordSelect.value = 0;
-                }
+                textWordSelect.value = String(targetIdx);
             }
             
             updateTextRandomDirections(words.length);
@@ -2583,16 +3091,24 @@
             drawFrame();
         });
 
+        const textGradientStyleSelect = document.getElementById('textGradientStyleSelect');
+
+        textGradientStyleSelect.addEventListener('change', () => {
+            textGradientStyle = textGradientStyleSelect.value;
+            drawFrame();
+        });
+
         textGradientToggle.addEventListener('change', () => {
             textGradientEnabled = textGradientToggle.checked;
+            document.getElementById('gradientStyleGroup').style.display = textGradientEnabled ? 'block' : 'none';
             drawFrame();
         });
 
         resetTextBtn.addEventListener('click', () => {
             textWordsOverride = {};
-            textGlobalYSlider.value = 1400;
-            textGlobalY = 1400;
-            textGlobalYVal.textContent = '1400';
+            textGlobalYSlider.value = 450;
+            textGlobalY = 450;
+            textGlobalYVal.textContent = '450';
             textStartSecSlider.value = 1;
             textStartSec = 1;
             textStartFrameSlider.value = 5;
@@ -2601,17 +3117,283 @@
             textStartTimeDisplay.textContent = '1s 5f (Frame 35)';
             textGradientToggle.checked = true;
             textGradientEnabled = true;
+            textGradientStyleSelect.value = 'sunset';
+            textGradientStyle = 'sunset';
+            document.getElementById('gradientStyleGroup').style.display = 'block';
+            setMatchMode(false);
             populateWordSelect();
             drawFrame();
         });
 
-        // Initialize setup variables
-        populateThemeDropdowns();
-        populateStyleDropdowns();
+        // --- Match Logic & Format Painter Functions ---
+        const matchPainterBtn = document.getElementById('matchPainterBtn');
+        const matchScaleCheck = document.getElementById('matchScaleCheck');
+        const matchYCheck = document.getElementById('matchYCheck');
+        const matchHighlightCheck = document.getElementById('matchHighlightCheck');
+
+        function setMatchMode(active) {
+            isMatchMode = active;
+            if (isMatchMode) {
+                const currentSource = parseInt(textWordSelect.value);
+                if (isNaN(currentSource)) {
+                    alert("Please select a word first!");
+                    isMatchMode = false;
+                    return;
+                }
+                matchSourceWordIdx = currentSource;
+                matchPainterBtn.textContent = "🎨 Match Mode: Active";
+                matchPainterBtn.style.background = "#f59e0b"; // glowing orange
+                matchPainterBtn.style.borderColor = "#d97706";
+                matchPainterBtn.style.color = "#000000";
+                canvas.style.cursor = 'copy';
+            } else {
+                matchSourceWordIdx = null;
+                matchPainterBtn.textContent = "🎨 Format Painter (Off)";
+                matchPainterBtn.style.background = "rgba(56, 189, 248, 0.1)";
+                matchPainterBtn.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                matchPainterBtn.style.color = "var(--accent-color)";
+                canvas.style.cursor = 'default';
+            }
+            drawFrame();
+        }
+
+        matchPainterBtn.addEventListener('click', () => {
+            setMatchMode(!isMatchMode);
+        });
+
+        // Bulk apply actions
+        const applyScaleToAllBtn = document.getElementById('applyScaleToAllBtn');
+        const applyYToAllBtn = document.getElementById('applyYToAllBtn');
+
+        applyScaleToAllBtn.addEventListener('click', () => {
+            const currentIdx = parseInt(textWordSelect.value);
+            if (isNaN(currentIdx)) return;
+            
+            const currentOverride = textWordsOverride[currentIdx] || { scale: 100 };
+            const scaleToCopy = currentOverride.scale;
+            
+            const wordsCount = getWordsList().length;
+            for (let i = 0; i < wordsCount; i++) {
+                if (!textWordsOverride[i]) {
+                    textWordsOverride[i] = { scale: 100, x: 0, y: 0, highlight: 'none', anim: 'default' };
+                }
+                textWordsOverride[i].scale = scaleToCopy;
+            }
+            drawFrame();
+        });
+
+        applyYToAllBtn.addEventListener('click', () => {
+            const currentIdx = parseInt(textWordSelect.value);
+            if (isNaN(currentIdx)) return;
+            
+            const currentOverride = textWordsOverride[currentIdx] || { y: 0 };
+            const yToCopy = currentOverride.y;
+            
+            const wordsCount = getWordsList().length;
+            for (let i = 0; i < wordsCount; i++) {
+                if (!textWordsOverride[i]) {
+                    textWordsOverride[i] = { scale: 100, x: 0, y: 0, highlight: 'none', anim: 'default' };
+                }
+                textWordsOverride[i].y = yToCopy;
+            }
+            drawFrame();
+        });
+
+        // --- Interactive Word Drag & Scale Canvas Controls ---
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+            
+            // Search for clicked word (reverse order for top-most selection)
+            let clickedWordIdx = null;
+            for (let i = wordBoundingBoxes.length - 1; i >= 0; i--) {
+                const box = wordBoundingBoxes[i];
+                if (mouseX >= box.x1 && mouseX <= box.x2 && mouseY >= box.y1 && mouseY <= box.y2) {
+                    clickedWordIdx = box.idx;
+                    break;
+                }
+            }
+            
+            if (clickedWordIdx !== null) {
+                e.preventDefault();
+                
+                if (isMatchMode) {
+                    // Match Mode is active: copy formatting from source to clicked word
+                    if (clickedWordIdx !== matchSourceWordIdx) {
+                        const sourceOverride = textWordsOverride[matchSourceWordIdx] || { scale: 100, x: 0, y: 0, highlight: 'none', anim: 'default' };
+                        
+                        if (!textWordsOverride[clickedWordIdx]) {
+                            textWordsOverride[clickedWordIdx] = {
+                                scale: 100,
+                                x: 0,
+                                y: 0,
+                                highlight: 'none',
+                                anim: 'default'
+                            };
+                        }
+                        const targetOverride = textWordsOverride[clickedWordIdx];
+                        
+                        // Check which checkboxes are checked in the sidebar UI
+                        const copyScale = document.getElementById('matchScaleCheck').checked;
+                        const copyY = document.getElementById('matchYCheck').checked;
+                        const copyHighlight = document.getElementById('matchHighlightCheck').checked;
+                        
+                        if (copyScale) {
+                            targetOverride.scale = sourceOverride.scale;
+                        }
+                        if (copyY) {
+                            targetOverride.y = sourceOverride.y;
+                        }
+                        if (copyHighlight) {
+                            targetOverride.highlight = sourceOverride.highlight;
+                        }
+                        
+                        // Select target word in UI to display updated values
+                        textWordSelect.value = String(clickedWordIdx);
+                        loadSelectedWordSettings();
+                        drawFrame();
+                    }
+                    return; // Skip standard drag initialization
+                }
+                
+                // Standard drag initialization
+                draggedWordIdx = clickedWordIdx;
+                isDraggingWord = true;
+                
+                // Initialize override configuration if missing
+                if (!textWordsOverride[clickedWordIdx]) {
+                    textWordsOverride[clickedWordIdx] = {
+                        scale: 100,
+                        x: 0,
+                        y: 0,
+                        highlight: 'none',
+                        anim: 'default'
+                    };
+                }
+                
+                // Select this word in the dropdown and load its configurations
+                textWordSelect.value = String(clickedWordIdx);
+                loadSelectedWordSettings();
+                
+                // Auto-pause playback for precision editing
+                if (isPlaying) {
+                    isPlaying = false;
+                    playBtn.innerText = "▶ Play";
+                }
+                
+                // Capture initial offsets relative to the word's custom positioning
+                const override = textWordsOverride[clickedWordIdx];
+                dragStartOffsetX = mouseX - override.x;
+                dragStartOffsetY = mouseY - override.y;
+                
+                drawFrame();
+            } else {
+                // Clicked outside word, exit match mode if active
+                if (isMatchMode) {
+                    setMatchMode(false);
+                }
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDraggingWord && draggedWordIdx !== null) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                const mouseY = (e.clientY - rect.top) * scaleY;
+                
+                let newX = mouseX - dragStartOffsetX;
+                let newY = mouseY - dragStartOffsetY;
+                
+                // Clamp coordinates to the slide range of the sliders (-1500 to 1500)
+                newX = Math.max(-1500, Math.min(1500, newX));
+                newY = Math.max(-1500, Math.min(1500, newY));
+                
+                const override = textWordsOverride[draggedWordIdx];
+                override.x = Math.round(newX);
+                override.y = Math.round(newY);
+                
+                // Synchronize sidebar layout controllers
+                wordXSlider.value = override.x;
+                wordXVal.textContent = override.x;
+                wordYSlider.value = override.y;
+                wordYVal.textContent = override.y;
+                
+                drawFrame();
+            } else {
+                // Update hovered word status for canvas styling
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                const mouseY = (e.clientY - rect.top) * scaleY;
+                
+                let foundHover = null;
+                for (let i = wordBoundingBoxes.length - 1; i >= 0; i--) {
+                    const box = wordBoundingBoxes[i];
+                    if (mouseX >= box.x1 && mouseX <= box.x2 && mouseY >= box.y1 && mouseY <= box.y2) {
+                        foundHover = box.idx;
+                        break;
+                    }
+                }
+                
+                if (hoveredWordIdx !== foundHover) {
+                    hoveredWordIdx = foundHover;
+                    if (foundHover !== null) {
+                        canvas.style.cursor = isMatchMode ? 'copy' : 'move';
+                    } else {
+                        canvas.style.cursor = isMatchMode ? 'copy' : 'default';
+                    }
+                    drawFrame();
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDraggingWord) {
+                isDraggingWord = false;
+                draggedWordIdx = null;
+                drawFrame();
+            }
+        });
+
+        // Mouse Wheel scrolling to scale words
+        canvas.addEventListener('wheel', (e) => {
+            if (hoveredWordIdx !== null) {
+                e.preventDefault();
+                const delta = -e.deltaY;
+                const scaleStep = delta > 0 ? 5 : -5;
+                
+                if (!textWordsOverride[hoveredWordIdx]) {
+                    textWordsOverride[hoveredWordIdx] = {
+                        scale: 100,
+                        x: 0,
+                        y: 0,
+                        highlight: 'none',
+                        anim: 'default'
+                    };
+                }
+                
+                const override = textWordsOverride[hoveredWordIdx];
+                let newScale = override.scale + scaleStep;
+                newScale = Math.max(30, Math.min(300, newScale)); // Slider range is 30 to 300
+                override.scale = newScale;
+                
+                // Synchronize sidebar if the scaled word is currently selected
+                if (hoveredWordIdx === parseInt(textWordSelect.value)) {
+                    wordScaleSlider.value = newScale;
+                    wordScaleVal.textContent = newScale + '%';
+                }
+                
+                drawFrame();
+            }
+        }, { passive: false });
+
         populateWordSelect();
-        // Trigger default animation presets to initialize keyframe sliders
-        document.getElementById('photoAnimType').dispatchEvent(new Event('change'));
-        updateLabels();
         requestAnimationFrame(mainLoop);
     </script>
 </body>
