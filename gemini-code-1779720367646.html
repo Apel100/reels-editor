@@ -5,6 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Reels Motion Engine - Pro v5.0</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Satisfy&family=EB+Garamond:ital,wght@0,700;1,700&display=swap');
+
+        /* ── Mode Switcher ── */
+        .mode-switcher {
+            display: flex;
+            background: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            color: var(--text-dim);
+            background: transparent;
+            letter-spacing: 0.3px;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: #fff;
+            box-shadow: 0 0 16px rgba(139,92,246,0.45);
+        }
+        .mode-btn.active.photo-mode-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 0 16px rgba(245,158,11,0.45);
+        }
+        /* Photo anim panel */
+        #photoAnimPanel {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
         :root {
             --bg-color: #05050b;
             --panel-color: #0f111a;
@@ -97,7 +137,7 @@
         
         .timeline-container { width: 100%; padding: 0 5px; }
         .timeline-bar { width: 100%; height: 8px; background: #1e293b; position: relative; border-radius: 4px; overflow: hidden; margin-top: 10px;}
-        .timeline-progress { height: 100%; width: 0%; background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); transition: width 0.05s linear; }
+        .timeline-progress { height: 100%; width: 0%; background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
 
         /* Custom Toggle */
         .toggle-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; }
@@ -120,6 +160,12 @@
         <div class="header-area">
             <h2>🚀 Motion Engine <span style="font-size: 0.8rem; background: var(--accent-color); color: #000; padding: 2px 6px; border-radius: 4px;">V5.1</span></h2>
             <div class="sub-header">CFR Smooth Export • Premiere Pro Optimized</div>
+        </div>
+
+        <!-- ── Mode Switcher ── -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" id="modeShapeBtn">⚡ Shape Mode</button>
+            <button class="mode-btn photo-mode-btn" id="modePhotoBtn">📷 Photo Animation</button>
         </div>
 
         <div class="action-grid" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -149,7 +195,7 @@
                 <button class="mini-btn" id="resetTransformBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);">↺ Reset All</button>
             </div>
             
-            <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+            <div class="shape-only-panel" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
                 <div class="card-title" style="font-size: 0.7rem; color: var(--accent-color);">Shape Transformation</div>
                 <div class="control-group">
                     <label>Scale <span class="val" id="shapeScaleVal">700</span></label>
@@ -187,14 +233,14 @@
         </div>
 
         <!-- Section 2: Environment -->
-        <div class="card">
+        <div class="card shape-only-panel">
             <div class="card-title">🌍 Environment</div>
             <div class="row-group">
                 <div class="control-group">
                     <label>BG Color</label>
                     <div class="input-with-btn">
                         <input type="color" id="bgColor" value="#0f172a">
-                        <label class="switch" title="Lock Color">
+                        <label class="switch" title="Lock BG Options">
                             <input type="checkbox" id="lockBGColor">
                             <span class="slider"></span>
                         </label>
@@ -208,24 +254,153 @@
                     </select>
                 </div>
             </div>
+            <!-- Float fade edge options (shown only in Float mode) -->
+            <div class="control-group" id="floatFadeOptions" style="display:none;">
+                <label style="margin-bottom:4px;">Edge Fade (Float)</label>
+                <div style="display:flex; gap:16px; margin-top:2px; flex-wrap:wrap;">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-color);">
+                        <input type="checkbox" id="fadeLeft" style="accent-color:var(--accent-color); width:14px; height:14px;"> ← Left
+                    </label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-color);">
+                        <input type="checkbox" id="fadeRight" style="accent-color:var(--accent-color); width:14px; height:14px;"> Right →
+                    </label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-color);">
+                        <input type="checkbox" id="fadeBottom" style="accent-color:var(--accent-color); width:14px; height:14px;"> ↓ Bottom
+                    </label>
+                </div>
+            </div>
             <div class="control-group">
+                <label>Background Theme Preset</label>
+                <select id="bgPreset">
+                    <option value="custom">🎨 Custom Color Picker</option>
+                    <option value="lime_cream">🍋 Lime Cream (Subtle)</option>
+                    <option value="sunset">🌅 Sunset Glow</option>
+                    <option value="lavender">🌌 Lavender Dream</option>
+                    <option value="emerald">🍃 Emerald Mint</option>
+                    <option value="cyberpunk">⚡ Cyberpunk Neon</option>
+                    <option value="cotton_candy">🍬 Cotton Candy</option>
+                    <option value="charcoal">🖤 Dark Charcoal</option>
+                    <option value="royal">👑 Royal Indigo</option>
+                    <option value="sakura">🌸 Sakura Pastel</option>
+                </select>
+            </div>
+
+            <div class="control-group" style="display: none;">
                 <label>Background Style</label>
                 <div class="input-with-btn">
                     <select id="bgStyle">
                         <option value="solid">Solid Color</option>
-                        <option value="grid">Grid Pattern</option>
-                        <option value="dots">Dot Matrix</option>
+                        <option value="gradient_only">Gradient Only</option>
                         <option value="rad_c">Radial Glow</option>
+                        <option value="mesh">Ambient Mesh Glow</option>
+                        <option value="grid">Subtle Grid (Solid)</option>
+                        <option value="grid_gradient">Subtle Grid (Gradient)</option>
+                        <option value="dots">Subtle Dots (Solid)</option>
+                        <option value="dots_gradient">Subtle Dots (Gradient)</option>
                         <option value="diag">Diagonal Stripes</option>
-                        <option value="mesh">Mesh Gradient</option>
+                        <option value="vignette">Cinematic Vignette (Solid)</option>
+                        <option value="vignette_gradient">Cinematic Vignette (Gradient)</option>
                     </select>
                     <button class="mini-btn" id="randomBGBtn" title="Random Style">🎲</button>
                 </div>
             </div>
         </div>
 
+        <!-- Section: Text Overlay Engine -->
+        <div class="card" id="textOverlayCard">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <div class="card-title" style="margin-bottom: 0; color: #38bdf8;">✍️ Text Overlay Engine</div>
+                <button class="mini-btn" id="resetTextBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);">↺ Reset Text</button>
+            </div>
+
+            <div class="control-group">
+                <label>Text Caption</label>
+                <input type="text" id="textInput" value="Advanced Motion Engine" placeholder="Enter text here...">
+            </div>
+
+            <div class="control-group">
+                <label>Select Word to Customize</label>
+                <select id="textWordSelect">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Individual Word Settings Sub-card -->
+            <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <div class="card-title" style="font-size: 0.7rem; color: #38bdf8;">Selected Word Settings</div>
+                
+                <div class="control-group">
+                    <label>Word Scale <span class="val" id="wordScaleVal">100%</span></label>
+                    <input type="range" id="wordScaleSlider" min="30" max="300" value="100">
+                </div>
+
+                <div class="row-group" style="margin-top: 5px;">
+                    <div class="control-group">
+                        <label>Pos X <span class="val" id="wordXVal">0</span></label>
+                        <input type="range" id="wordXSlider" min="-1500" max="1500" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Pos Y <span class="val" id="wordYVal">0</span></label>
+                        <input type="range" id="wordYSlider" min="-1500" max="1500" value="0">
+                    </div>
+                </div>
+
+                <div class="row-group" style="margin-top: 5px;">
+                    <div class="control-group">
+                        <label>Font Highlight</label>
+                        <select id="wordHighlightSelect">
+                            <option value="none">Default (Inter)</option>
+                            <option value="ashton">Ashton Script</option>
+                            <option value="garamond">Apple Garamond (B/I)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Animation Direction</label>
+                        <select id="wordAnimSelect">
+                            <option value="default">Default (Auto)</option>
+                            <option value="left_to_right">Left to Right</option>
+                            <option value="right_to_left">Right to Left</option>
+                            <option value="bottom_to_up">Bottom to Up</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Text Settings Sub-card -->
+            <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <div class="card-title" style="font-size: 0.7rem; color: #fb7185;">Global Text Settings</div>
+                
+                <div class="control-group">
+                    <label>Global Y Position <span class="val" id="textGlobalYVal">1400</span></label>
+                    <input type="range" id="textGlobalYSlider" min="200" max="1800" value="1400">
+                </div>
+
+                <div class="control-group" style="margin-top: 5px;">
+                    <label>Text Start Time <span class="val" id="textStartTimeDisplay">1s 5f (Frame 35)</span></label>
+                    <div class="row-group" style="gap: 10px; margin-top: 4px; display: flex;">
+                        <div class="control-group" style="flex: 1;">
+                            <label style="font-size: 0.65rem;">Seconds</label>
+                            <input type="range" id="textStartSecSlider" min="0" max="4" value="1" style="margin-top:2px;">
+                        </div>
+                        <div class="control-group" style="flex: 1;">
+                            <label style="font-size: 0.65rem;">Frames (30fps)</label>
+                            <input type="range" id="textStartFrameSlider" min="0" max="29" value="5" style="margin-top:2px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card toggle-card" style="padding: 6px 10px; background: rgba(255,255,255,0.01); margin-top: 5px;" onclick="document.getElementById('textGradientToggle').click(); event.stopPropagation();">
+                    <span style="font-size:0.75rem; font-weight:700;">Highlight Gradient Fill</span>
+                    <label class="switch">
+                        <input type="checkbox" id="textGradientToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <!-- Section 3: Shape Styling -->
-        <div class="card">
+        <div class="card shape-only-panel">
             <div class="card-title">🎨 Style & Geometry</div>
             <div class="row-group">
                 <div class="control-group">
@@ -252,7 +427,6 @@
                     <label>Render</label>
                     <select id="renderStyle">
                         <option value="fill">Solid Fill</option>
-                        <option value="outline">Neon Outline</option>
                         <option value="both">Fill + Glow</option>
                     </select>
                 </div>
@@ -263,7 +437,7 @@
             </div>
 
             <div class="control-group">
-                <label>Color & Texture Layout</label>
+                <label>Color Layout</label>
                 <select id="shapeLayout">
                     <option value="auto_solid">Auto Solid (Contrast)</option>
                     <option value="auto_gradient">Auto Neon Gradient</option>
@@ -271,8 +445,7 @@
                     <option value="auto_solid_lines">Auto Solid + Grid</option>
                     <option value="auto_gradient_dots">Auto Neon + Dots</option>
                     <option value="auto_gradient_lines">Auto Neon + Grid</option>
-                    <option value="pattern_dots">Pattern - Dots Only</option>
-                    <option value="pattern_lines">Pattern - Grid Only</option>
+
                     <option value="custom">Custom Color</option>
                 </select>
             </div>
@@ -291,6 +464,193 @@
                 </label>
             </div>
         </div>
+
+        <!-- ── Photo Animation Panel ── -->
+        <div id="photoAnimPanel">
+            <div class="card" style="border-color: #f59e0b44; background: rgba(245,158,11,0.04);">
+                <div class="card-title" style="color: #fbbf24;">🎬 Photo Animation</div>
+
+                <div class="control-group">
+                    <label>Animation Type</label>
+                    <select id="photoAnimType">
+                        <option value="polaroid_spin">🖼️ Polaroid Spin</option>
+                        <option value="bordered_card_rtl">🖼️ Bordered Card RTL (Right to Left)</option>
+                        <option value="bordered_card_ltr">🖼️ Bordered Card LTR (Left to Right)</option>
+                        <option value="ken_burns">Ken Burns (Zoom + Drift)</option>
+                        <option value="drift_pan">Slow Drift Pan</option>
+                        <option value="fade_zoom">Zoom In (Full Bleed)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Intensity <span class="val" id="photoAnimIntensityVal">50</span></label>
+                    <input type="range" id="photoAnimIntensity" min="10" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label>Background Theme Preset</label>
+                    <select id="photoAnimBgPreset">
+                        <option value="custom">🎨 Custom Color Picker</option>
+                        <option value="lime_cream">🍋 Lime Cream (Subtle)</option>
+                        <option value="sunset">🌅 Sunset Glow</option>
+                        <option value="lavender">🌌 Lavender Dream</option>
+                        <option value="emerald">🍃 Emerald Mint</option>
+                        <option value="cyberpunk">⚡ Cyberpunk Neon</option>
+                        <option value="cotton_candy">🍬 Cotton Candy</option>
+                        <option value="charcoal">🖤 Dark Charcoal</option>
+                        <option value="royal">👑 Royal Indigo</option>
+                        <option value="sakura">🌸 Sakura Pastel</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>BG Color</label>
+                    <div class="input-with-btn">
+                        <input type="color" id="photoAnimBgColor" value="#000000">
+                        <label class="switch" title="Lock BG Options">
+                            <input type="checkbox" id="lockBGColorPhoto">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group" style="display: none;">
+                    <label>BG Style</label>
+                    <select id="photoAnimBgStyle">
+                        <option value="solid">Solid Color</option>
+                        <option value="gradient_only">Gradient Only</option>
+                        <option value="rad_c">Radial Glow</option>
+                        <option value="mesh">Ambient Mesh Glow</option>
+                        <option value="grid">Subtle Grid (Solid)</option>
+                        <option value="grid_gradient">Subtle Grid (Gradient)</option>
+                        <option value="dots">Subtle Dots (Solid)</option>
+                        <option value="dots_gradient">Subtle Dots (Gradient)</option>
+                        <option value="diag">Diagonal Stripes</option>
+                        <option value="vignette">Cinematic Vignette (Solid)</option>
+                        <option value="vignette_gradient">Cinematic Vignette (Gradient)</option>
+                    </select>
+                </div>
+
+                <div id="ringsToggleCard" class="card toggle-card" style="padding: 10px; background: rgba(255,255,255,0.02); margin-top: 5px;" onclick="document.getElementById('polaroidRingsToggle').click(); event.stopPropagation();">
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:0.75rem; font-weight:700;">Show Background Rings</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="polaroidRingsToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Section 2: Layout & Geometry for Photo Animation -->
+            <div id="layoutGeometryCard" class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <div class="card-title" style="margin-bottom: 0; color: #fbbf24;">📏 Layout & Geometry</div>
+                    <button class="mini-btn" id="resetPhotoAnimLayoutBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">↺ Reset</button>
+                </div>
+                
+                <div id="polaroidLayoutGroup" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Polaroid / Photo</div>
+                    <div class="control-group">
+                        <label>Scale <span class="val" id="polaroidScaleVal">600</span></label>
+                        <input type="range" id="polaroidScaleSlider" min="300" max="1000" value="600">
+                    </div>
+                    <div class="row-group" style="margin-top: 5px;">
+                        <div class="control-group">
+                            <label>Pos X <span class="val" id="polaroidXVal">30</span></label>
+                            <input type="range" id="polaroidXSlider" min="-300" max="300" value="30">
+                        </div>
+                        <div class="control-group">
+                            <label>Pos Y <span class="val" id="polaroidYVal">0</span></label>
+                            <input type="range" id="polaroidYSlider" min="-300" max="300" value="0">
+                        </div>
+                    </div>
+                </div>
+ 
+                <div id="circlesLayoutGroup" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 10px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Decorative Circles</div>
+                    <div class="control-group">
+                        <label>Radius (Scale) <span class="val" id="circleScaleVal">420</span></label>
+                        <input type="range" id="circleScaleSlider" min="150" max="800" value="420">
+                    </div>
+                    <div class="row-group" style="margin-top: 5px;">
+                        <div class="control-group">
+                            <label>Pos X <span class="val" id="circleXVal">30</span></label>
+                            <input type="range" id="circleXSlider" min="-300" max="300" value="30">
+                        </div>
+                        <div class="control-group">
+                            <label>Pos Y <span class="val" id="circleYVal">0</span></label>
+                            <input type="range" id="circleYSlider" min="-300" max="300" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Photo Animation Keyframes -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <div class="card-title" style="margin-bottom: 0; color: #fbbf24;">🎯 Photo Animation Keyframes</div>
+                    <button class="mini-btn" id="resetPhotoAnimPresetBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">↺ Reset Preset</button>
+                </div>
+                
+                <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Scale (%)</div>
+                    <div class="row-group">
+                        <div class="control-group">
+                            <label>Start <span class="val" id="paScaleStartVal">145%</span></label>
+                            <input type="range" id="paScaleStartSlider" min="50" max="250" value="145">
+                        </div>
+                        <div class="control-group">
+                            <label>End <span class="val" id="paScaleEndVal">120%</span></label>
+                            <input type="range" id="paScaleEndSlider" min="50" max="250" value="120">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 10px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Position X</div>
+                    <div class="row-group">
+                        <div class="control-group">
+                            <label>Start <span class="val" id="paXStartVal">120</span></label>
+                            <input type="range" id="paXStartSlider" min="-500" max="500" value="120">
+                        </div>
+                        <div class="control-group">
+                            <label>End <span class="val" id="paXEndVal">-120</span></label>
+                            <input type="range" id="paXEndSlider" min="-500" max="500" value="-120">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 10px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Position Y</div>
+                    <div class="row-group">
+                        <div class="control-group">
+                            <label>Start <span class="val" id="paYStartVal">34</span></label>
+                            <input type="range" id="paYStartSlider" min="-500" max="500" value="34">
+                        </div>
+                        <div class="control-group">
+                            <label>End <span class="val" id="paYEndVal">0</span></label>
+                            <input type="range" id="paYEndSlider" min="-500" max="500" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="keyframeRotationBlock" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 10px;">
+                    <div class="card-title" style="font-size: 0.7rem; color: #fbbf24;">Rotation (Degrees)</div>
+                    <div class="row-group">
+                        <div class="control-group">
+                            <label>Start <span class="val" id="paAngleStartVal">0°</span></label>
+                            <input type="range" id="paAngleStartSlider" min="-180" max="180" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>End <span class="val" id="paAngleEndVal">0°</span></label>
+                            <input type="range" id="paAngleEndSlider" min="-180" max="180" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     </div>
 
@@ -304,11 +664,171 @@
         const canvas = document.getElementById('motionCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Force internal resolution constants
+        const INTERNAL_W = 1080;
+        const INTERNAL_H = 1920;
+        canvas.width = INTERNAL_W;
+        canvas.height = INTERNAL_H;
+
+        // ── PALETTES (from index.html) ──────────────────────────
+        const PALETTES = [
+            {n:'Midnight Blue',  bg:'#040d21',c1:'#0d47a1',c2:'#1565C0',c3:'#1e88e5',acc:'#FFD700'},
+            {n:'Blood Moon',     bg:'#1a0000',c1:'#7f0000',c2:'#b71c1c',c3:'#d32f2f',acc:'#FF8F00'},
+            {n:'Deep Violet',    bg:'#0d0020',c1:'#4a148c',c2:'#6a1b9a',c3:'#8e24aa',acc:'#E040FB'},
+            {n:'Forest Dark',    bg:'#001a00',c1:'#1b5e20',c2:'#2e7d32',c3:'#388e3c',acc:'#69F0AE'},
+            {n:'Dark Ember',     bg:'#1a1400',c1:'#e65100',c2:'#f57f17',c3:'#ff8f00',acc:'#FFEA00'},
+            {n:'Ocean Abyss',    bg:'#000d1a',c1:'#006064',c2:'#00838f',c3:'#0097a7',acc:'#00E5FF'},
+            {n:'Cyber Purple',   bg:'#050510',c1:'#6200ea',c2:'#aa00ff',c3:'#d500f9',acc:'#00E5FF'},
+            {n:'Hot Magenta',    bg:'#0a0014',c1:'#c51162',c2:'#f50057',c3:'#ff4081',acc:'#FF80AB'},
+            {n:'Toxic Green',    bg:'#001400',c1:'#1a4d00',c2:'#2e7d00',c3:'#388e00',acc:'#39FF14'},
+            {n:'Neon Sky',       bg:'#001020',c1:'#0277bd',c2:'#0288d1',c3:'#039be5',acc:'#40C4FF'},
+            {n:'Pink Bomb',      bg:'#200010',c1:'#e91e63',c2:'#f06292',c3:'#f48fb1',acc:'#FFEB3B'},
+            {n:'Electric Teal',  bg:'#001014',c1:'#00695c',c2:'#00897b',c3:'#00acc1',acc:'#64FFDA'},
+            {n:'Teal+Orange',    bg:'#0f1923',c1:'#1565C0',c2:'#1e88e5',c3:'#2196f3',acc:'#FF6F00'},
+            {n:'Dark Amber',     bg:'#1c1410',c1:'#5d4037',c2:'#795548',c3:'#8d6e63',acc:'#BCAAA4'},
+            {n:'Space Gray',     bg:'#0d1117',c1:'#21262d',c2:'#30363d',c3:'#484f58',acc:'#f0883e'},
+            {n:'Dark Ocean',     bg:'#0a1628',c1:'#102a55',c2:'#1565C0',c3:'#1976d2',acc:'#4FC3F7'},
+            {n:'Blue Ocean',     bg:'#000428',c1:'#003090',c2:'#004e92',c3:'#0277bd',acc:'#E8F5FF'},
+            {n:'Dark Cosmos',    bg:'#0f0c29',c1:'#302b63',c2:'#24243e',c3:'#3d3d6b',acc:'#A8EDEA'},
+            {n:'Night City',     bg:'#1a1a2e',c1:'#16213e',c2:'#0f3460',c3:'#1a4080',acc:'#e94560'},
+            {n:'Royal Storm',    bg:'#200122',c1:'#6f0000',c2:'#a00020',c3:'#b71c1c',acc:'#FF6B6B'},
+            {n:'Fire Red',       bg:'#990000',c1:'#B71C1C',c2:'#C62828',c3:'#D32F2F',acc:'#FFFF00'},
+            {n:'Royal Blue',     bg:'#003087',c1:'#0D47A1',c2:'#1565C0',c3:'#1976D2',acc:'#FFD700'},
+            {n:'Sunset Orange',  bg:'#BF360C',c1:'#E64A19',c2:'#FF5722',c3:'#FF7043',acc:'#FFFFFF'},
+            {n:'Earth Green',    bg:'#004D40',c1:'#00897B',c2:'#26A69A',c3:'#4DB6AC',acc:'#F9FBE7'},
+            {n:'Hot Pink',       bg:'#880E4F',c1:'#AD1457',c2:'#E91E63',c3:'#F06292',acc:'#FCE4EC'},
+            {n:'Gold BD',        bg:'#003087',c1:'#0050C8',c2:'#0070FF',c3:'#1a90FF',acc:'#FFD700'},
+            {n:'Deep Red BD',    bg:'#8B0000',c1:'#B71C1C',c2:'#D32F2F',c3:'#E53935',acc:'#FFFFFF'},
+            {n:'Green Gold',     bg:'#004d00',c1:'#007700',c2:'#009900',c3:'#00bb00',acc:'#FFD700'},
+            {n:'Indigo Rose',    bg:'#1A0033',c1:'#4B0082',c2:'#7B00D4',c3:'#9c27b0',acc:'#FF69B4'},
+            {n:'Blue White',     bg:'#0d47a1',c1:'#1976D2',c2:'#2196F3',c3:'#42a5f5',acc:'#FFFFFF'},
+            {n:'Onyx',           bg:'#000000',c1:'#1a1a1a',c2:'#333333',c3:'#4a4a4a',acc:'#FFFFFF'},
+            {n:'Dark Iron',      bg:'#1a1a1a',c1:'#2d2d2d',c2:'#404040',c3:'#555555',acc:'#FF4444'},
+            {n:'Sunset Blaze',   bg:'#3a1c71',c1:'#d76d77',c2:'#ffaf7b',c3:'#ffd3a0',acc:'#FFFFFF'},
+            {n:'Deep Water',     bg:'#141e30',c1:'#243b55',c2:'#2d4a70',c3:'#3a5a85',acc:'#00E5FF'},
+            {n:'Crimson Desert', bg:'#1d4350',c1:'#a43931',c2:'#c0493e',c3:'#d45d52',acc:'#FFD700'},
+            {n:'Ocean Blue',     bg:'#0b486b',c1:'#2980b9',c2:'#3498db',c3:/#5dade2/,acc:'#FFFFFF'},
+            {n:'Lava',           bg:'#000000',c1:'#8b0000',c2:'#cc0000',c3:'#ff1a00',acc:'#FFFF00'},
+            {n:'Galaxy',         bg:'#000033',c1:'#0000aa',c2:'#0000cc',c3:'#1a1aff',acc:'#00FF00'},
+            {n:'Matrix',         bg:'#000a00',c1:'#003300',c2:'#004d00',c3:'#006600',acc:'#00FF00'},
+            {n:'Aurora',         bg:'#0d1b2a',c1:'#2d4a3e',c2:'#3d6b52',c3:'#4e8066',acc:'#7FFFAA'},
+            {n:'Solar Flare',    bg:'#1a0800',c1:'#993300',c2:'#cc6600',c3:'#ff8c00',acc:'#FFD700'},
+            {n:'Arctic',         bg:'#0a1628',c1:'#1a3040',c2:'#2a4060',c3:'#3a5070',acc:'#A8D8EA'},
+            {n:'Purple Haze',    bg:'#2c003e',c1:'#4a0072',c2:'#6200ea',c3:'#7c4dff',acc:'#ffd740'},
+            {n:'Dark Teal',      bg:'#003333',c1:'#004d4d',c2:'#006666',c3:'#008080',acc:'#ff9800'},
+            {n:'Dark Rust',      bg:'#331a00',c1:'#663600',c2:'#804400',c3:'#995200',acc:'#00bcd4'},
+            {n:'Deep Space',     bg:'#00001a',c1:'#000066',c2:'#000080',c3:'#000099',acc:'#ff4081'},
+            {n:'Burnt',          bg:'#1f0a0a',c1:'#5a2020',c2:'#7a3030',c3:'#943a3a',acc:'#FF4500'},
+            {n:'Vintage Red',    bg:'#c62828',c1:'#a00000',c2:'#880000',c3:'#6a0000',acc:'#FFEB3B'},
+            {n:'Ocean Storm',    bg:'#283593',c1:'#1a237e',c2:'#0d1b6e',c3:'#080d40',acc:'#FF5722'},
+            {n:'Dark Jade',      bg:'#00695c',c1:'#00433a',c2:'#002d28',c3:'#001a18',acc:'#E040FB'},
+            {n:'Black Red',      bg:'#0a0000',c1:'#3d0000',c2:'#600000',c3:'#800000',acc:'#FF0000'},
+            {n:'Electric Navy',  bg:'#000d1a',c1:'#003060',c2:'#004080',c3:'#0050a0',acc:'#00FFFF'},
+            {n:'Moody Olive',    bg:'#1a1a00',c1:'#404000',c2:'#555500',c3:'#6b6b00',acc:'#FF4500'},
+            {n:'Midnight Forest',bg:'#001a0a',c1:'#004020',c2:'#005530',c3:'#006a3c',acc:'#FFD700'},
+            {n:'Dark Sapphire',  bg:'#000a2e',c1:'#001a60',c2:'#002480',c3:'#002e9e',acc:'#FFD700'},
+            {n:'Dark Royal',     bg:'#4527a0',c1:'#1e1260',c2:'#150d40',c3:'#0d0828',acc:'#FF6E40'},
+            {n:'Solar Gold',     bg:'#1a0d00',c1:'#4d2800',c2:'#7f4400',c3:'#b36200',acc:'#FFD700'},
+            {n:'Electric Rose',  bg:'#1a0020',c1:'#5c0080',c2:'#8000b3',c3:'#a000d9',acc:'#FF69B4'},
+            {n:'Neon Orange',    bg:'#1a0800',c1:'#cc3300',c2:'#ff5500',c3:'#ff7722',acc:'#00FFFF'},
+            {n:'Shadow Blue',    bg:'#030a1a',c1:'#0a1a40',c2:'#102060',c3:'#1a2a7a',acc:'#FFD700'},
+            {n:'Deep Magenta',   bg:'#1a0010',c1:'#800040',c2:'#aa0055',c3:'#cc006a',acc:'#FFFF00'},
+            {n:'Stone Cold',     bg:'#0d0d0d',c1:'#1a1a1a',c2:'#2a2a2a',c3:'#3a3a3a',acc:'#00BFFF'},
+            {n:'Crimson Night',  bg:'#0a0005',c1:'#3d001a',c2:'#660033',c3:'#8c0044',acc:'#FF6600'},
+            {n:'Emerald Dark',   bg:'#001a0d',c1:'#003d1f',c2:'#005929',c3:'#006633',acc:'#FF4500'}
+        ];
+
+        // Film grain noise pattern generated once for maximum performance
+        const noiseCv = document.createElement('canvas');
+        noiseCv.width = 128; noiseCv.height = 128;
+        const noiseCx = noiseCv.getContext('2d');
+        const noiseImgData = noiseCx.createImageData(128, 128);
+        const nd = noiseImgData.data;
+        for(let i=0; i<nd.length; i+=4) {
+            const val = Math.floor(Math.random() * 255);
+            nd[i] = val; nd[i+1] = val; nd[i+2] = val; nd[i+3] = 18; // low opacity noise
+        }
+        noiseCx.putImageData(noiseImgData, 0, 0);
+        const noisePat = ctx.createPattern(noiseCv, 'repeat');
+
+        // Populate dropdowns dynamically
+        function populateThemeDropdowns() {
+            const presets = [
+                { value: 'custom', name: '🎨 Custom Color Picker' },
+                ...PALETTES.map(p => ({
+                    value: p.n.toLowerCase().replace(/\s+/g, '_'),
+                    name: '🌌 ' + p.n
+                }))
+            ];
+            
+            const bgPreset = document.getElementById('bgPreset');
+            const photoAnimBgPreset = document.getElementById('photoAnimBgPreset');
+            
+            [bgPreset, photoAnimBgPreset].forEach(select => {
+                if (select) {
+                    const currentVal = select.value;
+                    select.innerHTML = '';
+                    presets.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.value;
+                        opt.textContent = p.name;
+                        select.appendChild(opt);
+                    });
+                    if (currentVal) select.value = currentVal;
+                }
+            });
+        }
+
+        function populateStyleDropdowns() {
+            const styles = [
+                { value: 'solid', name: 'Solid Color' },
+                { value: 'lin45', name: 'Linear Gradient 45°' },
+                { value: 'lin135', name: 'Linear Gradient 135°' },
+                { value: 'lin3', name: '3-Color Linear Gradient' },
+                { value: 'rad_c', name: 'Radial Center Glow' },
+                { value: 'rad_corner', name: 'Radial Corner Glow' },
+                { value: 'rad_multi', name: 'Multi-Radial Blobs' },
+                { value: 'grid', name: 'Grid (Medium)' },
+                { value: 'grid_h', name: 'Grid (Heavy)' },
+                { value: 'grid_m', name: 'Grid (Micro)' },
+                { value: 'dots', name: 'Dot Matrix (Medium)' },
+                { value: 'dots_l', name: 'Dot Matrix (Large)' },
+                { value: 'diag', name: 'Diagonal Stripes (Wide)' },
+                { value: 'diag_t', name: 'Diagonal Stripes (Thin)' },
+                { value: 'cross', name: 'Cross Hatch Pattern' },
+                { value: 'hex', name: 'Hexagon Grid' },
+                { value: 'conc', name: 'Concentric Rings' },
+                { value: 'wavy', name: 'Wavy Lines Pattern' },
+                { value: 'mesh', name: 'Ambient Mesh Glow' },
+                { value: 'vignette', name: 'Cinematic Vignette' },
+                { value: 'cglow', name: 'Four-Corner Glow' },
+                { value: 'circuit', name: 'Circuit Board Pattern' }
+            ];
+
+            const bgStyleSelect = document.getElementById('bgStyle');
+            const photoAnimBgStyleSelect = document.getElementById('photoAnimBgStyle');
+            
+            [bgStyleSelect, photoAnimBgStyleSelect].forEach(select => {
+                if (select) {
+                    const currentVal = select.value;
+                    select.innerHTML = '';
+                    styles.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.value;
+                        opt.textContent = s.name;
+                        select.appendChild(opt);
+                    });
+                    if (currentVal) select.value = currentVal;
+                }
+            });
+        }
+
         // UI Controls elements
         const imageLoader = document.getElementById('imageLoader');
         const bgColor = document.getElementById('bgColor');
         const bgStyle = document.getElementById('bgStyle');
         const lockBGColor = document.getElementById('lockBGColor');
+        const lockBGColorPhoto = document.getElementById('lockBGColorPhoto');
         const randomBGBtn = document.getElementById('randomBGBtn');
         const clipMode = document.getElementById('clipMode');
         const motionStyle = document.getElementById('motionStyle');
@@ -350,6 +870,22 @@
         let isExporting = false;
         const totalDuration = 150; // 5 Seconds at 30fps
 
+        // ── Mode state ──
+        let appMode = 'shape'; // 'shape' | 'photo_anim'
+        const modeShapeBtn  = document.getElementById('modeShapeBtn');
+        const modePhotoBtn  = document.getElementById('modePhotoBtn');
+        const photoAnimPanel = document.getElementById('photoAnimPanel');
+        const shapePanels   = []; // filled after DOM ready
+
+        // Photo animation state vars
+        let pa_zoom   = 1.0;   // current zoom
+        let pa_x      = 0;     // current x drift
+        let pa_y      = 0;     // current y drift
+        let pa_angle  = 0;     // current rotation
+        let pa_alpha  = 0;     // current opacity
+        let pa_wipe   = 0;     // wipe reveal progress (0→1)
+        let pa_bounce = 0;     // bounce scale
+
         // State dynamics
         let dynamicScale = 0;
         let dynamicRotation = 0;
@@ -357,9 +893,20 @@
         let dynamicPulse = 1;
         let motionPhotoXOffset = 0;
         let motionPhotoYOffset = 0;
+        let photoIntroStartX = 0;
+        let photoIntroStartY = 0;
         let dynamicPhotoZoom = 1.0;
         let entryDirection = 'bottom';
         let colorVariationSeed = Math.random();
+
+        // Text Engine State
+        let textWordsOverride = {};
+        let textGlobalY = 1400;
+        let textStartSec = 1;
+        let textStartFrameOffset = 5;
+        let textStartFrame = 35;
+        let textGradientEnabled = true;
+        let textRandomDirections = [];
 
         function hexToHsl(hex) {
             if (hex.indexOf('#') === 0) hex = hex.slice(1);
@@ -411,7 +958,6 @@
             
             return hslToHex(targetHue, targetSaturation, targetLightness);
         }
-
         function hexToRgba(hex, alpha) {
             if (hex.indexOf('#') === 0) hex = hex.slice(1);
             if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
@@ -419,87 +965,113 @@
             return `rgba(${r},${g},${b},${alpha})`;
         }
 
+        function drawUnifiedBackground(context, baseColor, style, preset, t) {
+            const W = INTERNAL_W;
+            const H = INTERNAL_H;
+
+            // 1. Get the current palette object
+            let p;
+            if (preset === 'custom') {
+                const contrastGrad = getContrastColor(baseColor, 'gradient');
+                const contrastSolid = getContrastColor(baseColor, 'solid');
+                p = {
+                    bg: baseColor,
+                    c1: contrastGrad[0],
+                    c2: contrastGrad[1],
+                    c3: contrastGrad[1],
+                    acc: contrastSolid
+                };
+            } else {
+                p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset) || PALETTES[0];
+            }
+            const bg = p.bg, c1 = p.c1, c2 = p.c2, c3 = p.c3, acc = p.acc;
+            context.clearRect(0, 0, W, H);
+
+            function getGradientColor(hex) {
+                const [h, s, l] = hexToHsl(hex);
+                // Enforce minimum lightness (55%) and soft saturation (max 70%) to avoid dark/blackish corners
+                const finalL = Math.max(l, 55);
+                const finalS = Math.min(s, 70);
+                return hslToHex(h, finalS, finalL);
+            }
+            const gradC1 = getGradientColor(c1);
+            const gradC2 = getGradientColor(c2);
+
+            function getMidwayColor(hex) {
+                const [h, s, l] = hexToHsl(hex);
+                const midL = l + (100 - l) * 0.55; 
+                const midS = s * 0.85;             
+                return hslToHex(h, midS, midL);
+            }
+            const midC2 = getMidwayColor(gradC2);
+
+            // 2. Draw diagonal linear gradient: gradC1 (top-left) -> gradC2 -> midC2 -> white (bottom-right)
+            const gradient = context.createLinearGradient(0, 0, W, H);
+            gradient.addColorStop(0, gradC1);
+            gradient.addColorStop(0.20, gradC2);
+            gradient.addColorStop(0.45, midC2);
+            gradient.addColorStop(0.70, '#ffffff');
+            gradient.addColorStop(1, '#ffffff');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, W, H);
+
+            // 3. Subtle static grid overlay (visible grey lines, no animation)
+            context.save();
+            context.strokeStyle = 'rgba(0, 0, 0, 0.09)';
+            context.lineWidth = 1.0;
+            const gs = 60; // grid size
+            const dx = 0;
+            const dy = 0;
+            for (let x = dx - gs; x <= W + gs; x += gs) {
+                context.beginPath();
+                context.moveTo(x, 0);
+                context.lineTo(x, H);
+                context.stroke();
+            }
+            for (let y = dy - gs; y <= H + gs; y += gs) {
+                context.beginPath();
+                context.moveTo(0, y);
+                context.lineTo(W, y);
+                context.stroke();
+            }
+            context.restore();
+
+            // 4. Soft top/bottom vignette shadow (linear gradient overlays)
+            context.save();
+            // Top vignette (extremely subtle to avoid dark corners)
+            const topVg = context.createLinearGradient(0, 0, 0, H * 0.18);
+            topVg.addColorStop(0, 'rgba(0, 0, 0, 0.06)');
+            topVg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            context.fillStyle = topVg;
+            context.fillRect(0, 0, W, H * 0.18);
+
+            // Bottom vignette (subtle depth)
+            const bottomVg = context.createLinearGradient(0, H, 0, H * 0.82);
+            bottomVg.addColorStop(0, 'rgba(0, 0, 0, 0.15)');
+            bottomVg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            context.fillStyle = bottomVg;
+            context.fillRect(0, H * 0.82, W, H * 0.18);
+            context.restore();
+
+            // 5. Film grain noise texture overlay (opacity ~0.04)
+            context.save();
+            context.fillStyle = noisePat;
+            context.globalAlpha = 0.04;
+            context.fillRect(0, 0, W, H);
+            context.restore();
+
+            // 6. Universal dark overlay to tone down the background (very subtle)
+            context.save();
+            context.fillStyle = 'rgba(0, 0, 0, 0.02)';
+            context.fillRect(0, 0, W, H);
+            context.restore();
+        }
+
         function renderBackground(t = 0) {
             const style = bgStyle.value;
             const baseColor = bgColor.value;
-            const W = canvas.width;
-            const H = canvas.height;
-
-            // Base fill for all non-transparent styles
-            ctx.fillStyle = baseColor;
-            ctx.fillRect(0, 0, W, H);
-
-            if (style === 'solid') return;
-
-            ctx.save();
-            
-            if (style === 'grid') {
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.globalAlpha = 0.1;
-                const gs = 60;
-                const offX = (t * 0.5) % gs;
-                const offY = (t * 0.3) % gs;
-                for (let x = offX; x < W; x += gs) {
-                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-                }
-                for (let y = offY; y < H; y += gs) {
-                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-                }
-            } else if (style === 'dots') {
-                ctx.fillStyle = '#ffffff';
-                ctx.globalAlpha = 0.15;
-                const sp = 40;
-                const dr = 3;
-                const offX = (t * 0.4) % sp;
-                const offY = (t * 0.2) % sp;
-                for (let x = offX; x < W; x += sp) {
-                    for (let y = offY; y < H; y += sp) {
-                        ctx.beginPath(); ctx.arc(x, y, dr, 0, Math.PI * 2); ctx.fill();
-                    }
-                }
-            } else if (style === 'rad_c') {
-                const g = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, H * 0.9);
-                const colors = getContrastColor(baseColor, 'gradient');
-                g.addColorStop(0, hexToRgba(colors[0], 0.3));
-                g.addColorStop(1, 'transparent');
-                ctx.fillStyle = g;
-                ctx.fillRect(0, 0, W, H);
-            } else if (style === 'diag') {
-                ctx.fillStyle = '#ffffff';
-                ctx.globalAlpha = 0.08;
-                const sw = 40;
-                const off = (t * 0.6) % (sw * 2);
-                for (let i = -H + off; i < W; i += sw * 2) {
-                    ctx.beginPath();
-                    ctx.moveTo(i, 0); ctx.lineTo(i + sw, 0);
-                    ctx.lineTo(i + sw + H, H); ctx.lineTo(i + H, H);
-                    ctx.closePath(); ctx.fill();
-                }
-            } else if (style === 'mesh') {
-                const colors = getContrastColor(baseColor, 'gradient');
-                [[W * 0.2 + Math.sin(t * 0.01) * 150, H * 0.3 + Math.cos(t * 0.01) * 100, colors[0]],
-                 [W * 0.8 + Math.cos(t * 0.012) * 150, H * 0.7 + Math.sin(t * 0.012) * 100, colors[1]]].forEach(([px, py, col]) => {
-                    const g = ctx.createRadialGradient(px, py, 0, px, py, W * 0.7);
-                    g.addColorStop(0, hexToRgba(col, 0.25));
-                    g.addColorStop(1, 'transparent');
-                    ctx.fillStyle = g;
-                    ctx.fillRect(0, 0, W, H);
-                });
-            }
-            
-            ctx.restore();
-        }
-
-        function getContrastColor(hex, type = 'solid') {
-            if (hex.indexOf('#') === 0) hex = hex.slice(1);
-            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-            let r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
-            let brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            
-            if (b > 200 && r < 100 && g < 150) return type === 'gradient' ? ['#ffea00', '#ff5722'] : '#ffea00';
-            if (type === 'gradient') return brightness > 128 ? ['#1e293b', '#0f172a'] : ['#38bdf8', '#c084fc'];
-            return brightness > 128 ? '#0f172a' : '#ffffff';
+            const preset = document.getElementById('bgPreset').value;
+            drawUnifiedBackground(ctx, baseColor, style, preset, t);
         }
 
         // Patterns implementation
@@ -525,20 +1097,35 @@
 
             const shapes = ['circle', 'vertical_strip', 'horizontal_strip', 'square', 'diamond'];
             const layouts = [
-                'auto_solid', 'auto_gradient', 
-                'auto_solid_dots', 'auto_solid_lines', 
+                'auto_solid', 'auto_gradient',
+                'auto_solid_dots', 'auto_solid_lines',
                 'auto_gradient_dots', 'auto_gradient_lines',
-                'pattern_dots', 'pattern_lines', 'custom'
+                'custom'
             ];
             const motions = ['classic', 'fade_pulse'];
-            const renders = ['fill', 'outline', 'both'];
-            const bgStyles = ['solid', 'grid', 'dots', 'rad_c', 'diag', 'mesh'];
+            const renders = ['fill', 'both'];
+            
+            const bgStyles = ['solid', 'lin45', 'lin135', 'lin3', 'rad_c', 'rad_corner', 'rad_multi', 'grid', 'grid_h', 'grid_m', 'dots', 'dots_l', 'diag', 'diag_t', 'cross', 'hex', 'conc', 'wavy', 'mesh', 'vignette', 'cglow', 'circuit'];
+            const presets = PALETTES.map(p => p.n.toLowerCase().replace(/\s+/g, '_'));
+            presets.push('custom');
 
             shapeType.value = shapes[Math.floor(Math.random() * shapes.length)];
             shapeLayout.value = layouts[Math.floor(Math.random() * layouts.length)];
             motionStyle.value = motions[Math.floor(Math.random() * motions.length)];
             renderStyle.value = renders[Math.floor(Math.random() * renders.length)];
-            bgStyle.value = bgStyles[Math.floor(Math.random() * bgStyles.length)];
+            
+            if (!lockBGColor.checked) {
+                const chosenStyle = bgStyles[Math.floor(Math.random() * bgStyles.length)];
+                const chosenPreset = presets[Math.floor(Math.random() * presets.length)];
+                
+                bgStyle.value = chosenStyle;
+                document.getElementById('bgPreset').value = chosenPreset;
+                
+                // Sync to photo anim panel as well
+                document.getElementById('photoAnimBgStyle').value = chosenStyle;
+                document.getElementById('photoAnimBgPreset').value = chosenPreset;
+            }
+
             comboToggle.checked = Math.random() > 0.5;
             
             shapeScaleSlider.value = Math.floor(Math.random() * (900 - 400 + 1)) + 400;
@@ -551,7 +1138,9 @@
             photoYSlider.value = 0;
 
             if (!lockBGColor.checked) {
-                bgColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                const randColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                bgColor.value = randColor;
+                document.getElementById('photoAnimBgColor').value = randColor;
             }
             shapeColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
 
@@ -571,6 +1160,29 @@
             photoScaleVal.innerText = photoScale.value + '%';
             photoXVal.innerText = photoXSlider.value;
             photoYVal.innerText = photoYSlider.value;
+
+            // Polaroid Spin layout labels
+            const pScaleEl = document.getElementById('polaroidScaleSlider');
+            if (pScaleEl) {
+                document.getElementById('polaroidScaleVal').innerText = pScaleEl.value;
+                document.getElementById('polaroidXVal').innerText = document.getElementById('polaroidXSlider').value;
+                document.getElementById('polaroidYVal').innerText = document.getElementById('polaroidYSlider').value;
+                document.getElementById('circleScaleVal').innerText = document.getElementById('circleScaleSlider').value;
+                document.getElementById('circleXVal').innerText = document.getElementById('circleXSlider').value;
+                document.getElementById('circleYVal').innerText = document.getElementById('circleYSlider').value;
+            }
+
+            // Keyframe labels
+            if (document.getElementById('paScaleStartSlider')) {
+                document.getElementById('paScaleStartVal').innerText = document.getElementById('paScaleStartSlider').value + '%';
+                document.getElementById('paScaleEndVal').innerText = document.getElementById('paScaleEndSlider').value + '%';
+                document.getElementById('paXStartVal').innerText = document.getElementById('paXStartSlider').value;
+                document.getElementById('paXEndVal').innerText = document.getElementById('paXEndSlider').value;
+                document.getElementById('paYStartVal').innerText = document.getElementById('paYStartSlider').value;
+                document.getElementById('paYEndVal').innerText = document.getElementById('paYEndSlider').value;
+                document.getElementById('paAngleStartVal').innerText = document.getElementById('paAngleStartSlider').value + '°';
+                document.getElementById('paAngleEndVal').innerText = document.getElementById('paAngleEndSlider').value + '°';
+            }
         }
 
         function resetAnimation() {
@@ -580,6 +1192,11 @@
             dynamicOpacity = 0;
             dynamicPulse = 1;
             dynamicPhotoZoom = 1.0;
+
+            // Reset photo anim state
+            pa_zoom = 1.0; pa_x = 0; pa_y = 0;
+            pa_angle = 0; pa_alpha = 0;
+            pa_wipe = 0; pa_bounce = 0;
             
             // Logic: Left/Right only works in 'no_clip' mode. 
             // In 'clip' mode, it always starts from 'bottom' for a clean entry.
@@ -592,24 +1209,35 @@
             
             motionPhotoXOffset = 0;
             motionPhotoYOffset = 0;
+            photoIntroStartX = 0;
+            photoIntroStartY = 0;
             
-            if (entryDirection === 'bottom') motionPhotoYOffset = 1000;
-            else if (entryDirection === 'left') motionPhotoXOffset = -1000;
-            else if (entryDirection === 'right') motionPhotoXOffset = 1000;
+            if (entryDirection === 'bottom') {
+                motionPhotoYOffset = 1920;
+                photoIntroStartY = 1920;
+            } else if (entryDirection === 'left') {
+                motionPhotoXOffset = -1080;
+                photoIntroStartX = -1080;
+            } else if (entryDirection === 'right') {
+                motionPhotoXOffset = 1080;
+                photoIntroStartX = 1080;
+            }
 
             timeProgress.style.width = '0%';
+            updatePhysics(true);
             drawFrame();
         }
 
-        function updatePhysics() {
-            if (isPlaying) {
-                currentFrame++;
-                
-                if (currentFrame > totalDuration) {
-                    if (isExporting) return;
-                    isPlaying = false;
-                    playBtn.innerText = "▶ Play";
-                    return;
+        function updatePhysics(force = false) {
+            if (isPlaying || force) {
+                if (isPlaying && !force) {
+                    if (currentFrame >= totalDuration) {
+                        if (isExporting) return;
+                        isPlaying = false;
+                        playBtn.innerText = "▶ Play";
+                        return;
+                    }
+                    currentFrame++;
                 }
                 
                 // 1. Shape Dynamics (Settles at Frame 22)
@@ -625,20 +1253,48 @@
 
                 // 2. Photo Dynamics (Settles at Frame 30)
                 if (currentFrame < 30) {
-                    if (currentFrame > 6) {
-                        motionPhotoXOffset += (0 - motionPhotoXOffset) * 0.18;
-                        motionPhotoYOffset += (0 - motionPhotoYOffset) * 0.18;
-                    }
+                    const introT = currentFrame / 30;
+                    const introEase = 1 - Math.pow(1 - introT, 3); // Smooth cubic ease-out
+                    motionPhotoXOffset = photoIntroStartX * (1 - introEase);
+                    motionPhotoYOffset = photoIntroStartY * (1 - introEase);
                 } else {
                     motionPhotoXOffset = 0;
                     motionPhotoYOffset = 0;
                     
-                    // Post-Intro Effects
-                    dynamicPhotoZoom = 1.0 + (currentFrame - 30) * 0.0006;
-                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025;
+                    // Post-Intro Effects - Eased to stop smoothly at the end
+                    const postT = Math.min(1.0, Math.max(0.0, (currentFrame - 30) / (totalDuration - 30)));
+                    const postEase = 1 - Math.pow(1 - postT, 3); // Smooth cubic ease-out curve
+                    dynamicPhotoZoom = 1.0 + postEase * 0.072;
+                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025 * (1.0 - postEase);
                 }
-                
-                timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
+
+                // ── Photo Animation mode physics ──
+                if (appMode === 'photo_anim') {
+                    const animType  = document.getElementById('photoAnimType').value;
+                    const intensity = parseInt(document.getElementById('photoAnimIntensity').value) / 100;
+                    const t = Math.min(1.0, Math.max(0.0, currentFrame / totalDuration)); // 0→1 normalised progress
+                    const ease = (v) => 1 - Math.pow(1 - v, 3); // cubic ease-out (starts fast immediately, ends with 0 velocity & acceleration)
+
+                    // Get keyframe configuration values from UI sliders
+                    const startScale = parseInt(document.getElementById('paScaleStartSlider').value) / 100;
+                    const endScale = parseInt(document.getElementById('paScaleEndSlider').value) / 100;
+                    const startX = parseInt(document.getElementById('paXStartSlider').value);
+                    const endX = parseInt(document.getElementById('paXEndSlider').value);
+                    const startY = parseInt(document.getElementById('paYStartSlider').value);
+                    const endY = parseInt(document.getElementById('paYEndSlider').value);
+                    const startAngle = parseInt(document.getElementById('paAngleStartSlider').value);
+                    const endAngle = parseInt(document.getElementById('paAngleEndSlider').value);
+
+                    // Interpolate values using ease function and intensity multiplier on the delta
+                    pa_zoom  = startScale + (endScale - startScale) * ease(t) * intensity;
+                    pa_x     = startX + (endX - startX) * ease(t) * intensity;
+                    pa_y     = startY + (endY - startY) * ease(t) * intensity;
+                    pa_angle = startAngle + (endAngle - startAngle) * ease(t) * intensity;
+
+                    pa_alpha = 1.0; // Always keep full opacity for smooth cuts and joins in Premiere Pro
+                }
+
+                timeProgress.style.width = `${Math.min(100.0, Math.max(0.0, (currentFrame / totalDuration) * 100))}%`;
             }
         }
 
@@ -655,9 +1311,9 @@
                 context.lineTo(cx - size / 2, cy);
                 context.closePath();
             } else if (type === 'vertical_strip') {
-                context.rect(cx - size / 2, 0, size, canvas.height);
+                context.rect(cx - size / 2, 0, size, INTERNAL_H);
             } else if (type === 'horizontal_strip') {
-                context.rect(0, cy - size / 2, canvas.width, size);
+                context.rect(0, cy - size / 2, INTERNAL_W, size);
             }
         }
 
@@ -687,13 +1343,13 @@
             // Apply motion kinematics
             if (motionStyle.value === 'rotation' && type !== 'circle') {
                 context.translate(cx, cy);
-                context.rotate(isPlaying ? dynamicRotation : 0);
+                context.rotate(dynamicRotation);
                 context.translate(-cx, -cy);
             }
             
             if (motionStyle.value === 'fade_pulse') {
-                context.globalAlpha = isPlaying ? dynamicOpacity : 1.0;
-                baseSize = baseSize * (isPlaying ? dynamicPulse : 1.0);
+                context.globalAlpha = dynamicOpacity;
+                baseSize = baseSize * dynamicPulse;
             }
 
             // Draw Core Render Strategy
@@ -734,19 +1390,300 @@
             context.restore();
         }
 
+        // ── Photo Animation Renderer ──
+        function drawPhotoAnimFrame() {
+            if (!uploadedImg) {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                ctx.strokeStyle = 'rgba(245,158,11,0.3)';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([15, 15]);
+                ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2, 150, 0, Math.PI*2); ctx.stroke();
+                return;
+            }
+
+            const bgCol    = document.getElementById('photoAnimBgColor').value;
+            const bgStyle  = document.getElementById('photoAnimBgStyle').value;
+            const animType = document.getElementById('photoAnimType').value;
+
+            // ── Polaroid Spin: special full renderer ──
+            if (animType === 'polaroid_spin') {
+                // Background (Uses UI Color, Style & Preset)
+                const animPreset = document.getElementById('photoAnimBgPreset').value;
+                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
+
+                const cx = INTERNAL_W / 2;
+                const cy = INTERNAL_H / 2 - 80;
+
+                // Get layout slider values
+                const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
+                const pX = parseInt(document.getElementById('polaroidXSlider').value);
+                const pY = parseInt(document.getElementById('polaroidYSlider').value);
+
+                const cScale = parseInt(document.getElementById('circleScaleSlider').value);
+                const cX = parseInt(document.getElementById('circleXSlider').value);
+                const cY = parseInt(document.getElementById('circleYSlider').value);
+
+                // Polaroid dimensions (proportional scaling)
+                const frameW = pScale;
+                const frameH = pScale * (560 / 520);  
+                const photoInset = pScale * (28 / 520); 
+                const bottomInset = pScale * (100 / 520); 
+
+                // Position: slightly right-of-center, adjusted by pa_x/pa_y
+                const fx = cx - frameW / 2 + pX + pa_x;
+                const fy = cy - frameH / 2 + pY + pa_y;
+
+                // Center of the polaroid frame
+                const fcx = fx + frameW / 2;
+                const fcy = fy + frameH / 2;
+
+                // ── Decorative circular ring (behind polaroid) ──
+                const showRings = document.getElementById('polaroidRingsToggle').checked;
+                if (showRings) {
+                    ctx.save();
+                    ctx.globalAlpha = pa_alpha * 0.9;
+                    const ringR = cScale;
+                    
+                    let p;
+                    const animPreset = document.getElementById('photoAnimBgPreset').value;
+                    if (animPreset === 'custom') {
+                        const contrastSolid = getContrastColor(bgCol, 'solid');
+                        p = { acc: contrastSolid };
+                    } else {
+                        p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === animPreset) || PALETTES[0];
+                    }
+                    const [ch, cs, cl] = hexToHsl(p.acc);
+                    const strokeCol = hslToHex(ch, Math.max(cs, 50), 25); // Elegant dark version (25% lightness) of the palette accent
+                    
+                    // Center of circles (customizable)
+                    const ccx = cx + cX + pa_x;
+                    const ccy = cy + cY + pa_y;
+
+                    // Write-on path animation based on time progress t
+                    const t = Math.min(1.0, Math.max(0.0, currentFrame / totalDuration));
+                    const ease = (v) => v < 0.5 ? 2*v*v : -1+(4-2*v)*v;
+                    const drawAngle = ease(t) * Math.PI * 2;
+                    
+                    // Proportional line widths based on circle scale (default 370)
+                    const scaleFactor = cScale / 370;
+
+                    // Outer ring (High visibility, centered on ccx, ccy, drawing clockwise from top)
+                    ctx.beginPath();
+                    ctx.arc(ccx, ccy, ringR, -Math.PI / 2, -Math.PI / 2 + drawAngle);
+                    ctx.strokeStyle = hexToRgba(strokeCol, 0.8);
+                    ctx.lineWidth = 2.5 * scaleFactor;
+                    ctx.setLineDash([]);
+                    ctx.stroke();
+                    // Inner thin ring
+                    ctx.beginPath();
+                    ctx.arc(ccx, ccy, ringR - (18 * scaleFactor), -Math.PI / 2, -Math.PI / 2 + drawAngle);
+                    ctx.strokeStyle = hexToRgba(strokeCol, 0.4);
+                    ctx.lineWidth = 1.5 * scaleFactor;
+                    ctx.stroke();
+                    // Small dash-ring accent
+                    ctx.beginPath();
+                    ctx.arc(ccx, ccy, ringR + (22 * scaleFactor), -Math.PI / 2, -Math.PI / 2 + drawAngle);
+                    ctx.strokeStyle = hexToRgba(strokeCol, 0.3);
+                    ctx.lineWidth = 1.5 * scaleFactor;
+                    ctx.setLineDash([8 * scaleFactor, 20 * scaleFactor]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.restore();
+                }
+
+                // ── Polaroid frame + photo ──
+                ctx.save();
+                ctx.globalAlpha = pa_alpha;
+
+                // Apply scale + rotation around frame center
+                ctx.translate(fcx, fcy);
+                ctx.scale(pa_zoom, pa_zoom);
+                ctx.rotate(pa_angle * Math.PI / 180);
+                ctx.translate(-fcx, -fcy);
+
+                // Drop shadow
+                ctx.shadowColor = 'rgba(0,0,0,0.7)';
+                ctx.shadowBlur = 60;
+                ctx.shadowOffsetX = 12;
+                ctx.shadowOffsetY = 20;
+
+                // White polaroid frame
+                ctx.fillStyle = '#f5f5f0';
+                ctx.beginPath();
+                ctx.roundRect(fx, fy, frameW, frameH, 6);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Photo area (clipped inside frame)
+                const photoX = fx + photoInset;
+                const photoY = fy + photoInset;
+                const photoW = frameW - photoInset * 2;
+                const photoH = frameH - photoInset - bottomInset;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(photoX, photoY, photoW, photoH);
+                ctx.clip();
+
+                // User manual scaling and offsets
+                const userScale = parseInt(document.getElementById('photoScale').value) / 100;
+                const userX = parseInt(document.getElementById('photoXSlider').value);
+                const userY = parseInt(document.getElementById('photoYSlider').value);
+
+                // Cover-fit photo inside the photo area combined with user scale
+                const pCover = Math.max(photoW / uploadedImg.width, photoH / uploadedImg.height) * userScale;
+                const piw = uploadedImg.width  * pCover;
+                const pih = uploadedImg.height * pCover;
+                const pix = photoX + (photoW - piw) / 2 + userX;
+                const piy = photoY + (photoH - pih) / 2 + userY;
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(uploadedImg, pix, piy, piw, pih);
+                ctx.restore(); // unclip
+
+                ctx.restore(); // un-transform
+                return;
+            }
+
+            // ── Bordered Card RTL/LTR: special card renderer ──
+            if (animType === 'bordered_card_rtl' || animType === 'bordered_card_ltr') {
+                // 1. Background
+                const animPreset = document.getElementById('photoAnimBgPreset').value;
+                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
+
+                const cx = INTERNAL_W / 2;
+                const cy = INTERNAL_H / 2;
+
+                // Get layout slider values
+                const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
+                const pX = parseInt(document.getElementById('polaroidXSlider').value);
+                const pY = parseInt(document.getElementById('polaroidYSlider').value);
+
+                // 2. Card Dimensions (using sliders, maintaining aspect ratio)
+                const cardW = pScale;
+                const cardH = pScale * (960 / 640); 
+                const borderRadius = 20 * (pScale / 640);
+                const borderThickness = 12 * (pScale / 640);
+
+                // Position (stationary, adjusted only by slider layout offsets)
+                const fx = cx - cardW / 2 + pX;
+                const fy = cy - cardH / 2 + pY;
+
+                ctx.save();
+                
+                // Drop shadow for the card
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 50;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 15;
+
+                // Draw white border card
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(fx, fy, cardW, cardH, borderRadius);
+                ctx.fill();
+
+                // Reset shadow for photo drawing
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Photo area (clipped inside the border)
+                const photoX = fx + borderThickness;
+                const photoY = fy + borderThickness;
+                const photoW = cardW - borderThickness * 2;
+                const photoH = cardH - borderThickness * 2;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(photoX, photoY, photoW, photoH, Math.max(0, borderRadius - borderThickness));
+                ctx.clip();
+
+                // User manual scaling and offsets
+                const userScale = parseInt(document.getElementById('photoScale').value) / 100;
+                const userX = parseInt(document.getElementById('photoXSlider').value);
+                const userY = parseInt(document.getElementById('photoYSlider').value);
+
+                // Apply zoom to the image inside the card (cover-fit) combined with user scale
+                const pScaleFactor = Math.max(photoW / uploadedImg.width, photoH / uploadedImg.height) * pa_zoom * userScale;
+                const piw = uploadedImg.width  * pScaleFactor;
+                const pih = uploadedImg.height * pScaleFactor;
+                const pix = photoX + (photoW - piw) / 2 + pa_x + userX;
+                const piy = photoY + (photoH - pih) / 2 + pa_y + userY;
+
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(uploadedImg, pix, piy, piw, pih);
+                
+                ctx.restore(); // unclip
+                ctx.restore(); // restore shadow/transformations
+                return;
+            }
+
+            // Draw background (non-polaroid modes)
+            const animPreset = document.getElementById('photoAnimBgPreset').value;
+            drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
+
+            // User manual scaling and offsets
+            const userScale = parseInt(document.getElementById('photoScale').value) / 100;
+            const userX = parseInt(document.getElementById('photoXSlider').value);
+            const userY = parseInt(document.getElementById('photoYSlider').value);
+
+            // Scale photo to fill canvas (cover) combined with user scale
+            const cover = Math.max(INTERNAL_W / uploadedImg.width, INTERNAL_H / uploadedImg.height) * userScale;
+            const iw = uploadedImg.width  * cover * pa_zoom;
+            const ih = uploadedImg.height * cover * pa_zoom;
+            const bx = (INTERNAL_W - iw) / 2 + pa_x + userX;
+            const by = (INTERNAL_H - ih) / 2 + pa_y + userY;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, pa_alpha));
+
+            if (animType === 'wipe_up') {
+                const revealH = INTERNAL_H * pa_wipe;
+                ctx.beginPath();
+                ctx.rect(0, INTERNAL_H - revealH, INTERNAL_W, revealH);
+                ctx.clip();
+            }
+
+            if (Math.abs(pa_angle) > 0.01) {
+                ctx.translate(INTERNAL_W / 2, INTERNAL_H / 2);
+                ctx.rotate(pa_angle * Math.PI / 180);
+                ctx.translate(-INTERNAL_W / 2, -INTERNAL_H / 2);
+            }
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(uploadedImg, bx, by, iw, ih);
+            ctx.restore();
+        }
+
         function drawFrame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+            // ── Photo Animation mode ──
+            if (appMode === 'photo_anim') {
+                drawPhotoAnimFrame();
+                drawTextOverlay();
+                return;
+            }
             
-            // Reset context state to prevent persistent styles (like dash or shadows)
+            // Standardize context for deterministic render
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.setLineDash([]);
             ctx.shadowBlur = 0;
             ctx.shadowColor = 'transparent';
             
             renderBackground(currentFrame);
 
-            // Calculation setups
-            const cx = (canvas.width / 2) + parseInt(shapeXSlider.value);
-            const cy = (canvas.height / 2) + parseInt(shapeYSlider.value); 
+            // Calculation setups using fixed resolution
+            const cx = (INTERNAL_W / 2) + parseInt(shapeXSlider.value);
+            const cy = (INTERNAL_H / 2) + parseInt(shapeYSlider.value); 
 
             const userShapeSize = parseInt(shapeScaleSlider.value);
             const classicScale = isPlaying ? dynamicScale : 1.0;
@@ -772,23 +1709,23 @@
             // Render subject overlay
             if (uploadedImg) {
                 const userScale = (parseInt(photoScale.value) / 100) * dynamicPhotoZoom;
-                const baseScale = Math.min((canvas.width * 0.85) / uploadedImg.width, (canvas.height * 0.75) / uploadedImg.height);
+                const baseScale = Math.min((INTERNAL_W * 0.85) / uploadedImg.width, (INTERNAL_H * 0.75) / uploadedImg.height);
                 const iw = uploadedImg.width * baseScale * userScale;
                 const ih = uploadedImg.height * baseScale * userScale;
                 
-                const actualXOffset = isPlaying && currentFrame < 30 ? motionPhotoXOffset : 0;
-                const actualYOffset = isPlaying && currentFrame < 30 ? motionPhotoYOffset : 0;
+                const actualXOffset = currentFrame < 30 ? motionPhotoXOffset : 0;
+                const actualYOffset = currentFrame < 30 ? motionPhotoYOffset : 0;
 
-                const px = (canvas.width / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
-                const py = (canvas.height / 2) + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
+                const px = (INTERNAL_W / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
+                const py = (INTERNAL_H / 2) + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
 
                 const drawSubject = (targetCtx) => {
                     targetCtx.save();
-                    // Explicitly reset shadow and dash before drawing image to avoid artifacts
+                    targetCtx.imageSmoothingEnabled = true;
+                    targetCtx.imageSmoothingQuality = 'high';
                     targetCtx.shadowBlur = 0;
                     targetCtx.shadowColor = 'transparent';
                     targetCtx.setLineDash([]);
-                    
                     targetCtx.drawImage(uploadedImg, px, py, iw, ih);
                     targetCtx.restore();
                 };
@@ -801,144 +1738,211 @@
                         horizonY = cy + (baseShapeSize * 0.15);
                     }
 
-                    const isIntroSideEntry = isPlaying && currentFrame < 30 && (entryDirection === 'left' || entryDirection === 'right');
+                    const isIntroSideEntry = currentFrame < 30 && (entryDirection === 'left' || entryDirection === 'right');
 
                     ctx.save();
-                    // Unified Clipping Strategy: Combine shape and pop-out rect into ONE path
-                    // This prevents double-rendering the subject and eliminates "dark lines" during transparency
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
-                    
                     if (!isIntroSideEntry) {
-                        // Add the pop-out area (top half) to the current clipping path
-                        ctx.rect(0, 0, canvas.width, horizonY);
+                        ctx.rect(0, 0, INTERNAL_W, horizonY);
                     }
-                    
                     ctx.clip();
                     drawSubject(ctx);
                     ctx.restore();
                 } else {
+                    // Float mode: soft edge fades using destination-in masks
                     ctx.save();
-                    drawSubject(ctx);
+
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = INTERNAL_W;
+                    tempCanvas.height = INTERNAL_H;
+                    const tCtx = tempCanvas.getContext('2d');
+
+                    tCtx.imageSmoothingEnabled = true;
+                    tCtx.imageSmoothingQuality = 'high';
+                    tCtx.drawImage(uploadedImg, px, py, iw, ih);
+
+                    // ── Bottom fade (cosine curve, toggleable) ──
+                    if (document.getElementById('fadeBottom').checked) {
+                        const fadeStartY = py + ih * 0.70;
+                        const fadeEndY   = py + ih;
+                        const bottomGrad = tCtx.createLinearGradient(0, fadeStartY, 0, fadeEndY);
+                        for (let i = 0; i <= 100; i++) {
+                            const t = i / 100;
+                            const alpha = parseFloat(Math.cos(t * Math.PI / 2).toFixed(4));
+                            bottomGrad.addColorStop(t, `rgba(0,0,0,${alpha})`);
+                        }
+                        tCtx.globalCompositeOperation = 'destination-in';
+                        tCtx.fillStyle = bottomGrad;
+                        tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                    }
+
+                    // ── Left fade (optional): smooth, wide zone ──
+                    if (document.getElementById('fadeLeft').checked) {
+                        const leftFadeEnd = px + iw * 0.28;
+                        const leftGrad = tCtx.createLinearGradient(px, 0, leftFadeEnd, 0);
+                        leftGrad.addColorStop(0.0, 'rgba(0,0,0,0)');
+                        leftGrad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                        leftGrad.addColorStop(1.0, 'rgba(0,0,0,1)');
+                        tCtx.globalCompositeOperation = 'destination-in';
+                        tCtx.fillStyle = leftGrad;
+                        tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                    }
+
+                    // ── Right fade (optional): smooth, wide zone ──
+                    if (document.getElementById('fadeRight').checked) {
+                        const rightFadeStart = px + iw * 0.72;
+                        const rightGrad = tCtx.createLinearGradient(rightFadeStart, 0, px + iw, 0);
+                        rightGrad.addColorStop(0.0, 'rgba(0,0,0,1)');
+                        rightGrad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                        rightGrad.addColorStop(1.0, 'rgba(0,0,0,0)');
+                        tCtx.globalCompositeOperation = 'destination-in';
+                        tCtx.fillStyle = rightGrad;
+                        tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                    }
+
+                    ctx.drawImage(tempCanvas, 0, 0);
                     ctx.restore();
                 }
             } else {
-                // Placeholder guide lines
                 ctx.strokeStyle = 'rgba(255,255,255,0.15)';
                 ctx.lineWidth = 4;
                 ctx.setLineDash([15, 15]);
-                ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2 + 150, 150, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2 + 150, 150, 0, Math.PI * 2); ctx.stroke();
             }
+            drawTextOverlay();
         }
 
-        // CFR Sequential frame by frame pipeline exporter
         async function startExport() {
-            if (!uploadedImg) { alert("এক্সপোর্ট করার জন্য একটি ইমেজ আপলোড করুন!"); return; }
+            if (!uploadedImg) { alert("দয়া করে একটি ইমেজ আপলোড করুন!"); return; }
             
-            isExporting = true;
-            isPlaying = true;
-            let recordedChunks = [];
             resetAnimation();
+            isPlaying = true;
+            isExporting = true;
+            currentFrame = 0;
+            
+            exportBtn.disabled = true;
+            exportBtn.innerText = "⏺ Recording...";
 
-            // Setup manual frame programmatic capture stream
-            const stream = canvas.captureStream(0); 
-            const videoTrack = stream.getVideoTracks()[0];
+            // Force internal resolution and draw first frame
+            canvas.width = INTERNAL_W;
+            canvas.height = INTERNAL_H;
+            drawFrame();
 
-            // Auto-detect best supported format
-            let types = [
-                'video/mp4;codecs=avc1',
-                'video/webm;codecs=vp8',
-                'video/webm;codecs=vp9'
-            ];
-            let supportedType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'video/webm';
-            let extension = supportedType.includes('mp4') ? 'mp4' : 'webm';
+            const stream = canvas.captureStream(30);
+            
+            let mimeType = 'video/mp4; codecs=avc1';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'video/webm; codecs=h264';
+            }
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'video/webm';
+            }
 
-            let options = { mimeType: supportedType, videoBitsPerSecond: 30000000 };
-            let mediaRecorder = new MediaRecorder(stream, options);
+            const recorder = new MediaRecorder(stream, {
+                mimeType: mimeType,
+                videoBitsPerSecond: 12000000 // 12Mbps
+            });
 
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) recordedChunks.push(event.data);
-            };
-
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: supportedType });
+            const chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: mimeType });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.style.display = 'none';
                 a.href = url;
-                a.download = `reels_export_${Date.now()}.${extension}`;
-                document.body.appendChild(a);
+                a.download = `reels-export-${Date.now()}.mp4`;
                 a.click();
-                window.URL.revokeObjectURL(url);
                 
-                exportBtn.innerText = "💾 Export";
-                exportBtn.disabled = false;
-                playBtn.disabled = false;
-                playBtn.innerText = "▶ Play";
-                randomBtn.disabled = false;
                 isExporting = false;
-                isPlaying = false;
-                resetAnimation();
+                exportBtn.disabled = false;
+                exportBtn.innerText = "💾 Export";
+                resetBtn.click();
             };
 
-            mediaRecorder.start();
-            exportBtn.innerText = "⏳ Recording 0%...";
-            exportBtn.disabled = true;
-            playBtn.disabled = true;
-            randomBtn.disabled = true;
+            recorder.start();
 
-            // Frame-by-Frame deterministic execution loop logic for Premiere Pro CFR matching
-            for (let f = 0; f <= totalDuration; f++) {
-                currentFrame = f;
-                
-                // Physics sync
-                const shapeProgress = Math.min(1.0, currentFrame / 22);
-                const photoProgress = Math.min(1.0, currentFrame / 30);
-
-                dynamicScale = shapeProgress;
-                dynamicRotation = shapeProgress * (360 * Math.PI / 180);
-                dynamicOpacity = shapeProgress;
-
-                if (currentFrame < 30) {
-                    if (entryDirection === 'bottom') {
-                        motionPhotoYOffset = 1000 * (1.0 - photoProgress);
-                        motionPhotoXOffset = 0;
-                    } else if (entryDirection === 'left') {
-                        motionPhotoXOffset = -1000 * (1.0 - photoProgress);
-                        motionPhotoYOffset = 0;
-                    } else if (entryDirection === 'right') {
-                        motionPhotoXOffset = 1000 * (1.0 - photoProgress);
-                        motionPhotoYOffset = 0;
-                    }
-                } else {
-                    motionPhotoXOffset = 0;
-                    motionPhotoYOffset = 0;
-                    dynamicPhotoZoom = 1.0 + (currentFrame - 30) * 0.0006;
-                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025;
-                }
-
-                timeProgress.style.width = `${(currentFrame / totalDuration) * 100}%`;
-                
-                // Draw framework pipeline
+            // Frame-by-frame recording loop
+            const renderInterval = setInterval(() => {
+                updatePhysics();
                 drawFrame();
                 
-                // CRITICAL for Premiere Smoothness: Wait for paint before capturing
-                await new Promise(resolve => requestAnimationFrame(resolve));
-                
-                // Track push execution request
-                if (videoTrack && typeof videoTrack.requestFrame === 'function') {
-                    videoTrack.requestFrame();
+                if (currentFrame >= totalDuration) {
+                    clearInterval(renderInterval);
+                    // Stop stream tracks immediately so no extra frames are captured
+                    stream.getVideoTracks().forEach(track => track.stop());
+                    recorder.stop();
                 }
-                
-                // Inform process state via UI metrics
-                let progressPercent = Math.round((currentFrame / totalDuration) * 100);
-                exportBtn.innerText = `⏳ Recording ${progressPercent}%...`;
-
-                // Add a tiny delay to give the encoder room
-                await new Promise(resolve => setTimeout(resolve, 16));
-            }
-
-            mediaRecorder.stop();
+            }, 33.33);
         }
+
+        // ── Mode switcher logic ──
+        function setAppMode(mode) {
+            appMode = mode;
+            if (mode === 'shape') {
+                modeShapeBtn.classList.add('active');
+                modePhotoBtn.classList.remove('active');
+                photoAnimPanel.style.display = 'none';
+                // Show shape panels
+                document.querySelectorAll('.shape-only-panel').forEach(el => el.style.display = '');
+            } else {
+                modePhotoBtn.classList.add('active');
+                modeShapeBtn.classList.remove('active');
+                photoAnimPanel.style.display = 'flex';
+                // Hide shape-specific panels
+                document.querySelectorAll('.shape-only-panel').forEach(el => el.style.display = 'none');
+                
+                // Set correct sub-controls visibility for the selected animation type
+                updatePhotoAnimControlsVisibility(document.getElementById('photoAnimType').value);
+            }
+            resetAnimation();
+            isPlaying = true;
+            playBtn.innerText = '⏸ Pause';
+        }
+
+        function updatePhotoAnimControlsVisibility(animType) {
+            const ringsToggleCard = document.getElementById('ringsToggleCard');
+            const layoutGeometryCard = document.getElementById('layoutGeometryCard');
+            const polaroidLayoutGroup = document.getElementById('polaroidLayoutGroup');
+            const circlesLayoutGroup = document.getElementById('circlesLayoutGroup');
+            const keyframeRotationBlock = document.getElementById('keyframeRotationBlock');
+            
+            // 1. Show rings toggle card only for polaroid_spin
+            if (ringsToggleCard) {
+                ringsToggleCard.style.display = animType === 'polaroid_spin' ? 'flex' : 'none';
+            }
+            
+            // 2. Layout & Geometry Card (Polaroid and Bordered Card both use layout adjustments)
+            if (layoutGeometryCard) {
+                if (animType === 'polaroid_spin' || animType.startsWith('bordered_card')) {
+                    layoutGeometryCard.style.display = 'flex';
+                } else {
+                    layoutGeometryCard.style.display = 'none'; // hide for ken_burns, drift_pan, fade_zoom
+                }
+            }
+            
+            // 3. Polaroid Layout Group
+            if (polaroidLayoutGroup) {
+                polaroidLayoutGroup.style.display = (animType === 'polaroid_spin' || animType.startsWith('bordered_card')) ? 'block' : 'none';
+                // Change title text depending on mode
+                const title = polaroidLayoutGroup.querySelector('.card-title');
+                if (title) {
+                    title.textContent = animType.startsWith('bordered_card') ? 'Bordered Card Layout' : 'Polaroid / Photo';
+                }
+            }
+            
+            // 4. Circles Layout Group
+            if (circlesLayoutGroup) {
+                circlesLayoutGroup.style.display = animType === 'polaroid_spin' ? 'block' : 'none';
+            }
+            
+            // 5. Rotation Keyframe Block
+            if (keyframeRotationBlock) {
+                keyframeRotationBlock.style.display = animType.startsWith('bordered_card') ? 'none' : 'block';
+            }
+        }
+
+        modeShapeBtn.addEventListener('click', () => setAppMode('shape'));
+        modePhotoBtn.addEventListener('click', () => setAppMode('photo_anim'));
 
         // Action and sliders binding routines
         exportBtn.addEventListener('click', startExport);
@@ -958,11 +1962,183 @@
             reader.readAsDataURL(e.target.files[0]);
         });
 
+        const fadeBottom = document.getElementById('fadeBottom');
+        const fadeLeft   = document.getElementById('fadeLeft');
+        const fadeRight  = document.getElementById('fadeRight');
+        const floatFadeOptions = document.getElementById('floatFadeOptions');
+
+        // Show/hide edge fade options based on clip mode
+        function updateFadeVisibility() {
+            floatFadeOptions.style.display = clipMode.value === 'no_clip' ? 'block' : 'none';
+        }
+        clipMode.addEventListener('change', () => { updateFadeVisibility(); drawFrame(); });
+        updateFadeVisibility();
+
+        const photoAnimIntensity = document.getElementById('photoAnimIntensity');
+        const photoAnimIntensityVal = document.getElementById('photoAnimIntensityVal');
+        photoAnimIntensity.addEventListener('input', () => {
+            photoAnimIntensityVal.innerText = photoAnimIntensity.value;
+            if (!isPlaying) {
+                updatePhysics(true);
+            }
+            drawFrame();
+        });
+        document.getElementById('photoAnimType').addEventListener('change', () => {
+            const animType = document.getElementById('photoAnimType').value;
+            
+            // Apply preset values to keyframe sliders
+            if (animType === 'polaroid_spin') {
+                document.getElementById('paScaleStartSlider').value = 100;
+                document.getElementById('paScaleEndSlider').value = 100;
+                document.getElementById('paXStartSlider').value = 0;
+                document.getElementById('paXEndSlider').value = 0;
+                document.getElementById('paYStartSlider').value = 0;
+                document.getElementById('paYEndSlider').value = 0;
+                document.getElementById('paAngleStartSlider').value = -30;
+                document.getElementById('paAngleEndSlider').value = 0;
+            } else if (animType === 'bordered_card_rtl') {
+                document.getElementById('paScaleStartSlider').value = 145;
+                document.getElementById('paScaleEndSlider').value = 120;
+                document.getElementById('paXStartSlider').value = 120;
+                document.getElementById('paXEndSlider').value = -120;
+                document.getElementById('paYStartSlider').value = 34;
+                document.getElementById('paYEndSlider').value = 0;
+                document.getElementById('paAngleStartSlider').value = 0;
+                document.getElementById('paAngleEndSlider').value = 0;
+            } else if (animType === 'bordered_card_ltr') {
+                document.getElementById('paScaleStartSlider').value = 145;
+                document.getElementById('paScaleEndSlider').value = 120;
+                document.getElementById('paXStartSlider').value = -120;
+                document.getElementById('paXEndSlider').value = 120;
+                document.getElementById('paYStartSlider').value = 34;
+                document.getElementById('paYEndSlider').value = 0;
+                document.getElementById('paAngleStartSlider').value = 0;
+                document.getElementById('paAngleEndSlider').value = 0;
+            } else if (animType === 'ken_burns') {
+                document.getElementById('paScaleStartSlider').value = 100;
+                document.getElementById('paScaleEndSlider').value = 118;
+                document.getElementById('paXStartSlider').value = 0;
+                document.getElementById('paXEndSlider').value = 80;
+                document.getElementById('paYStartSlider').value = 0;
+                document.getElementById('paYEndSlider').value = -60;
+                document.getElementById('paAngleStartSlider').value = 0;
+                document.getElementById('paAngleEndSlider').value = 0;
+            } else if (animType === 'drift_pan') {
+                document.getElementById('paScaleStartSlider').value = 105;
+                document.getElementById('paScaleEndSlider').value = 105;
+                document.getElementById('paXStartSlider').value = -100;
+                document.getElementById('paXEndSlider').value = 100;
+                document.getElementById('paYStartSlider').value = 0;
+                document.getElementById('paYEndSlider').value = 0;
+                document.getElementById('paAngleStartSlider').value = 0;
+                document.getElementById('paAngleEndSlider').value = 0;
+            } else if (animType === 'fade_zoom') {
+                document.getElementById('paScaleStartSlider').value = 100;
+                document.getElementById('paScaleEndSlider').value = 125;
+                document.getElementById('paXStartSlider').value = 0;
+                document.getElementById('paXEndSlider').value = 0;
+                document.getElementById('paYStartSlider').value = 0;
+                document.getElementById('paYEndSlider').value = 0;
+                document.getElementById('paAngleStartSlider').value = 0;
+                document.getElementById('paAngleEndSlider').value = 0;
+            }
+            
+            updatePhotoAnimControlsVisibility(animType);
+            updateLabels();
+            resetAnimation();
+            isPlaying = true;
+            playBtn.innerText = '⏸ Pause';
+        });
+ 
+        // Keyframe triggers setup
+        const photoAnimKeyframeSliders = [
+            'paScaleStartSlider', 'paScaleEndSlider',
+            'paXStartSlider', 'paXEndSlider',
+            'paYStartSlider', 'paYEndSlider',
+            'paAngleStartSlider', 'paAngleEndSlider'
+        ];
+        photoAnimKeyframeSliders.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const handler = () => {
+                    updateLabels();
+                    if (!isPlaying) {
+                        const isStart = id.toLowerCase().includes('start');
+                        currentFrame = isStart ? 0 : totalDuration;
+                        updatePhysics(true);
+                    }
+                    drawFrame();
+                };
+                el.addEventListener('input', handler);
+                el.addEventListener('change', handler);
+            }
+        });
+
+        document.getElementById('photoAnimBgColor').addEventListener('input', drawFrame);
+        document.getElementById('photoAnimBgStyle').addEventListener('change', drawFrame);
+        document.getElementById('polaroidRingsToggle').addEventListener('change', drawFrame);
+        document.getElementById('bgPreset').addEventListener('change', drawFrame);
+        document.getElementById('photoAnimBgPreset').addEventListener('change', drawFrame);
+
+        if (lockBGColorPhoto) {
+            lockBGColorPhoto.addEventListener('change', () => {
+                lockBGColor.checked = lockBGColorPhoto.checked;
+            });
+            lockBGColor.addEventListener('change', () => {
+                lockBGColorPhoto.checked = lockBGColor.checked;
+            });
+        }
+
+        // Polaroid & Circle layout geometry triggers
+        const photoAnimLayoutTriggers = [
+            'polaroidScaleSlider', 'polaroidXSlider', 'polaroidYSlider',
+            'circleScaleSlider', 'circleXSlider', 'circleYSlider'
+        ];
+        photoAnimLayoutTriggers.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => {
+                    updateLabels();
+                    drawFrame();
+                });
+                el.addEventListener('change', () => {
+                    updateLabels();
+                    drawFrame();
+                });
+            }
+        });
+
+        const resetPhotoAnimLayoutBtn = document.getElementById('resetPhotoAnimLayoutBtn');
+        if (resetPhotoAnimLayoutBtn) {
+            resetPhotoAnimLayoutBtn.addEventListener('click', () => {
+                document.getElementById('polaroidScaleSlider').value = 600;
+                document.getElementById('polaroidXSlider').value = 30;
+                document.getElementById('polaroidYSlider').value = 0;
+                document.getElementById('circleScaleSlider').value = 420;
+                document.getElementById('circleXSlider').value = 30;
+                document.getElementById('circleYSlider').value = 0;
+                // Dispatch change event to trigger keyframe presets reset
+                document.getElementById('photoAnimType').dispatchEvent(new Event('change'));
+            });
+        }
+
+        const resetPhotoAnimPresetBtn = document.getElementById('resetPhotoAnimPresetBtn');
+        if (resetPhotoAnimPresetBtn) {
+            resetPhotoAnimPresetBtn.addEventListener('click', () => {
+                document.getElementById('photoAnimType').dispatchEvent(new Event('change'));
+            });
+        }
+
         const inputTriggers = [
-            bgColor, clipMode, motionStyle, renderStyle, shapeLayout, shapeColor, comboToggle, shapeType,
-            shapeScaleSlider, glowSizeSlider, shapeXSlider, shapeYSlider, photoScale, photoXSlider, photoYSlider
+            bgColor, motionStyle, renderStyle, shapeLayout, shapeColor, comboToggle, shapeType,
+            shapeScaleSlider, glowSizeSlider, shapeXSlider, shapeYSlider, photoScale, photoXSlider, photoYSlider,
+            fadeBottom, fadeLeft, fadeRight
         ];
         inputTriggers.forEach(el => el.addEventListener('input', () => {
+            updateLabels();
+            drawFrame();
+        }));
+        inputTriggers.forEach(el => el.addEventListener('change', () => {
             updateLabels();
             drawFrame();
         }));
@@ -994,10 +2170,24 @@
         });
 
         randomBGBtn.addEventListener('click', () => {
-            const bgStyles = ['solid', 'grid', 'dots', 'rad_c', 'diag', 'mesh'];
-            bgStyle.value = bgStyles[Math.floor(Math.random() * bgStyles.length)];
             if (!lockBGColor.checked) {
-                bgColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                const bgStyles = ['solid', 'lin45', 'lin135', 'lin3', 'rad_c', 'rad_corner', 'rad_multi', 'grid', 'grid_h', 'grid_m', 'dots', 'dots_l', 'diag', 'diag_t', 'cross', 'hex', 'conc', 'wavy', 'mesh', 'vignette', 'cglow', 'circuit'];
+                const chosenStyle = bgStyles[Math.floor(Math.random() * bgStyles.length)];
+                
+                const presets = PALETTES.map(p => p.n.toLowerCase().replace(/\s+/g, '_'));
+                presets.push('custom');
+                const chosenPreset = presets[Math.floor(Math.random() * presets.length)];
+                
+                bgStyle.value = chosenStyle;
+                document.getElementById('bgPreset').value = chosenPreset;
+                
+                // Sync to photo anim panel as well
+                document.getElementById('photoAnimBgStyle').value = chosenStyle;
+                document.getElementById('photoAnimBgPreset').value = chosenPreset;
+
+                const randColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                bgColor.value = randColor;
+                document.getElementById('photoAnimBgColor').value = randColor;
             }
             drawFrame();
         });
@@ -1014,13 +2204,413 @@
                     updatePhysics();
                     drawFrame();
                 }
-            } else if (!isPlaying) {
-                drawFrame(); // Keep rendering for static changes
             }
             requestAnimationFrame(mainLoop);
         }
 
+        // ── Text Overlay Engine Controller ──
+        const textInput = document.getElementById('textInput');
+        const textWordSelect = document.getElementById('textWordSelect');
+        const wordScaleSlider = document.getElementById('wordScaleSlider');
+        const wordScaleVal = document.getElementById('wordScaleVal');
+        const wordXSlider = document.getElementById('wordXSlider');
+        const wordXVal = document.getElementById('wordXVal');
+        const wordYSlider = document.getElementById('wordYSlider');
+        const wordYVal = document.getElementById('wordYVal');
+        const wordHighlightSelect = document.getElementById('wordHighlightSelect');
+        const wordAnimSelect = document.getElementById('wordAnimSelect');
+        
+        const textGlobalYSlider = document.getElementById('textGlobalYSlider');
+        const textGlobalYVal = document.getElementById('textGlobalYVal');
+        const textGradientToggle = document.getElementById('textGradientToggle');
+        const resetTextBtn = document.getElementById('resetTextBtn');
+
+        function getPresetLuminance() {
+            let hex = '#05050b'; // default dark
+            if (appMode === 'shape') {
+                const preset = document.getElementById('bgPreset').value;
+                if (preset === 'custom') {
+                    hex = bgColor.value;
+                } else {
+                    const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
+                    if (p) hex = p.bg;
+                }
+            } else {
+                const preset = document.getElementById('photoAnimBgPreset').value;
+                if (preset === 'custom') {
+                    hex = document.getElementById('photoAnimBgColor').value;
+                } else {
+                    const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
+                    if (p) hex = p.bg;
+                }
+            }
+            // Calculate luminance of hex
+            if (hex.startsWith('#')) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            const r = parseInt(hex.slice(0, 2), 16) / 255;
+            const g = parseInt(hex.slice(2, 4), 16) / 255;
+            const b = parseInt(hex.slice(4, 6), 16) / 255;
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+
+        function getBackgroundLuminance(yPos) {
+            try {
+                // Sample a horizontal strip at yPos across the center area
+                // We'll sample a 200x40 pixel box centered at (540, yPos)
+                const sampleW = 200;
+                const sampleH = 40;
+                const sampleX = Math.max(0, Math.min(INTERNAL_W - sampleW, (INTERNAL_W / 2) - (sampleW / 2)));
+                const sampleY = Math.max(0, Math.min(INTERNAL_H - sampleH, yPos - (sampleH / 2)));
+                
+                const imgData = ctx.getImageData(sampleX, sampleY, sampleW, sampleH);
+                const data = imgData.data;
+                
+                let rSum = 0, gSum = 0, bSum = 0, count = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    rSum += data[i];
+                    gSum += data[i+1];
+                    bSum += data[i+2];
+                    count++;
+                }
+                
+                if (count === 0) return 0.1; // Default to dark background if empty
+                
+                const r = rSum / count;
+                const g = gSum / count;
+                const b = bSum / count;
+                
+                // Relative luminance formula
+                return 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
+            } catch (e) {
+                console.warn("Canvas reading error (possibly unrendered or clean canvas), using preset fallback:", e);
+                return getPresetLuminance();
+            }
+        }
+
+        function drawTextOverlay() {
+            const words = getWordsList();
+            if (words.length === 0) return;
+
+            // 1. Determine background-aware coloring
+            const luminance = getBackgroundLuminance(textGlobalY);
+            const isDarkBg = luminance < 0.5;
+
+            // Define colors
+            let defaultColor = isDarkBg ? '#ffffff' : '#1e293b';
+            let shadowColor = isDarkBg ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+
+            // Base font size
+            const baseFontSize = 70;
+
+            // 2. Measure widths and calculate total sentence width
+            ctx.save();
+            let wordWidths = [];
+            let totalWidth = 0;
+
+            // Measure space width under default Inter font
+            ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
+            const spaceWidth = ctx.measureText(' ').width;
+
+            words.forEach((word, idx) => {
+                const override = textWordsOverride[idx] || {
+                    scale: 100,
+                    x: 0,
+                    y: 0,
+                    highlight: 'none',
+                    anim: 'default'
+                };
+                const scaleMult = override.scale / 100;
+                
+                // Set font to measure
+                if (override.highlight === 'ashton') {
+                    ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
+                } else if (override.highlight === 'garamond') {
+                    ctx.font = `italic bold ${baseFontSize * scaleMult}px 'EB Garamond', serif`;
+                } else {
+                    ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
+                }
+
+                const width = ctx.measureText(word).width;
+                wordWidths.push(width);
+                totalWidth += width;
+            });
+
+            // Add spaces
+            totalWidth += spaceWidth * (words.length - 1);
+            ctx.restore();
+
+            // 3. Draw each word
+            let currentX = (INTERNAL_W - totalWidth) / 2;
+
+            words.forEach((word, idx) => {
+                const override = textWordsOverride[idx] || {
+                    scale: 100,
+                    x: 0,
+                    y: 0,
+                    highlight: 'none',
+                    anim: 'default'
+                };
+                const scaleMult = override.scale / 100;
+                const userX = override.x;
+                const userY = override.y;
+
+                // Staggered entry animation calculation (starts at textStartFrame)
+                const startFrame = textStartFrame + idx * 6;
+                const animDuration = 24;
+
+                // Default state if animation hasn't started
+                let opacity = 0;
+                let animX = 0;
+                let animY = 0;
+
+                if (currentFrame >= startFrame) {
+                    const t = Math.min(1.0, (currentFrame - startFrame) / animDuration);
+                    const ease = 1 - Math.pow(1 - t, 3); // Cubic Ease-Out
+                    opacity = ease;
+
+                    // Get animation direction
+                    let dir = override.anim;
+                    if (dir === 'default') {
+                        // Fallback to pre-generated random direction
+                        dir = textRandomDirections[idx] || 'bottom_to_up';
+                    }
+
+                    // Calculate animated position offsets
+                    if (dir === 'left_to_right') {
+                        animX = -60 * (1 - ease);
+                    } else if (dir === 'right_to_left') {
+                        animX = 60 * (1 - ease);
+                    } else if (dir === 'bottom_to_up') {
+                        animY = 60 * (1 - ease);
+                    }
+                }
+
+                // If word is visible
+                if (opacity > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = opacity;
+
+                    // Compute final coordinates
+                    const finalX = currentX + userX + animX;
+                    const finalY = textGlobalY + userY + animY;
+                    const wordWidth = wordWidths[idx];
+
+                    // Set font style
+                    if (override.highlight === 'ashton') {
+                        ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
+                    } else if (override.highlight === 'garamond') {
+                        ctx.font = `italic bold ${baseFontSize * scaleMult}px 'EB Garamond', serif`;
+                    } else {
+                        ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
+                    }
+
+                    // Text shadow/glow for premium contrast readability
+                    ctx.shadowColor = shadowColor;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 2;
+
+                    // Fill style selection
+                    let fillStyle = defaultColor;
+                    if (override.highlight !== 'none') {
+                        if (textGradientEnabled) {
+                            // Create gradient fill
+                            let grad = ctx.createLinearGradient(finalX, finalY - (baseFontSize * scaleMult * 0.7), finalX + wordWidth, finalY);
+                            if (isDarkBg) {
+                                // Bright neon gradient (e.g. yellow-orange)
+                                grad.addColorStop(0, '#ffd200');
+                                grad.addColorStop(1, '#ff6a00');
+                            } else {
+                                // Dark vibrant gradient (e.g. violet-pink)
+                                grad.addColorStop(0, '#7f00ff');
+                                grad.addColorStop(1, '#e100ff');
+                            }
+                            fillStyle = grad;
+                        } else {
+                            // Solid accent fill
+                            fillStyle = isDarkBg ? '#ffd200' : '#d5006d';
+                        }
+                    }
+
+                    ctx.fillStyle = fillStyle;
+                    ctx.fillText(word, finalX, finalY);
+                    ctx.restore();
+                }
+
+                // Advance X position for the next word
+                currentX += wordWidths[idx] + spaceWidth;
+            });
+        }
+
+        function getWordsList() {
+            return textInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+        }
+
+        function populateWordSelect() {
+            const words = getWordsList();
+            const currentSelectedIdx = parseInt(textWordSelect.value) || 0;
+            textWordSelect.innerHTML = '';
+            
+            words.forEach((word, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `Word ${idx + 1}: "${word}"`;
+                textWordSelect.appendChild(opt);
+            });
+
+            if (words.length > 0) {
+                if (currentSelectedIdx < words.length) {
+                    textWordSelect.value = currentSelectedIdx;
+                } else {
+                    textWordSelect.value = 0;
+                }
+            }
+            
+            updateTextRandomDirections(words.length);
+            loadSelectedWordSettings();
+        }
+
+        function updateTextRandomDirections(length) {
+            if (length <= 3) {
+                textRandomDirections = Array(length).fill('bottom_to_up');
+            } else {
+                const directions = ['left_to_right', 'right_to_left', 'bottom_to_up'];
+                // Select two distinct directions
+                const idx1 = Math.floor(Math.random() * directions.length);
+                let idx2 = Math.floor(Math.random() * (directions.length - 1));
+                if (idx2 >= idx1) idx2++;
+                const d1 = directions[idx1];
+                const d2 = directions[idx2];
+                
+                // Fill list, ensuring at least one of each is used to meet requirement
+                let arr = [d1, d2];
+                for (let i = 2; i < length; i++) {
+                    arr.push(Math.random() > 0.5 ? d1 : d2);
+                }
+                
+                // Shuffle array to distribute randomly
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                textRandomDirections = arr;
+            }
+        }
+
+        function loadSelectedWordSettings() {
+            const wordIdx = parseInt(textWordSelect.value);
+            if (isNaN(wordIdx)) return;
+
+            if (!textWordsOverride[wordIdx]) {
+                textWordsOverride[wordIdx] = {
+                    scale: 100,
+                    x: 0,
+                    y: 0,
+                    highlight: 'none',
+                    anim: 'default'
+                };
+            }
+
+            const override = textWordsOverride[wordIdx];
+            wordScaleSlider.value = override.scale;
+            wordScaleVal.textContent = override.scale + '%';
+            wordXSlider.value = override.x;
+            wordXVal.textContent = override.x;
+            wordYSlider.value = override.y;
+            wordYVal.textContent = override.y;
+            wordHighlightSelect.value = override.highlight;
+            wordAnimSelect.value = override.anim;
+        }
+
+        function saveSelectedWordSettings() {
+            const wordIdx = parseInt(textWordSelect.value);
+            if (isNaN(wordIdx)) return;
+
+            if (!textWordsOverride[wordIdx]) {
+                textWordsOverride[wordIdx] = {};
+            }
+
+            textWordsOverride[wordIdx].scale = parseInt(wordScaleSlider.value);
+            textWordsOverride[wordIdx].x = parseInt(wordXSlider.value);
+            textWordsOverride[wordIdx].y = parseInt(wordYSlider.value);
+            textWordsOverride[wordIdx].highlight = wordHighlightSelect.value;
+            textWordsOverride[wordIdx].anim = wordAnimSelect.value;
+
+            wordScaleVal.textContent = wordScaleSlider.value + '%';
+            wordXVal.textContent = wordXSlider.value;
+            wordYVal.textContent = wordYSlider.value;
+
+            drawFrame();
+        }
+
+        [wordScaleSlider, wordXSlider, wordYSlider, wordHighlightSelect, wordAnimSelect].forEach(el => {
+            if (el) {
+                el.addEventListener('input', saveSelectedWordSettings);
+                el.addEventListener('change', saveSelectedWordSettings);
+            }
+        });
+
+        textWordSelect.addEventListener('change', loadSelectedWordSettings);
+
+        textInput.addEventListener('input', () => {
+            populateWordSelect();
+            drawFrame();
+        });
+
+        const textStartSecSlider = document.getElementById('textStartSecSlider');
+        const textStartFrameSlider = document.getElementById('textStartFrameSlider');
+        const textStartTimeDisplay = document.getElementById('textStartTimeDisplay');
+
+        function updateTextStartFrame() {
+            textStartFrame = (textStartSec * 30) + textStartFrameOffset;
+            textStartTimeDisplay.textContent = `${textStartSec}s ${textStartFrameOffset}f (Frame ${textStartFrame})`;
+            drawFrame();
+        }
+
+        textStartSecSlider.addEventListener('input', () => {
+            textStartSec = parseInt(textStartSecSlider.value);
+            updateTextStartFrame();
+        });
+
+        textStartFrameSlider.addEventListener('input', () => {
+            textStartFrameOffset = parseInt(textStartFrameSlider.value);
+            updateTextStartFrame();
+        });
+
+        textGlobalYSlider.addEventListener('input', () => {
+            textGlobalY = parseInt(textGlobalYSlider.value);
+            textGlobalYVal.textContent = textGlobalY;
+            drawFrame();
+        });
+
+        textGradientToggle.addEventListener('change', () => {
+            textGradientEnabled = textGradientToggle.checked;
+            drawFrame();
+        });
+
+        resetTextBtn.addEventListener('click', () => {
+            textWordsOverride = {};
+            textGlobalYSlider.value = 1400;
+            textGlobalY = 1400;
+            textGlobalYVal.textContent = '1400';
+            textStartSecSlider.value = 1;
+            textStartSec = 1;
+            textStartFrameSlider.value = 5;
+            textStartFrameOffset = 5;
+            textStartFrame = 35;
+            textStartTimeDisplay.textContent = '1s 5f (Frame 35)';
+            textGradientToggle.checked = true;
+            textGradientEnabled = true;
+            populateWordSelect();
+            drawFrame();
+        });
+
         // Initialize setup variables
+        populateThemeDropdowns();
+        populateStyleDropdowns();
+        populateWordSelect();
+        // Trigger default animation presets to initialize keyframe sliders
+        document.getElementById('photoAnimType').dispatchEvent(new Event('change'));
         updateLabels();
         requestAnimationFrame(mainLoop);
     </script>
