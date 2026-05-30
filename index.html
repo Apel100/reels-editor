@@ -395,6 +395,46 @@
                     <button class="mini-btn" id="randomBGBtn" title="Random Style">🎲</button>
                 </div>
             </div>
+            <!-- Background Slant Stripe Settings -->
+            <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div class="card-title" style="font-size: 0.75rem; color: var(--accent-color); margin-bottom: 0;">斜 Diagonal Slant Stripe</div>
+                
+                <div class="row-group">
+                    <div class="control-group">
+                        <label>Stripe Style</label>
+                        <select id="stripeStyle">
+                            <option value="none" selected>None</option>
+                            <option value="solid">Solid Block</option>
+                            <option value="glow">Neon Glow</option>
+                            <option value="double_outline">Double Outline</option>
+                            <option value="gradient_fade">Gradient Fade</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Stripe Color</label>
+                        <input type="color" id="stripeColor" value="#000000">
+                    </div>
+                </div>
+
+                <div class="row-group">
+                    <div class="control-group">
+                        <label>Width <span class="val" id="stripeWidthVal">150</span></label>
+                        <input type="range" id="stripeWidth" min="10" max="600" value="150">
+                    </div>
+                    <div class="control-group">
+                        <label>Opacity <span class="val" id="stripeOpacityVal">15%</span></label>
+                        <input type="range" id="stripeOpacity" min="0" max="100" value="15">
+                    </div>
+                </div>
+
+                <div class="row-group">
+                    <div class="control-group">
+                        <label>Angle <span class="val" id="stripeAngleVal">-35°</span></label>
+                        <input type="range" id="stripeAngle" min="-90" max="90" value="-35">
+                    </div>
+                </div>
+            </div>
+
             <div class="control-group" id="bgImageLoaderGroup" style="display: none; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
                 <div class="control-group">
                     <label>🖼️ Upload Background Image</label>
@@ -621,11 +661,9 @@
                         <option value="bordered_card_rtl">🖼️ Bordered Card RTL (Right to Left)</option>
                         <option value="bordered_card_ltr">🖼️ Bordered Card LTR (Left to Right)</option>
                         <option value="polaroid_stack">🖼️ Polaroid Stack (2 Photos)</option>
-                        <option value="split_panels">🖼️ Split Panels (2 Photos)</option>
                         <option value="ken_burns">Ken Burns (Zoom + Drift)</option>
                         <option value="drift_pan">Slow Drift Pan</option>
                         <option value="fade_zoom">Zoom In (Full Bleed)</option>
-                        <option value="torn_paper_reveal">📰 Tabloid Paper Rip Reveal</option>
                     </select>
                 </div>
 
@@ -1366,6 +1404,9 @@
             context.fillRect(0, H * 0.82, W, H * 0.18);
             context.restore();
 
+            // 4.5 Draw Diagonal Slanted Stripe
+            drawSlantedStripe(context, W, H);
+
             // 5. Film grain noise texture overlay (opacity ~0.04)
             context.save();
             context.fillStyle = noisePat;
@@ -1377,6 +1418,78 @@
             context.save();
             context.fillStyle = 'rgba(0, 0, 0, 0.02)';
             context.fillRect(0, 0, W, H);
+            context.restore();
+        }
+
+        function drawSlantedStripe(context, W, H) {
+            const stripeStyleEl = document.getElementById('stripeStyle');
+            if (!stripeStyleEl) return;
+            const style = stripeStyleEl.value;
+            if (style === 'none') return;
+
+            const width = parseInt(document.getElementById('stripeWidth').value);
+            const angleDeg = parseInt(document.getElementById('stripeAngle').value);
+            const color = document.getElementById('stripeColor').value;
+            const opacity = parseInt(document.getElementById('stripeOpacity').value) / 100;
+
+            context.save();
+            context.globalAlpha = opacity;
+
+            // Translate to center of canvas to rotate around center
+            context.translate(W / 2, H / 2);
+            context.rotate(angleDeg * Math.PI / 180);
+
+            // Draw a vertical stripe of width `width` at X = 0 (since it rotated, it will become diagonal slanted)
+            const y1 = -H * 2;
+            const y2 = H * 2;
+            const xLeft = -width / 2;
+            const xRight = width / 2;
+
+            context.setLineDash([]);
+
+            if (style === 'solid') {
+                context.fillStyle = color;
+                context.fillRect(xLeft, y1, width, y2 - y1);
+            } else if (style === 'glow') {
+                // Main solid strip
+                context.fillStyle = color;
+                context.fillRect(xLeft, y1, width, y2 - y1);
+
+                // Add bright glowing lines on the edges
+                context.shadowColor = color;
+                context.shadowBlur = 30;
+                context.strokeStyle = color;
+                context.lineWidth = 6;
+                
+                context.beginPath();
+                context.moveTo(xLeft, y1);
+                context.lineTo(xLeft, y2);
+                context.moveTo(xRight, y1);
+                context.lineTo(xRight, y2);
+                context.stroke();
+            } else if (style === 'double_outline') {
+                context.strokeStyle = color;
+                context.lineWidth = 6;
+                
+                context.beginPath();
+                context.moveTo(xLeft, y1);
+                context.lineTo(xLeft, y2);
+                context.moveTo(xRight, y1);
+                context.lineTo(xRight, y2);
+                context.stroke();
+            } else if (style === 'gradient_fade') {
+                const rgbaColor = hexToRgba(color, 1.0);
+                const transparentColor = hexToRgba(color, 0.0);
+                
+                const gradFade = context.createLinearGradient(xLeft, 0, xRight, 0);
+                gradFade.addColorStop(0, transparentColor);
+                gradFade.addColorStop(0.5, rgbaColor);
+                gradFade.addColorStop(1, transparentColor);
+
+                context.fillStyle = gradFade;
+                context.fillRect(xLeft, y1, width, y2 - y1);
+            }
+
             context.restore();
         }
 
@@ -1567,6 +1680,13 @@
                 document.getElementById('paAngleStartVal').innerText = document.getElementById('paAngleStartSlider').value + '°';
                 document.getElementById('paAngleEndVal').innerText = document.getElementById('paAngleEndSlider').value + '°';
             }
+
+            // Stripe labels
+            if (document.getElementById('stripeOpacity')) {
+                document.getElementById('stripeOpacityVal').innerText = document.getElementById('stripeOpacity').value + '%';
+                document.getElementById('stripeWidthVal').innerText = document.getElementById('stripeWidth').value;
+                document.getElementById('stripeAngleVal').innerText = document.getElementById('stripeAngle').value + '°';
+            }
         }
 
         function resetAnimation() {
@@ -1634,9 +1754,11 @@
                 
                 // 1. Shape Dynamics (Settles at Frame 22)
                 if (currentFrame < 22) {
-                    dynamicScale += (1.0 - dynamicScale) * 0.22;
-                    dynamicRotation += ((360 * Math.PI / 180) - dynamicRotation) * 0.20;
-                    dynamicOpacity += (1.0 - dynamicOpacity) * 0.22;
+                    const shapeT = currentFrame / 22;
+                    const shapeEase = shapeT < 0.5 ? 4 * shapeT * shapeT * shapeT : 1 - Math.pow(-2 * shapeT + 2, 3) / 2;
+                    dynamicScale = shapeEase;
+                    dynamicRotation = shapeEase * (360 * Math.PI / 180);
+                    dynamicOpacity = shapeEase;
                 } else {
                     dynamicScale = 1.0;
                     dynamicRotation = 360 * Math.PI / 180;
@@ -1646,7 +1768,7 @@
                 // 2. Photo Dynamics (Settles at Frame 30)
                 if (currentFrame < 30) {
                     const introT = currentFrame / 30;
-                    const introEase = 1 - Math.pow(1 - introT, 3); // Smooth cubic ease-out
+                    const introEase = introT < 0.5 ? 4 * introT * introT * introT : 1 - Math.pow(-2 * introT + 2, 3) / 2;
                     motionPhotoXOffset = photoIntroStartX * (1 - introEase);
                     motionPhotoYOffset = photoIntroStartY * (1 - introEase);
                     dynamicPhotoZoom = 1.0;
@@ -1712,7 +1834,8 @@
                 // 1. Intro (Entry) Transition Phase
                 if (currentFrame < transFrames) {
                     const p = currentFrame / transFrames;
-                    const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
+                    // Cubic Ease-In-Out for ultra-smooth entry
+                    const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
                     
                     if (introType === 'slide_in_left') {
                         trans_tx = -INTERNAL_W * (1 - ease);
@@ -1743,7 +1866,8 @@
                 // 2. Outro (Exit) Transition Phase
                 else if (currentFrame >= totalDuration - transFrames) {
                     const p = (currentFrame - (totalDuration - transFrames)) / transFrames;
-                    const ease = Math.pow(p, 3); // ease-in cubic (accelerating)
+                    // Cubic Ease-In-Out for ultra-smooth exit
+                    const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
 
                     if (outroType === 'slide_out_left') {
                         trans_tx = -INTERNAL_W * ease;
@@ -2263,247 +2387,7 @@
                 return;
             }
 
-            // ── Split Panels (2 Photos) ──
-            if (animType === 'split_panels') {
-                const animPreset = document.getElementById('photoAnimBgPreset').value;
-                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
 
-                ctx.save();
-                applySubjectTransitions(ctx, INTERNAL_W / 2, INTERNAL_H / 2);
-
-                const imgs = [];
-                if (uploadedImages.length > 0) {
-                    imgs.push(uploadedImages[0]);
-                    if (uploadedImages.length > 1) {
-                        imgs.push(uploadedImages[1]);
-                    } else {
-                        imgs.push(uploadedImages[0]);
-                    }
-                } else {
-                    imgs.push(uploadedImg);
-                    imgs.push(uploadedImg);
-                }
-
-                const N = 2; // Always exactly 2 split panels side-by-side
-                const panelW = INTERNAL_W / N;
-                const dividerW = 6;
-
-                for (let i = 0; i < N; i++) {
-                    const img = imgs[i];
-                    const panelStartFrame = i * 8;
-                    const animDuration = 24;
-
-                    let entryY = 0;
-                    let opacity = 1.0;
-
-                    if (isPlaying || currentFrame > 0) {
-                        if (currentFrame < panelStartFrame) {
-                            opacity = 0;
-                        } else {
-                            const t = Math.min(1.0, (currentFrame - panelStartFrame) / animDuration);
-                            const ease = 1 - Math.pow(1 - t, 3);
-                            opacity = ease;
-                            const slideDir = (i % 2 === 0) ? -1 : 1;
-                            entryY = slideDir * INTERNAL_H * (1 - ease);
-                        }
-                    }
-
-                    if (opacity > 0) {
-                        ctx.save();
-                        ctx.globalAlpha = opacity;
-
-                        const px_start = i * panelW + (i > 0 ? dividerW / 2 : 0);
-                        const px_end = (i + 1) * panelW - (i < N - 1 ? dividerW / 2 : 0);
-                        const pw = px_end - px_start;
-
-                        ctx.beginPath();
-                        ctx.rect(px_start, entryY, pw, INTERNAL_H);
-                        ctx.clip();
-
-                        let driftScale = 1.05;
-                        let driftX = 0;
-                        let driftY = 0;
-
-                        if (isPlaying) {
-                            const progress = Math.min(1.0, currentFrame / totalDuration);
-                            if (i === 0) {
-                                driftScale = 1.0 + progress * 0.12;
-                            } else if (i === 1) {
-                                driftScale = 1.1;
-                                driftY = -progress * 80;
-                            } else {
-                                driftScale = 1.1;
-                                driftX = -progress * 50;
-                                driftY = progress * 50;
-                            }
-                        }
-
-                        const scaleId = (i === 1) ? 'photoScale2' : 'photoScale';
-                        const xId = (i === 1) ? 'photoXSlider2' : 'photoXSlider';
-                        const yId = (i === 1) ? 'photoYSlider2' : 'photoYSlider';
-
-                        const userScale = parseInt(document.getElementById(scaleId).value) / 100;
-                        const userX = parseInt(document.getElementById(xId).value);
-                        const userY = parseInt(document.getElementById(yId).value);
-
-                        const coverScale = Math.max(pw / img.width, INTERNAL_H / img.height) * userScale * driftScale * pa_zoom;
-                        
-                        const piw = img.width  * coverScale;
-                        const pih = img.height * coverScale;
-                        
-                        const pix = px_start + (pw - piw) / 2 + pa_x + userX + driftX;
-                        const piy = entryY + (INTERNAL_H - pih) / 2 + pa_y + userY + driftY;
-
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                        ctx.drawImage(img, pix, piy, piw, pih);
-
-                        const overlayGrad = ctx.createLinearGradient(0, INTERNAL_H * 0.7 + entryY, 0, INTERNAL_H + entryY);
-                        overlayGrad.addColorStop(0, 'rgba(0,0,0,0)');
-                        overlayGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
-                        ctx.fillStyle = overlayGrad;
-                        ctx.fillRect(px_start, INTERNAL_H * 0.7 + entryY, pw, INTERNAL_H * 0.3);
-
-                        ctx.restore();
-                    }
-                }
-
-                ctx.fillStyle = '#ffffff';
-                for (let i = 1; i < N; i++) {
-                    ctx.fillRect(i * panelW - dividerW / 2, 0, dividerW, INTERNAL_H);
-                }
-                ctx.restore();
-                return;
-            }
-
-            // ── Tabloid / Torn Paper Reveal ──
-            if (animType === 'torn_paper_reveal') {
-                const animPreset = document.getElementById('photoAnimBgPreset').value;
-                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
-
-                const cx = INTERNAL_W / 2;
-                const cy = INTERNAL_H / 2;
-
-                ctx.save();
-                applySubjectTransitions(ctx, cx, cy);
-
-                const userScale = parseInt(document.getElementById('photoScale').value) / 100;
-                const userX = parseInt(document.getElementById('photoXSlider').value);
-                const userY = parseInt(document.getElementById('photoYSlider').value);
-
-                const t = Math.min(1.0, Math.max(0.0, currentFrame / totalDuration));
-                const driftZoom = 1.0 + t * 0.08;
-
-                const pScaleFactor = Math.max(INTERNAL_W / uploadedImg.width, INTERNAL_H / uploadedImg.height) * userScale * driftZoom;
-                const piw = uploadedImg.width  * pScaleFactor;
-                const pih = uploadedImg.height * pScaleFactor;
-                const pix = cx - piw / 2 + userX;
-                const piy = cy - pih / 2 + userY;
-
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(uploadedImg, pix, piy, piw, pih);
-                ctx.restore();
-
-                const easeOutCubic = (v) => 1 - Math.pow(1 - v, 3);
-                const ripProgress = easeOutCubic(t);
-                const baseRipX = ripProgress * (INTERNAL_W + 150);
-
-                const getJaggedPath = (xOffset) => {
-                    const path = [];
-                    path.push({ x: INTERNAL_W, y: 0 });
-                    const step = 15;
-                    for (let y = 0; y <= INTERNAL_H; y += step) {
-                        const jag = Math.sin(y * 0.035) * 20 + Math.cos(y * 0.08) * 8 + Math.sin(y * 0.01) * 15;
-                        path.push({ x: xOffset + jag, y: y });
-                    }
-                    path.push({ x: INTERNAL_W, y: INTERNAL_H });
-                    return path;
-                };
-
-                const drawPath = (path) => {
-                    ctx.beginPath();
-                    ctx.moveTo(path[0].x, path[0].y);
-                    for (let i = 1; i < path.length; i++) {
-                        ctx.lineTo(path[i].x, path[i].y);
-                    }
-                    ctx.closePath();
-                };
-
-                ctx.save();
-                const pathWhite = getJaggedPath(baseRipX - 8);
-                drawPath(pathWhite);
-                ctx.fillStyle = '#ffffff';
-                ctx.fill();
-                ctx.restore();
-
-                ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                ctx.shadowBlur = 25;
-                ctx.shadowOffsetX = -12;
-                
-                const pathMain = getJaggedPath(baseRipX);
-                drawPath(pathMain);
-                
-                let paperColor = '#f3f3eb';
-                let textColor = '#27272a';
-                let accentColor = '#e11d48';
-                
-                if (animPreset === 'charcoal' || animPreset === 'royal') {
-                    paperColor = '#18181b';
-                    textColor = '#f4f4f5';
-                    accentColor = '#f59e0b';
-                } else if (animPreset === 'cyberpunk') {
-                    paperColor = '#0f172a';
-                    textColor = '#ffffff';
-                    accentColor = '#f43f5e';
-                }
-                
-                ctx.fillStyle = paperColor;
-                ctx.fill();
-                ctx.restore();
-
-                if (baseRipX < INTERNAL_W) {
-                    ctx.save();
-                    
-                    const customCaption = document.getElementById('textInput').value.trim();
-                    let headlineLine1 = "DRAMA";
-                    let headlineLine2 = "EXCLUSIVE";
-                    if (customCaption) {
-                        const words = customCaption.split(/\s+/);
-                        if (words.length > 0) {
-                            headlineLine1 = words[0].toUpperCase();
-                        }
-                        if (words.length > 1) {
-                            headlineLine2 = words.slice(1).join(" ").toUpperCase();
-                            if (headlineLine2.length > 12) {
-                                headlineLine2 = headlineLine2.substring(0, 12) + "...";
-                            }
-                        } else {
-                            headlineLine2 = "EXCLUSIVE";
-                        }
-                    }
-
-                    ctx.font = "900 90px 'Inter', sans-serif";
-                    ctx.fillStyle = accentColor;
-                    ctx.fillText(headlineLine1, baseRipX + 80, 500);
-
-                    ctx.font = "900 80px 'Inter', sans-serif";
-                    ctx.fillStyle = textColor;
-                    ctx.fillText(headlineLine2, baseRipX + 80, 600);
-
-                    ctx.fillStyle = accentColor;
-                    ctx.fillRect(baseRipX + 80, 640, 400, 10);
-
-                    ctx.font = "700 40px 'Inter', sans-serif";
-                    ctx.fillStyle = textColor === '#27272a' ? '#52525b' : '#a1a1aa';
-                    ctx.fillText("UNFILTERED TRUTH", baseRipX + 80, 710);
-                    ctx.fillText("SPILLING THE TEA", baseRipX + 80, 770);
-
-                    ctx.restore();
-                }
-                return;
-            }
 
             // Draw background (non-polaroid modes)
             const animPreset = document.getElementById('photoAnimBgPreset').value;
@@ -3109,7 +2993,7 @@
             const photo2LayoutGroup = document.getElementById('photo2LayoutGroup');
             
             if (photo2LayoutGroup) {
-                if (animType === 'polaroid_stack' || animType === 'split_panels') {
+                if (animType === 'polaroid_stack') {
                     photo2LayoutGroup.style.display = 'block';
                     if (photo1TransformTitle) photo1TransformTitle.textContent = 'Photo 1 Transformation';
                 } else {
@@ -3346,17 +3230,8 @@
                 document.getElementById('paYEndSlider').value = 0;
                 document.getElementById('paAngleStartSlider').value = 0;
                 document.getElementById('paAngleEndSlider').value = 0;
-            } else if (animType === 'torn_paper_reveal') {
-                document.getElementById('paScaleStartSlider').value = 100;
-                document.getElementById('paScaleEndSlider').value = 100;
-                document.getElementById('paXStartSlider').value = 0;
-                document.getElementById('paXEndSlider').value = 0;
-                document.getElementById('paYStartSlider').value = 0;
-                document.getElementById('paYEndSlider').value = 0;
-                document.getElementById('paAngleStartSlider').value = 0;
-                document.getElementById('paAngleEndSlider').value = 0;
             }
-            
+
             updatePhotoAnimControlsVisibility(animType);
             updateLabels();
             resetAnimation();
@@ -3458,7 +3333,12 @@
             document.getElementById('outroTransitionType'),
             document.getElementById('transFramesSlider'),
             document.getElementById('blurIntensitySlider'),
-            document.getElementById('photoEntryOpacityToggle')
+            document.getElementById('photoEntryOpacityToggle'),
+            document.getElementById('stripeStyle'),
+            document.getElementById('stripeColor'),
+            document.getElementById('stripeOpacity'),
+            document.getElementById('stripeWidth'),
+            document.getElementById('stripeAngle')
         ];
         inputTriggers.forEach(el => el.addEventListener('input', () => {
             updateLabels();
@@ -3900,8 +3780,8 @@
                 const baseAnchor = baseWordAnchors[idx];
 
                 // Staggered entry animation calculation (starts at textStartFrame)
-                const startFrame = textStartFrame + idx * 6;
-                const animDuration = 24;
+                const startFrame = textStartFrame + idx * 3;
+                const animDuration = 12;
 
                 // Default state if animation hasn't started
                 let opacity = 0;
