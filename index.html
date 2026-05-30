@@ -560,7 +560,7 @@
                     </div>
                 </div>
 
-                <label class="card toggle-card" style="padding: 6px 10px; background: rgba(255,255,255,0.01); margin-top: 5px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <label id="gradientToggleGroup" class="card toggle-card" style="padding: 6px 10px; background: rgba(255,255,255,0.01); margin-top: 5px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                     <span style="font-size:0.75rem; font-weight:700;">Highlight Gradient Fill</span>
                     <span class="switch">
                         <input type="checkbox" id="textGradientToggle" checked>
@@ -569,7 +569,7 @@
                 </label>
 
                 <div class="control-group" id="gradientStyleGroup" style="margin-top: 5px;">
-                    <label>Highlight Gradient Style</label>
+                    <label>Highlight Color Style</label>
                     <select id="textGradientStyleSelect">
                         <option value="auto" selected>✨ Auto-Match Theme</option>
                         <option value="sunset">🌅 Sunset Blaze</option>
@@ -577,6 +577,7 @@
                         <option value="teal">⚡ Electric Teal</option>
                         <option value="toxic">🍃 Toxic Neon</option>
                         <option value="blood">🩸 Blood Moon</option>
+                        <option value="default_color">⚪ Default Text Color (No Color)</option>
                     </select>
                 </div>
 
@@ -3822,7 +3823,15 @@
                     const avgBgColor = getBackgroundAverageColor(wordCenterX, wordCenterY);
                     const luminance = 0.2126 * (avgBgColor.r / 255) + 0.7152 * (avgBgColor.g / 255) + 0.0722 * (avgBgColor.b / 255);
                     const isDarkBg = luminance < 0.5;
-                    const defaultColor = isDarkBg ? '#ffffff' : '#1e293b';
+                    
+                    // Dynamic Tinted Contrast via HSL Lightness Inversion
+                    const [bh, bs, bl] = rgbToHsl(avgBgColor.r, avgBgColor.g, avgBgColor.b);
+                    let defaultColor;
+                    if (bl < 45) {
+                        defaultColor = hslToHex(bh, Math.min(bs, 35), 92);
+                    } else {
+                        defaultColor = hslToHex(bh, Math.min(bs, 40), 12);
+                    }
                     const shadowColor = isDarkBg ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
 
                     // Store bounding box in internal canvas resolution
@@ -3859,7 +3868,9 @@
                             activeStyle = getAutoGradientStyle(avgBgColor);
                         }
 
-                        if (textGradientEnabled) {
+                        if (activeStyle === 'default_color') {
+                            fillStyle = defaultColor;
+                        } else if (textGradientEnabled) {
                             // Create gradient fill
                             let grad = ctx.createLinearGradient(finalX, finalY - (baseFontSize * scaleMult * 0.7), finalX + wordWidth, finalY);
                             const palette = gradientPalettes[activeStyle] || gradientPalettes.sunset;
@@ -4192,16 +4203,24 @@
 
         const textGradientStyleSelect = document.getElementById('textGradientStyleSelect');
 
+        function updateTextHighlightControlsVisibility() {
+            const isDefault = textGradientStyleSelect.value === 'default_color';
+            document.getElementById('gradientToggleGroup').style.display = isDefault ? 'none' : 'flex';
+        }
+
         textGradientStyleSelect.addEventListener('change', () => {
             textGradientStyle = textGradientStyleSelect.value;
+            updateTextHighlightControlsVisibility();
             drawFrame();
         });
 
         textGradientToggle.addEventListener('change', () => {
             textGradientEnabled = textGradientToggle.checked;
-            document.getElementById('gradientStyleGroup').style.display = textGradientEnabled ? 'block' : 'none';
             drawFrame();
         });
+
+        // Initialize visibility
+        updateTextHighlightControlsVisibility();
 
         resetTextBtn.addEventListener('click', () => {
             textWordsOverride = {};
@@ -4218,7 +4237,7 @@
             textGradientEnabled = true;
             textGradientStyleSelect.value = 'auto';
             textGradientStyle = 'auto';
-            document.getElementById('gradientStyleGroup').style.display = 'block';
+            updateTextHighlightControlsVisibility();
             setMatchMode(false);
             populateWordSelect();
             drawFrame();
