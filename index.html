@@ -1237,6 +1237,7 @@
         let uploadedBgVideo = null;
         let uploadedImages = [];
         let shapeImagesProps = [];
+        let playedWordSounds = new Set();
 
 
 
@@ -2043,9 +2044,10 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                 }
                 
-                // 1. Shape Dynamics (Settles at Frame 22)
-                if (currentFrame < 22) {
-                    const shapeT = currentFrame / 22;
+                // 1. Shape Dynamics (Starts at Frame 0, Settles at Frame 17)
+                const shapeSettleFrame = 17;
+                if (currentFrame < shapeSettleFrame) {
+                    const shapeT = currentFrame / shapeSettleFrame;
                     const shapeEase = shapeT < 0.5 ? 4 * shapeT * shapeT * shapeT : 1 - Math.pow(-2 * shapeT + 2, 3) / 2;
                     dynamicScale = shapeEase;
                     dynamicRotation = shapeEase * (360 * Math.PI / 180);
@@ -2056,31 +2058,37 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     dynamicOpacity = 1.0;
                 }
 
-                // 2. Photo Dynamics (Settles at Frame 30)
-                const photoStartFrame = appMode === 'shape' ? (clipMode.value === 'clip' ? 8 : 3) : 0;
+                // 2. Photo Dynamics (Starts at Frame 4, Settles at Frame 20)
+                const photoStartFrame = 4;
+                const photoSettleFrame = 20;
+                const photoDuration = photoSettleFrame - photoStartFrame; // 16 frames
                 
                 if (currentFrame < photoStartFrame) {
                     motionPhotoXOffset = photoIntroStartX;
                     motionPhotoYOffset = photoIntroStartY;
-                    dynamicPhotoZoom = 0; // Start scaled down to 0 to prevent hard cuts at the clipping mask edge
-                    dynamicPulse = 1.0;
-                    photoEntryAlpha = 0; // Force hide photo before its animation starts to prevent awkward static appearance
-                } else if (currentFrame - photoStartFrame < 30) {
-                    const introT = (currentFrame - photoStartFrame) / 30;
-                    const introEase = 1 - Math.pow(1 - introT, 3); // Cubic Ease-Out for fast responsive entry
-                    motionPhotoXOffset = photoIntroStartX * (1 - introEase);
-                    motionPhotoYOffset = photoIntroStartY * (1 - introEase);
+                    photoEntryAlpha = 0;
+                    
+                    const globalT = currentFrame / totalDuration;
+                    const globalEase = 1 - Math.pow(1 - globalT, 3);
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    dynamicPhotoZoom = continuousZoom;
+                    dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
+                } else if (currentFrame < photoSettleFrame) {
+                    const photoT = (currentFrame - photoStartFrame) / photoDuration;
+                    const photoEase = 1 - Math.pow(1 - photoT, 3); // Cubic Ease-Out for responsive entry
+                    motionPhotoXOffset = photoIntroStartX * (1 - photoEase);
+                    motionPhotoYOffset = photoIntroStartY * (1 - photoEase);
                     
                     const globalT = currentFrame / totalDuration;
                     const globalEase = 1 - Math.pow(1 - globalT, 3);
                     const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
                     
-                    dynamicPhotoZoom = continuousZoom; // Do not scale up during entry, just slide
+                    dynamicPhotoZoom = continuousZoom; 
                     dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
                     
                     const opacityToggle = document.getElementById('photoEntryOpacityToggle');
                     if (opacityToggle && opacityToggle.checked) {
-                        photoEntryAlpha = introEase;
+                        photoEntryAlpha = photoT; // smooth linear fade-in
                     } else {
                         photoEntryAlpha = 1.0;
                     }
@@ -3012,8 +3020,9 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     const ccx = cx + cX + pa_x;
                     const ccy = cy + cY + pa_y;
 
-                    // Write-on path animation based on time progress t
-                    const t = Math.min(1.0, Math.max(0.0, currentFrame / totalDuration));
+                    // Write-on path animation based on time progress t (capped at max 60 frames)
+                    const circleDrawFrames = Math.min(60, totalDuration);
+                    const t = Math.min(1.0, Math.max(0.0, currentFrame / circleDrawFrames));
                     const ease = (v) => v < 0.5 ? 2*v*v : -1+(4-2*v)*v;
                     const drawAngle = ease(t) * Math.PI * 2;
                     
@@ -3817,11 +3826,21 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                     ctx.save();
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
-                    const shapeSettled = !isPlaying || (currentFrame >= 22);
-                    if (!isIntroSideEntry && shapeSettled) {
+                    if (!isIntroSideEntry) {
+                        let rectWidth = baseShapeSize * 1.15; // slightly wider than shape to allow head/hair popout
+                        let rectX = cx - rectWidth / 2;
+                        
+                        if (shapeType.value === 'horizontal_strip' || shapeType.value === 'diagonal_split' || shapeType.value === 'vertical_strip') {
+                            rectWidth = INTERNAL_W * 2;
+                            rectX = cx - rectWidth / 2;
+                        }
+                        
                         const topEdge = cy - baseShapeSize * 1.2;
                         const clipHeight = horizonY - topEdge;
-                        ctx.rect(-10000, topEdge, 20000, Math.max(0, clipHeight));
+                        
+                        if (shapeType.value !== 'vertical_strip' && shapeType.value !== 'diagonal_split') {
+                            ctx.rect(rectX, topEdge, rectWidth, Math.max(0, clipHeight));
+                        }
                     }
                     ctx.clip();
 
@@ -3888,11 +3907,21 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                     ctx.save();
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
-                    const shapeSettled = !isPlaying || (currentFrame >= 22);
-                    if (!isIntroSideEntry && shapeSettled) {
+                    if (!isIntroSideEntry) {
+                        let rectWidth = baseShapeSize * 1.15; // slightly wider than shape to allow head/hair popout
+                        let rectX = cx - rectWidth / 2;
+                        
+                        if (shapeType.value === 'horizontal_strip' || shapeType.value === 'diagonal_split' || shapeType.value === 'vertical_strip') {
+                            rectWidth = INTERNAL_W * 2;
+                            rectX = cx - rectWidth / 2;
+                        }
+                        
                         const topEdge = cy - baseShapeSize * 1.2;
                         const clipHeight = horizonY - topEdge;
-                        ctx.rect(-10000, topEdge, 20000, Math.max(0, clipHeight));
+                        
+                        if (shapeType.value !== 'vertical_strip' && shapeType.value !== 'diagonal_split') {
+                            ctx.rect(rectX, topEdge, rectWidth, Math.max(0, clipHeight));
+                        }
                     }
                     ctx.clip();
                     drawSubject(ctx);
