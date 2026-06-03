@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Reels Motion Engine - Pro v5.0</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Satisfy&family=EB+Garamond:ital,wght@0,700;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Satisfy&family=EB+Garamond:ital,wght@0,700;1,700&family=Pacifico&family=Bangers&family=Righteous&family=Cinzel:wght@700&display=swap');
 
         /* ── Mode Switcher ── */
         .mode-switcher {
@@ -159,6 +159,10 @@
     <!-- Font Preloaders to force browser to load custom fonts on page load -->
     <div style="font-family: 'Satisfy'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
     <div style="font-family: 'EB Garamond'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
+    <div style="font-family: 'Pacifico'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
+    <div style="font-family: 'Bangers'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
+    <div style="font-family: 'Righteous'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
+    <div style="font-family: 'Cinzel'; opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; overflow: hidden;">preload</div>
 
     <div class="controls">
         <div class="header-area">
@@ -183,7 +187,7 @@
             <div class="row-group" id="exportRowGroup" style="grid-template-columns: 1.5fr 1fr; align-items: end;">
                 <div class="control-group" id="subjectSelectGroup">
                     <label>📸 Select Subject</label>
-                    <input type="file" id="imageLoader" accept="image/*" multiple style="padding: 6px; font-size: 0.75rem;">
+                    <input type="file" id="imageLoader" accept="image/*, video/mp4, video/*" multiple style="padding: 6px; font-size: 0.9rem;">
                 </div>
                 <button class="btn btn-export" id="exportBtn" style="margin: 0; padding: 10px; height: 38px;">💾 Export</button>
             </div>
@@ -243,14 +247,23 @@
 
             <div class="row-group">
                 <div class="control-group">
-                    <label>Transition Duration <span class="val" id="transFramesVal">12f</span></label>
-                    <input type="range" id="transFramesSlider" min="4" max="30" value="12">
+                    <label>Transition Duration <span class="val" id="transFramesVal">24f</span></label>
+                    <input type="range" id="transFramesSlider" min="10" max="60" value="24">
                 </div>
                 <div class="control-group">
                     <label>Motion Blur Intensity <span class="val" id="blurIntensityVal">15px</span></label>
                     <input type="range" id="blurIntensitySlider" min="0" max="50" value="15">
                 </div>
             </div>
+
+            
+            <label class="card toggle-card shape-only-panel" style="padding: 6px 10px; background: rgba(255,255,255,0.01); margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <span style="font-size:0.75rem; font-weight:700; color: var(--text-color);">Photo Entry Opacity Fade</span>
+                <span class="switch">
+                    <input type="checkbox" id="photoEntryOpacityToggle" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
         </div>
 
 
@@ -295,13 +308,6 @@
                         <input type="range" id="photoYSlider" min="-1500" max="1500" value="0">
                     </div>
                 </div>
-                <label class="card toggle-card shape-only-panel" style="padding: 6px 10px; background: rgba(255,255,255,0.01); margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                    <span style="font-size:0.75rem; font-weight:700; color: var(--text-color);">Entry Opacity Fade</span>
-                    <span class="switch">
-                        <input type="checkbox" id="photoEntryOpacityToggle" checked>
-                        <span class="slider"></span>
-                    </span>
-                </label>
             </div>
 
             <div id="photo2LayoutGroup" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 8px; display: none;">
@@ -321,6 +327,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Dynamic container for multiple images in Shape Mode -->
+            <div id="shapeImagesControlsContainer" style="display: none; flex-direction: column; gap: 10px; margin-top: 8px;"></div>
         </div>
 
         <!-- Section 2: Environment -->
@@ -380,7 +388,7 @@
                 <label>Background Style</label>
                 <div class="input-with-btn">
                     <select id="bgStyle">
-                        <option value="solid">Solid Color</option>
+                        <option value="solid" selected>Solid Color</option>
                         <option value="gradient_only">Gradient Only</option>
                         <option value="rad_c">Radial Glow</option>
                         <option value="mesh">Ambient Mesh Glow</option>
@@ -490,9 +498,14 @@
                     <div class="control-group">
                         <label>Font Highlight</label>
                         <select id="wordHighlightSelect">
-                            <option value="none">Default (Inter)</option>
-                            <option value="ashton">Ashton Script</option>
-                            <option value="garamond">Apple Garamond (B/I)</option>
+                            <option value="none">Default (Inter) - No Color</option>
+                            <option value="inter_highlight">Default (Inter) - Colored</option>
+                            <option value="ashton">Ashton Script - Colored</option>
+                            <option value="garamond">Apple Garamond - Colored</option>
+                            <option value="pacifico_grad">Pacifico - Forced Gradient</option>
+                            <option value="bangers_color">Bangers - Forced Solid Color</option>
+                            <option value="righteous_font">Righteous - Font Only</option>
+                            <option value="cinzel_grad">Cinzel - Forced Gradient</option>
                         </select>
                     </div>
                     <div class="control-group">
@@ -547,7 +560,7 @@
                 </div>
 
                 <div class="control-group" style="margin-top: 5px;">
-                    <label>Text Start Time <span class="val" id="textStartTimeDisplay">0s 5f (Frame 5)</span></label>
+                    <label>Text Start Time <span class="val" id="textStartTimeDisplay">0s 19f (Frame 19)</span></label>
                     <div class="row-group" style="gap: 10px; margin-top: 4px; display: flex;">
                         <div class="control-group" style="flex: 1;">
                             <label style="font-size: 0.65rem;">Seconds</label>
@@ -555,7 +568,7 @@
                         </div>
                         <div class="control-group" style="flex: 1;">
                             <label style="font-size: 0.65rem;">Frames (30fps)</label>
-                            <input type="range" id="textStartFrameSlider" min="0" max="29" value="5" style="margin-top:2px;">
+                            <input type="range" id="textStartFrameSlider" min="0" max="29" value="19" style="margin-top:2px;">
                         </div>
                     </div>
                 </div>
@@ -602,6 +615,11 @@
                     <label>Shape Type</label>
                     <select id="shapeType">
                         <option value="circle">Circle</option>
+                        <option value="diagonal_split">Diagonal Split</option>
+                        <option value="3d_rings">3D Rings (Torus/Hoops)</option>
+                        <option value="fashion_double_ring">Fashion Double Ring</option>
+                        <option value="fashion_segmented_ring">Fashion Segmented Ring</option>
+                        <option value="fashion_hexagon">Fashion Hexagon</option>
                         <option value="vertical_strip">Vertical Strip</option>
                         <option value="horizontal_strip">Horizontal Strip</option>
                         <option value="square">Square</option>
@@ -703,7 +721,7 @@
                 <div class="control-group" style="display: none;">
                     <label>BG Style</label>
                     <select id="photoAnimBgStyle">
-                        <option value="solid">Solid Color</option>
+                        <option value="solid" selected>Solid Color</option>
                         <option value="gradient_only">Gradient Only</option>
                         <option value="rad_c">Radial Glow</option>
                         <option value="mesh">Ambient Mesh Glow</option>
@@ -1103,16 +1121,24 @@
         let uploadedBgImg = null;
         let uploadedBgVideo = null;
         let uploadedImages = [];
+        let shapeImagesProps = [];
 
 
 
-        function syncBgVideoPlayback() {
-            if (uploadedBgVideo) {
-                if (isPlaying && !isExporting) {
-                    uploadedBgVideo.play().catch(err => console.log("Video play failed:", err));
-                } else {
-                    uploadedBgVideo.pause();
+        function syncVideoPlayback() {
+            const syncVid = (vid) => {
+                if (vid && vid.tagName === 'VIDEO') {
+                    if (isPlaying && !isExporting) {
+                        vid.play().catch(err => console.log("Video play failed:", err));
+                    } else {
+                        vid.pause();
+                    }
                 }
+            };
+            
+            syncVid(uploadedBgVideo);
+            if (uploadedImages) {
+                uploadedImages.forEach(syncVid);
             }
         }
 
@@ -1179,8 +1205,8 @@
         let textWordsOverride = {};
         let textGlobalY = 450;
         let textStartSec = 0;
-        let textStartFrameOffset = 5;
-        let textStartFrame = 5;
+        let textStartFrameOffset = 19;
+        let textStartFrame = 19;
         let textGradientEnabled = true;
         let textGradientStyle = 'auto';
         let textRandomDirections = [];
@@ -1316,7 +1342,48 @@
             return `rgba(${r},${g},${b},${alpha})`;
         }
 
-        function drawUnifiedBackground(context, baseColor, style, preset, t) {
+        function drawSunburstRays(ctx, cx, cy, W, H, numRays = 20, color = 'rgba(255, 255, 255, 0.045)') {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.translate(cx, cy);
+            
+            const angleStep = (2 * Math.PI) / numRays;
+            for (let i = 0; i < numRays; i++) {
+                ctx.rotate(angleStep);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-24, H * 1.5);
+                ctx.lineTo(24, H * 1.5);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawFadingHalftoneDots(ctx, W, H) {
+            ctx.save();
+            const dotSpacing = 40;
+            const startY = H * 0.55; // Start halfway down
+            
+            for (let y = startY; y < H; y += dotSpacing) {
+                const factor = (y - startY) / (H - startY); // 0.0 to 1.0
+                const dotSize = 1.2 + factor * 2.8; // dots grow from 1.2px to 4.0px
+                const opacity = factor * 0.09; // opacity up to 0.09
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                ctx.beginPath();
+                for (let x = 0; x < W + dotSpacing; x += dotSpacing) {
+                    // Stagger odd rows for organic halftone layout
+                    const xOffset = ((y / dotSpacing) % 2 === 0) ? 0 : dotSpacing / 2;
+                    ctx.moveTo(x + xOffset, y);
+                    ctx.arc(x + xOffset, y, dotSize, 0, Math.PI * 2);
+                }
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+function drawUnifiedBackground(context, baseColor, style, preset, t) {
             const W = INTERNAL_W;
             const H = INTERNAL_H;
 
@@ -1367,13 +1434,13 @@
             context.fillStyle = gradient;
             context.fillRect(0, 0, W, H);
 
-            // 3. Subtle static grid overlay (visible grey lines, no animation)
+            // 3. Subtle grid overlay with smooth sub-pixel rendering (slow speed & anti-aliased 1.5px lines)
             context.save();
-            context.strokeStyle = 'rgba(0, 0, 0, 0.09)';
-            context.lineWidth = 1.0;
+            context.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+            context.lineWidth = 1.5;
             const gs = 60; // grid size
-            const dx = 0;
-            const dy = 0;
+            const dx = (t * 0.12) % gs;
+            const dy = (t * 0.12) % gs;
             for (let x = dx - gs; x <= W + gs; x += gs) {
                 context.beginPath();
                 context.moveTo(x, 0);
@@ -1562,7 +1629,7 @@
             // Randomize color variation seed for different harmonious results
             colorVariationSeed = Math.random();
 
-            const shapes = ['circle', 'vertical_strip', 'horizontal_strip', 'square', 'diamond'];
+            const shapes = ['circle', '3d_rings', 'vertical_strip', 'horizontal_strip', 'square', 'diamond', 'diagonal_split'];
             const layouts = [
                 'auto_solid', 'auto_gradient',
                 'auto_solid_dots', 'auto_solid_lines',
@@ -1580,6 +1647,9 @@
             shapeLayout.value = layouts[Math.floor(Math.random() * layouts.length)];
             motionStyle.value = motions[Math.floor(Math.random() * motions.length)];
             renderStyle.value = renders[Math.floor(Math.random() * renders.length)];
+            
+            const directions = ['bottom', 'left', 'right'];
+            entryDirection = directions[Math.floor(Math.random() * directions.length)];
             
             if (!lockBGColor.checked) {
                 const chosenStyle = bgStyles[Math.floor(Math.random() * bgStyles.length)];
@@ -1617,7 +1687,7 @@
             resetAnimation();
             isPlaying = true;
             playBtn.innerText = "⏸ Pause";
-            syncBgVideoPlayback();
+            syncVideoPlayback();
         }
 
         function updateLabels() {
@@ -1702,19 +1772,25 @@
                 uploadedBgVideo.pause();
                 uploadedBgVideo.currentTime = 0;
             }
+            if (uploadedImages) {
+                for (let vid of uploadedImages) {
+                    if (vid && vid.tagName === 'VIDEO') {
+                        vid.pause();
+                        vid.currentTime = 0;
+                    }
+                }
+            }
 
             // Reset photo anim state
             pa_zoom = 1.0; pa_x = 0; pa_y = 0;
             pa_angle = 0; pa_alpha = 0;
             pa_wipe = 0; pa_bounce = 0;
             
-            // Logic: Left/Right only works in 'no_clip' mode. 
             // In 'clip' mode, it always starts from 'bottom' for a clean entry.
             if (clipMode.value === 'clip') {
                 entryDirection = 'bottom';
-            } else {
-                const directions = ['bottom', 'left', 'right'];
-                entryDirection = directions[Math.floor(Math.random() * directions.length)];
+            } else if (!entryDirection) {
+                entryDirection = 'bottom';
             }
             
             motionPhotoXOffset = 0;
@@ -1723,14 +1799,14 @@
             photoIntroStartY = 0;
             
             if (entryDirection === 'bottom') {
-                motionPhotoYOffset = 250;
-                photoIntroStartY = 250;
+                motionPhotoYOffset = 300;
+                photoIntroStartY = 300;
             } else if (entryDirection === 'left') {
-                motionPhotoXOffset = -250;
-                photoIntroStartX = -250;
+                motionPhotoXOffset = -150;
+                photoIntroStartX = -150;
             } else if (entryDirection === 'right') {
-                motionPhotoXOffset = 250;
-                photoIntroStartX = 250;
+                motionPhotoXOffset = 150;
+                photoIntroStartX = 150;
             }
 
             timeProgress.style.width = '0%';
@@ -1745,7 +1821,7 @@
                         if (isExporting) return;
                         isPlaying = false;
                         playBtn.innerText = "▶ Play";
-                        if (typeof syncBgVideoPlayback === 'function') syncBgVideoPlayback();
+                        if (typeof syncVideoPlayback === 'function') syncVideoPlayback();
                         return;
                     }
                     currentFrame++;
@@ -1767,13 +1843,26 @@
                 }
 
                 // 2. Photo Dynamics (Settles at Frame 30)
-                if (currentFrame < 30) {
-                    const introT = currentFrame / 30;
-                    const introEase = introT < 0.5 ? 4 * introT * introT * introT : 1 - Math.pow(-2 * introT + 2, 3) / 2;
+                const photoStartFrame = appMode === 'shape' ? (clipMode.value === 'clip' ? 8 : 3) : 0;
+                
+                if (currentFrame < photoStartFrame) {
+                    motionPhotoXOffset = photoIntroStartX;
+                    motionPhotoYOffset = photoIntroStartY;
+                    dynamicPhotoZoom = 0; // Start scaled down to 0 to prevent hard cuts at the clipping mask edge
+                    dynamicPulse = 1.0;
+                    photoEntryAlpha = 0; // Force hide photo before its animation starts to prevent awkward static appearance
+                } else if (currentFrame - photoStartFrame < 30) {
+                    const introT = (currentFrame - photoStartFrame) / 30;
+                    const introEase = 1 - Math.pow(1 - introT, 3); // Cubic Ease-Out for fast responsive entry
                     motionPhotoXOffset = photoIntroStartX * (1 - introEase);
                     motionPhotoYOffset = photoIntroStartY * (1 - introEase);
-                    dynamicPhotoZoom = 1.0;
-                    dynamicPulse = 1.0;
+                    
+                    const globalT = currentFrame / totalDuration;
+                    const globalEase = 1 - Math.pow(1 - globalT, 3);
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    
+                    dynamicPhotoZoom = continuousZoom; // Do not scale up during entry, just slide
+                    dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
                     
                     const opacityToggle = document.getElementById('photoEntryOpacityToggle');
                     if (opacityToggle && opacityToggle.checked) {
@@ -1786,11 +1875,12 @@
                     motionPhotoYOffset = 0;
                     photoEntryAlpha = 1.0;
                     
-                    // Post-Intro Effects - Eased to stop smoothly at the end
-                    const postT = Math.min(1.0, Math.max(0.0, (currentFrame - 30) / (totalDuration - 30)));
-                    const postEase = 1 - Math.pow(1 - postT, 3); // Smooth cubic ease-out curve
-                    dynamicPhotoZoom = 1.0 + postEase * 0.10; // Zoom up to 10%
-                    dynamicPulse = 1.0 + Math.sin((currentFrame - 30) * 0.08) * 0.025 * (1.0 - postEase);
+                    const globalT = Math.min(1.0, currentFrame / totalDuration);
+                    const globalEase = 1 - Math.pow(1 - globalT, 3);
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    
+                    dynamicPhotoZoom = continuousZoom;
+                    dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
                 }
 
                 // ── Photo Animation mode physics ──
@@ -1835,8 +1925,8 @@
                 // 1. Intro (Entry) Transition Phase
                 if (currentFrame < transFrames) {
                     const p = currentFrame / transFrames;
-                    // Cubic Ease-In-Out for ultra-smooth entry
-                    const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+                    // Quintic Ease-Out: Starts very fast, decelerates buttery smooth into place
+                    const ease = 1 - Math.pow(1 - p, 5);
                     
                     if (introType === 'slide_in_left') {
                         trans_tx = -INTERNAL_W * (1 - ease);
@@ -1867,8 +1957,8 @@
                 // 2. Outro (Exit) Transition Phase
                 else if (currentFrame >= totalDuration - transFrames) {
                     const p = (currentFrame - (totalDuration - transFrames)) / transFrames;
-                    // Cubic Ease-In-Out for ultra-smooth exit
-                    const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+                    // Quintic Ease-In: Starts buttery slow, accelerates out smoothly
+                    const ease = Math.pow(p, 5);
 
                     if (outroType === 'slide_out_left') {
                         trans_tx = -INTERNAL_W * ease;
@@ -1909,10 +1999,574 @@
             }
         }
 
+        // --- 3D Rings & Floating Bubble Particles Style ---
+        const FLOATING_ELEMENTS = [];
+
+        // Cache container for pre-rendered offscreen canvases
+        const bubbleCache = {};
+
+        function preRenderFloatingElements() {
+            FLOATING_ELEMENTS.forEach((el, idx) => {
+                // Determine padding based on blur and shadow to prevent clipping
+                const pad = (el.blur ? el.blur * 4 : 0) + 40;
+                const canvasSize = el.size * 2 + pad;
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = canvasSize;
+                offCanvas.height = canvasSize;
+                const offCtx = offCanvas.getContext('2d');
+                
+                const center = canvasSize / 2;
+                
+                offCtx.save();
+                if (el.blur && el.blur > 0.5) {
+                    offCtx.filter = `blur(${el.blur}px)`;
+                }
+                
+                offCtx.imageSmoothingEnabled = true;
+                offCtx.imageSmoothingQuality = 'high';
+                offCtx.shadowBlur = 0;
+                offCtx.shadowColor = 'transparent';
+                offCtx.setLineDash([]);
+                
+                const size = el.size;
+                const color = el.color;
+                const type = el.type;
+                
+                if (type === 'pink_sphere') {
+                    let grad = offCtx.createRadialGradient(center - size * 0.25, center - size * 0.25, size * 0.05, center, center, size * 0.5);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.25, '#f472b6');
+                    grad.addColorStop(0.65, color);
+                    grad.addColorStop(1.0, '#701a75');
+                    
+                    offCtx.shadowColor = 'rgba(232, 121, 249, 0.35)';
+                    offCtx.shadowBlur = 20;
+                    
+                    offCtx.fillStyle = grad;
+                    offCtx.beginPath();
+                    offCtx.arc(center, center, size * 0.5, 0, Math.PI * 2);
+                    offCtx.fill();
+                } else {
+                    // Extrusion Shadow Layer
+                    offCtx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+                    offCtx.shadowBlur = 12;
+                    offCtx.shadowOffsetY = 8;
+                    
+                    const thickness = 6;
+                    offCtx.fillStyle = getDarkerColor(color);
+                    
+                    offCtx.save();
+                    offCtx.translate(center, center + thickness);
+                    drawBubbleShapePath(offCtx, 0, 0, size, type);
+                    offCtx.fill();
+                    offCtx.restore();
+                    
+                    // Front Face Layer
+                    offCtx.shadowColor = 'transparent';
+                    offCtx.shadowOffsetY = 0;
+                    offCtx.shadowBlur = 0;
+                    
+                    let grad = offCtx.createLinearGradient(center - size/2, center - size/2, center + size/2, center + size/2);
+                    if (type === 'insta_bubble') {
+                        grad.addColorStop(0, '#f97316');
+                        grad.addColorStop(0.45, '#ec4899');
+                        grad.addColorStop(1.0, '#8b5cf6');
+                    } else {
+                        grad.addColorStop(0, getLighterColor(color));
+                        grad.addColorStop(1.0, color);
+                    }
+                    
+                    offCtx.fillStyle = grad;
+                    offCtx.save();
+                    offCtx.translate(center, center);
+                    drawBubbleShapePath(offCtx, 0, 0, size, type);
+                    offCtx.fill();
+                    
+                    // Glossy highlights rim
+                    offCtx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                    offCtx.lineWidth = 1.8;
+                    drawBubbleShapePath(offCtx, 0, 0, size * 0.94, type);
+                    offCtx.stroke();
+                    
+                    // Icon Graphics inside
+                    offCtx.fillStyle = '#ffffff';
+                    if (type === 'heart_bubble') {
+                        drawHeart(offCtx, 0, 0, size * 0.28);
+                        offCtx.fill();
+                    } else if (type === 'like_bubble') {
+                        drawThumbsUp(offCtx, 0, 0, size * 0.42, size * 0.42);
+                        offCtx.fill();
+                    } else if (type === 'insta_bubble') {
+                        drawInstagram(offCtx, 0, 0, size * 0.40);
+                    }
+                    offCtx.restore();
+                }
+                
+                offCtx.restore();
+                
+                bubbleCache[idx] = {
+                    canvas: offCanvas,
+                    centerOffset: center
+                };
+            });
+        }
+
+        function draw3DBubbleCached(context, idx, x, y, angle, t, phase) {
+            const cache = bubbleCache[idx];
+            if (!cache) {
+                // Cache fallback in case rendering is triggered before cache is built
+                const el = FLOATING_ELEMENTS[idx];
+                if (el) {
+                    draw3DBubble(context, x, y, el.size, el.type, el.color, angle, t, phase, el.blur);
+                }
+                return;
+            }
+            
+            context.save();
+            const floatY = Math.sin(t * 0.06 + phase) * 15;
+            const wobbleAngle = angle * Math.PI / 180 + Math.sin(t * 0.03 + phase) * 0.08;
+            
+            context.translate(x, y + floatY);
+            context.rotate(wobbleAngle);
+            context.drawImage(cache.canvas, -cache.centerOffset, -cache.centerOffset);
+            context.restore();
+        }
+
+        function getDarkerColor(hex) {
+            try {
+                const [h, s, l] = hexToHsl(hex);
+                return hslToHex(h, s, Math.max(0, l - 15));
+            } catch(e) {
+                return hex;
+            }
+        }
+
+        function getLighterColor(hex) {
+            try {
+                const [h, s, l] = hexToHsl(hex);
+                return hslToHex(h, s, Math.min(100, l + 15));
+            } catch(e) {
+                return hex;
+            }
+        }
+
+        function drawHeart(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.3);
+            ctx.bezierCurveTo(-size * 0.5, -size * 0.8, -size, -size * 0.3, -size, size * 0.1);
+            ctx.bezierCurveTo(-size, size * 0.6, -size * 0.3, size * 0.8, 0, size * 1.1);
+            ctx.bezierCurveTo(size * 0.3, size * 0.8, size, size * 0.6, size, size * 0.1);
+            ctx.bezierCurveTo(size, -size * 0.3, size * 0.5, -size * 0.8, 0, -size * 0.3);
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        function drawThumbsUp(ctx, x, y, w, h) {
+            ctx.save();
+            ctx.translate(x - w/2, y - h/2);
+            ctx.scale(w / 24, h / 24);
+            ctx.beginPath();
+            // Cuff
+            ctx.moveTo(4, 20);
+            ctx.lineTo(8, 20);
+            ctx.lineTo(8, 10);
+            ctx.lineTo(4, 10);
+            ctx.closePath();
+            
+            // Hand & Fingers
+            ctx.moveTo(9, 11);
+            ctx.bezierCurveTo(9, 6, 12, 3, 14, 3);
+            ctx.bezierCurveTo(15, 3, 15.5, 4, 15, 6);
+            ctx.lineTo(13.5, 10);
+            ctx.lineTo(20, 10);
+            ctx.bezierCurveTo(21.5, 10, 22, 11, 21.5, 12.5);
+            ctx.lineTo(20, 15.5);
+            ctx.bezierCurveTo(19.8, 16.5, 19, 17, 18, 17);
+            ctx.lineTo(17.5, 17);
+            ctx.bezierCurveTo(17.8, 17.5, 18, 18, 17.5, 19);
+            ctx.lineTo(16, 20.5);
+            ctx.bezierCurveTo(15.5, 21, 14.5, 21, 13.5, 21);
+            ctx.lineTo(9, 21);
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        function drawInstagram(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = size * 0.12;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            ctx.roundRect(-size/2, -size/2, size, size, size * 0.28);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.24, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(size * 0.25, -size * 0.25, size * 0.07, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawBubbleShapePath(context, cx, cy, size, type) {
+            context.beginPath();
+            if (type === 'heart_bubble') {
+                context.arc(cx, cy, size * 0.5, 0, Math.PI * 2);
+            } else if (type === 'like_bubble') {
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * 60) * Math.PI / 180;
+                    const px = cx + size * 0.5 * Math.cos(angle);
+                    const py = cy + size * 0.5 * Math.sin(angle);
+                    if (i === 0) context.moveTo(px, py);
+                    else context.lineTo(px, py);
+                }
+                context.closePath();
+            } else if (type === 'insta_bubble') {
+                context.roundRect(cx - size * 0.5, cy - size * 0.5, size, size, size * 0.22);
+            }
+        }
+
+        function draw3DBubble(context, x, y, size, type, color, angle, t, phase, blur) {
+            context.save();
+            
+            const floatY = Math.sin(t * 0.06 + phase) * 15;
+            const wobbleAngle = angle * Math.PI / 180 + Math.sin(t * 0.03 + phase) * 0.08;
+            
+            context.translate(x, y + floatY);
+            context.rotate(wobbleAngle);
+            
+            if (blur && blur > 0.5) {
+                context.filter = `blur(${blur}px)`;
+            }
+            
+            if (type === 'pink_sphere') {
+                let grad = context.createRadialGradient(-size * 0.25, -size * 0.25, size * 0.05, 0, 0, size * 0.5);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.25, '#f472b6');
+                grad.addColorStop(0.65, color);
+                grad.addColorStop(1.0, '#701a75');
+                
+                context.shadowColor = 'rgba(232, 121, 249, 0.35)';
+                context.shadowBlur = 20;
+                
+                context.fillStyle = grad;
+                context.beginPath();
+                context.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+                context.fill();
+            } else {
+                // Extrusion Shadow Layer
+                context.shadowColor = 'rgba(0, 0, 0, 0.22)';
+                context.shadowBlur = 12;
+                context.shadowOffsetY = 8;
+                
+                const thickness = 6;
+                context.fillStyle = getDarkerColor(color);
+                drawBubbleShapePath(context, 0, thickness, size, type);
+                context.fill();
+                
+                // Front Face Layer
+                context.shadowColor = 'transparent';
+                context.shadowOffsetY = 0;
+                context.shadowBlur = 0;
+                
+                let grad = context.createLinearGradient(-size/2, -size/2, size/2, size/2);
+                if (type === 'insta_bubble') {
+                    grad.addColorStop(0, '#f97316');
+                    grad.addColorStop(0.45, '#ec4899');
+                    grad.addColorStop(1.0, '#8b5cf6');
+                } else {
+                    grad.addColorStop(0, getLighterColor(color));
+                    grad.addColorStop(1.0, color);
+                }
+                
+                context.fillStyle = grad;
+                drawBubbleShapePath(context, 0, 0, size, type);
+                context.fill();
+                
+                // Glossy highlights rim
+                context.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                context.lineWidth = 1.8;
+                drawBubbleShapePath(context, 0, 0, size * 0.94, type);
+                context.stroke();
+                
+                // Icon Graphics inside
+                context.fillStyle = '#ffffff';
+                if (type === 'heart_bubble') {
+                    drawHeart(context, 0, 0, size * 0.28);
+                    context.fill();
+                } else if (type === 'like_bubble') {
+                    drawThumbsUp(context, 0, 0, size * 0.42, size * 0.42);
+                    context.fill();
+                } else if (type === 'insta_bubble') {
+                    drawInstagram(context, 0, 0, size * 0.40);
+                }
+            }
+            
+            context.restore();
+        }
+
+        function drawFloatingElements(context, layer, t) {
+            FLOATING_ELEMENTS.forEach((el, idx) => {
+                if (el.layer === layer) {
+                    draw3DBubbleCached(context, idx, el.x, el.y, el.angle, t, el.phase);
+                }
+            });
+        }
+
+        function drawSingle3DRing(ctx, cx, cy, rx, ry, tiltAngle, side, colors, glowColor) {
+            ctx.save();
+            
+            let grad = ctx.createLinearGradient(cx - rx, cy, cx + rx, cy);
+            colors.forEach(stop => {
+                grad.addColorStop(stop.offset, stop.color);
+            });
+            
+            const startAngle = (side === 'back') ? Math.PI : 0;
+            const endAngle = (side === 'back') ? 2 * Math.PI : Math.PI;
+            
+            // Step 1: Base glowing ring
+            ctx.shadowColor = glowColor;
+            ctx.shadowBlur = 12; // Optimized from 24 to speed up rendering kernel
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 26;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, tiltAngle, startAngle, endAngle);
+            ctx.stroke();
+            
+            // Step 2: Mid highlight
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, tiltAngle, startAngle, endAngle);
+            ctx.stroke();
+            
+            // Step 3: Specular bright line
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, tiltAngle, startAngle, endAngle);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function draw3DRings(ctx, cx, cy, baseSize, side) {
+            const rxA = baseSize * 0.70;
+            const ryA = baseSize * 0.20;
+            const tiltA = -18 * Math.PI / 180;
+            const cyA = cy - baseSize * 0.04;
+            const colorsA = [
+                { offset: 0.0, color: '#34d399' },
+                { offset: 0.35, color: '#06b6d4' },
+                { offset: 0.65, color: '#3b82f6' },
+                { offset: 1.0, color: '#8b5cf6' }
+            ];
+            const glowColorA = 'rgba(6, 182, 212, 0.6)';
+
+            const rxB = baseSize * 0.64;
+            const ryB = baseSize * 0.17;
+            const tiltB = 18 * Math.PI / 180;
+            const cyB = cy + baseSize * 0.04;
+            const colorsB = [
+                { offset: 0.0, color: '#fb7185' },
+                { offset: 0.35, color: '#d946ef' },
+                { offset: 0.70, color: '#ff007f' },
+                { offset: 1.0, color: '#f97316' }
+            ];
+            const glowColorB = 'rgba(217, 70, 239, 0.6)';
+
+            if (side === 'back') {
+                drawSingle3DRing(ctx, cx, cyA, rxA, ryA, tiltA, 'back', colorsA, glowColorA);
+                drawSingle3DRing(ctx, cx, cyB, rxB, ryB, tiltB, 'back', colorsB, glowColorB);
+            } else if (side === 'front') {
+                drawSingle3DRing(ctx, cx, cyA, rxA, ryA, tiltA, 'front', colorsA, glowColorA);
+                drawSingle3DRing(ctx, cx, cyB, rxB, ryB, tiltB, 'front', colorsB, glowColorB);
+            }
+        }
+
+        function getActivePalette() {
+            let p = null;
+            const bgPreset = document.getElementById('bgPreset');
+            const photoAnimBgPreset = document.getElementById('photoAnimBgPreset');
+            
+            const presetVal = bgPreset ? bgPreset.value : '';
+            p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === presetVal);
+            
+            if (!p && photoAnimBgPreset) {
+                const animPresetVal = photoAnimBgPreset.value;
+                p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === animPresetVal);
+            }
+            
+            return p || PALETTES[0];
+        }
+
+        function drawFashionDoubleRing(ctx, cx, cy, baseSize) {
+            const p = getActivePalette();
+            const rOuter = baseSize * 0.44;
+            const rInner = baseSize * 0.38;
+            
+            ctx.save();
+            
+            // Outer Ring Glow and Stroke
+            const grad = ctx.createLinearGradient(cx - rOuter, cy - rOuter, cx + rOuter, cy + rOuter);
+            grad.addColorStop(0, p.c3);
+            grad.addColorStop(0.5, p.c2);
+            grad.addColorStop(1, p.acc);
+            
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = baseSize * 0.035; // thick neon ring
+            ctx.shadowColor = p.c2;
+            ctx.shadowBlur = 12;
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner Thin White Ring
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 2.0;
+            ctx.setLineDash([]); // Ensure solid
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function drawFashionSegmentedRing(ctx, cx, cy, baseSize) {
+            const p = getActivePalette();
+            const rOuter = baseSize * 0.44;
+            const rInner = baseSize * 0.38;
+            
+            ctx.save();
+            
+            // Slight static rotation offset so gaps aren't aligned with axes
+            ctx.translate(cx, cy);
+            ctx.rotate(-Math.PI / 6); // 30 degrees
+            ctx.translate(-cx, -cy);
+            
+            // Outer Ring Glow and Stroke
+            const grad = ctx.createLinearGradient(cx - rOuter, cy - rOuter, cx + rOuter, cy + rOuter);
+            grad.addColorStop(0, p.c3);
+            grad.addColorStop(0.5, p.c2);
+            grad.addColorStop(1, p.acc);
+            
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = baseSize * 0.035; // thick neon ring
+            ctx.shadowColor = p.c2;
+            ctx.shadowBlur = 12;
+            
+            const gapOuter = baseSize * 0.05;
+            const dashOuter = (2 * Math.PI * rOuter) / 3 - gapOuter;
+            ctx.setLineDash([dashOuter, gapOuter]);
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner Thin Segmented White Ring
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 2.0;
+            
+            const gapInner = baseSize * 0.05;
+            const dashInner = (2 * Math.PI * rInner) / 3 - gapInner;
+            ctx.setLineDash([dashInner, gapInner]);
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function drawFashionHexagon(ctx, cx, cy, baseSize) {
+            const p = getActivePalette();
+            const rOuter = baseSize * 0.44;
+            const rInner = baseSize * 0.38;
+            
+            ctx.save();
+            
+            // Outer Hexagon Glow and Stroke
+            const grad = ctx.createLinearGradient(cx - rOuter, cy - rOuter, cx + rOuter, cy + rOuter);
+            if (p.n === 'Fashion Purple') {
+                grad.addColorStop(0, '#fb7185'); // pink
+                grad.addColorStop(0.5, '#d946ef'); // purple
+                grad.addColorStop(1, '#fbbf24'); // gold/orange
+            } else {
+                grad.addColorStop(0, p.c3);
+                grad.addColorStop(0.5, p.c2);
+                grad.addColorStop(1, p.acc);
+            }
+            
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = baseSize * 0.035; // thick neon ring
+            ctx.shadowColor = p.c2;
+            ctx.shadowBlur = 12;
+            ctx.setLineDash([]); // Ensure solid
+            
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3 - Math.PI / 6;
+                const x = cx + rOuter * Math.cos(angle);
+                const y = cy + rOuter * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Inner Thin White Hexagon
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 2.0;
+            
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3 - Math.PI / 6;
+                const x = cx + rInner * Math.cos(angle);
+                const y = cy + rInner * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
         function defineShapePath(context, cx, cy, size, type) {
             context.beginPath();
-            if (type === 'circle') {
+            if (type === 'circle' || type === '3d_rings') {
                 context.arc(cx, cy, size / 2, 0, Math.PI * 2);
+            } else if (type === 'fashion_double_ring' || type === 'fashion_segmented_ring') {
+                context.arc(cx, cy, size * 0.44, 0, Math.PI * 2);
+            } else if (type === 'fashion_hexagon') {
+                const r = size * 0.44;
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI) / 3 - Math.PI / 6;
+                    const x = cx + r * Math.cos(angle);
+                    const y = cy + r * Math.sin(angle);
+                    if (i === 0) context.moveTo(x, y);
+                    else context.lineTo(x, y);
+                }
+                context.closePath();
             } else if (type === 'square') {
                 context.rect(cx - size / 2, cy - size / 2, size, size);
             } else if (type === 'diamond') {
@@ -1925,6 +2579,24 @@
                 context.rect(cx - size / 2, 0, size, INTERNAL_H);
             } else if (type === 'horizontal_strip') {
                 context.rect(0, cy - size / 2, INTERNAL_W, size);
+            } else if (type === 'diagonal_split') {
+                // Middle diagonal band
+                const yTopLeft = cy - size * 0.05;
+                const yTopRight = cy - size * 0.35;
+                const yBottomLeft = cy + size * 0.35;
+                const yBottomRight = cy + size * 0.05;
+
+                const cpTopX = INTERNAL_W / 2;
+                const cpTopY = (yTopLeft + yTopRight) / 2 + size * 0.02;
+
+                const cpBottomX = INTERNAL_W / 2;
+                const cpBottomY = (yBottomLeft + yBottomRight) / 2 + size * 0.02;
+
+                context.moveTo(-1000, yTopLeft);
+                context.quadraticCurveTo(cpTopX, cpTopY, INTERNAL_W + 1000, yTopRight);
+                context.lineTo(INTERNAL_W + 1000, yBottomRight);
+                context.quadraticCurveTo(cpBottomX, cpBottomY, -1000, yBottomLeft);
+                context.closePath();
             }
         }
 
@@ -1945,6 +2617,39 @@
         }
 
         function drawShapePipeline(context, cx, cy, baseSize, type, designColor) {
+            if (type === '3d_rings') {
+                context.save();
+                if (motionStyle.value === 'fade_pulse') {
+                    context.globalAlpha = dynamicOpacity;
+                    baseSize = baseSize * dynamicPulse;
+                }
+                draw3DRings(context, cx, cy, baseSize, 'back');
+                context.restore();
+                return;
+            }
+
+            if (type === 'fashion_double_ring' || type === 'fashion_segmented_ring' || type === 'fashion_hexagon') {
+                context.save();
+                if (motionStyle.value === 'rotation') {
+                    context.translate(cx, cy);
+                    context.rotate(dynamicRotation);
+                    context.translate(-cx, -cy);
+                }
+                if (motionStyle.value === 'fade_pulse') {
+                    context.globalAlpha = dynamicOpacity;
+                    baseSize = baseSize * dynamicPulse;
+                }
+                if (type === 'fashion_double_ring') {
+                    drawFashionDoubleRing(context, cx, cy, baseSize);
+                } else if (type === 'fashion_segmented_ring') {
+                    drawFashionSegmentedRing(context, cx, cy, baseSize);
+                } else if (type === 'fashion_hexagon') {
+                    drawFashionHexagon(context, cx, cy, baseSize);
+                }
+                context.restore();
+                return;
+            }
+
             const rMode = renderStyle.value;
             const glowSize = parseInt(glowSizeSlider.value);
             const layout = shapeLayout.value;
@@ -2166,9 +2871,9 @@
                 const userY = parseInt(document.getElementById('photoYSlider').value);
 
                 // Cover-fit photo inside the photo area combined with user scale
-                const pCover = Math.max(photoW / uploadedImg.width, photoH / uploadedImg.height) * userScale;
-                const piw = uploadedImg.width  * pCover;
-                const pih = uploadedImg.height * pCover;
+                const pCover = Math.max(photoW / (uploadedImg.videoWidth || uploadedImg.width), photoH / (uploadedImg.videoHeight || uploadedImg.height)) * userScale;
+                const piw = (uploadedImg.videoWidth || uploadedImg.width)  * pCover;
+                const pih = (uploadedImg.videoHeight || uploadedImg.height) * pCover;
                 const pix = photoX + (photoW - piw) / 2 + userX;
                 const piy = photoY + (photoH - pih) / 2 + userY;
                 ctx.imageSmoothingEnabled = true;
@@ -2244,9 +2949,9 @@
                 const userY = parseInt(document.getElementById('photoYSlider').value);
 
                 // Apply zoom to the image inside the card (cover-fit) combined with user scale
-                const pScaleFactor = Math.max(photoW / uploadedImg.width, photoH / uploadedImg.height) * pa_zoom * userScale;
-                const piw = uploadedImg.width  * pScaleFactor;
-                const pih = uploadedImg.height * pScaleFactor;
+                const pScaleFactor = Math.max(photoW / (uploadedImg.videoWidth || uploadedImg.width), photoH / (uploadedImg.videoHeight || uploadedImg.height)) * pa_zoom * userScale;
+                const piw = (uploadedImg.videoWidth || uploadedImg.width)  * pScaleFactor;
+                const pih = (uploadedImg.videoHeight || uploadedImg.height) * pScaleFactor;
                 const pix = photoX + (photoW - piw) / 2 + pa_x + userX;
                 const piy = photoY + (photoH - pih) / 2 + pa_y + userY;
 
@@ -2369,9 +3074,9 @@
                         const userY = parseInt(document.getElementById(yId).value);
 
                         const img = cfg.img;
-                        const coverScale = Math.max(pw_area / img.width, ph_area / img.height) * userScale;
-                        const piw = img.width  * coverScale;
-                        const pih = img.height * coverScale;
+                        const coverScale = Math.max(pw_area / (img.videoWidth || img.width), ph_area / (img.videoHeight || img.height)) * userScale;
+                        const piw = (img.videoWidth || img.width)  * coverScale;
+                        const pih = (img.videoHeight || img.height) * coverScale;
                         const pix = px_area + (pw_area - piw) / 2 + userX;
                         const piy = py_area + (ph_area - pih) / 2 + userY;
 
@@ -2388,7 +3093,365 @@
                 return;
             }
 
+            // ── Concentric Circles: Special premium circles renderer ──
+            if (animType === 'concentric_circles') {
+                const animPreset = document.getElementById('photoAnimBgPreset').value;
+                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
 
+                const cx = INTERNAL_W / 2;
+                const cy = INTERNAL_H / 2 + 120; // Align with the lower vertical center used in main shape layouts
+
+                ctx.save();
+                applySubjectTransitions(ctx, cx, cy);
+
+                // Get layout slider values
+                const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
+                const pX = parseInt(document.getElementById('polaroidXSlider').value);
+                const pY = parseInt(document.getElementById('polaroidYSlider').value);
+
+                // Photo radius (radius is based on scale)
+                const R = pScale * 0.44;
+
+                // Center of the circle
+                const ccx = cx + pX;
+                const ccy = cy + pY;
+
+                // Get active palette for neon accents
+                let p;
+                const animPresetVal = document.getElementById('photoAnimBgPreset').value;
+                if (animPresetVal === 'custom') {
+                    const contrastSolid = getContrastColor(bgCol, 'solid');
+                    p = { acc: contrastSolid, c2: contrastSolid, c3: contrastSolid };
+                } else {
+                    p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === animPresetVal) || PALETTES[0];
+                }
+
+                // Staggered Entry Transitions (0 to 30 frames)
+                let entry1 = 1.0;
+                let entry2 = 1.0;
+                let entryPhoto = 1.0;
+                if (currentFrame < 30) {
+                    // Outer Ring 2 (earliest)
+                    const t2 = Math.min(1.0, Math.max(0.0, currentFrame / 18));
+                    entry2 = 1 - Math.pow(1 - t2, 3); // cubic ease-out
+                    
+                    // Outer Ring 1 (middle)
+                    const t1 = Math.min(1.0, Math.max(0.0, (currentFrame - 4) / 18));
+                    entry1 = 1 - Math.pow(1 - t1, 3);
+                    
+                    // Photo (latest)
+                    const tPhoto = Math.min(1.0, Math.max(0.0, (currentFrame - 8) / 18));
+                    entryPhoto = 1 - Math.pow(1 - tPhoto, 3);
+                }
+
+                // Soft breathing animation for background shapes
+                const timeScale = currentFrame * 0.04;
+                const pulse2 = 1.0 + Math.sin(timeScale) * 0.02;
+                const pulse1 = 1.0 + Math.sin(timeScale + 1.2) * 0.015;
+
+                // Draw Outer Concentric Ring 2 (Largest, softest)
+                ctx.save();
+                ctx.globalAlpha = entry2 * 0.3;
+                const r2 = R * 1.30 * pulse2 * pa_zoom;
+                const x2 = ccx + pa_x * 0.8;
+                const y2 = ccy + pa_y * 0.8;
+                ctx.shadowColor = p.c2 || p.acc;
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = hexToRgba(p.acc || '#ffffff', 0.15);
+                ctx.beginPath();
+                ctx.arc(x2, y2, r2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+
+                // Draw Outer Concentric Ring 1 (Middle, stronger)
+                ctx.save();
+                ctx.globalAlpha = entry1 * 0.6;
+                const r1 = R * 1.15 * pulse1 * pa_zoom;
+                const x1 = ccx + pa_x * 0.9;
+                const y1 = ccy + pa_y * 0.9;
+                ctx.shadowColor = p.c3 || p.acc;
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = hexToRgba(p.acc || '#ffffff', 0.25);
+                ctx.beginPath();
+                ctx.arc(x1, y1, r1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+
+                // Draw Photo Circle (Front)
+                if (entryPhoto > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = entryPhoto;
+
+                    // Compute current translation and scale of photo
+                    const px_c = ccx + pa_x;
+                    const py_c = ccy + pa_y;
+                    const rPhoto = R * pa_zoom;
+
+                    // Photo Drop Shadow
+                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                    ctx.shadowBlur = 30;
+                    ctx.shadowOffsetY = 10;
+
+                    // Outer border ring for the photo (white outline)
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 5 * (pScale / 640);
+                    ctx.beginPath();
+                    ctx.arc(px_c, py_c, rPhoto, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0; // reset shadow for photo draw
+
+                    // Clip Photo inside the circle
+                    ctx.beginPath();
+                    ctx.arc(px_c, py_c, rPhoto - ctx.lineWidth/2, 0, Math.PI * 2);
+                    ctx.clip();
+
+                    // Draw image (cover-fit inside circle boundaries)
+                    const userScale = parseInt(document.getElementById('photoScale').value) / 100;
+                    const userX = parseInt(document.getElementById('photoXSlider').value);
+                    const userY = parseInt(document.getElementById('photoYSlider').value);
+
+                    const imgCover = Math.max((rPhoto * 2) / (uploadedImg.videoWidth || uploadedImg.width), (rPhoto * 2) / (uploadedImg.videoHeight || uploadedImg.height)) * userScale;
+                    const piw = (uploadedImg.videoWidth || uploadedImg.width)  * imgCover;
+                    const pih = (uploadedImg.videoHeight || uploadedImg.height) * imgCover;
+                    const pix = px_c - piw / 2 + userX;
+                    const piy = py_c - pih / 2 + userY;
+
+                    if (Math.abs(pa_angle) > 0.01) {
+                        ctx.translate(px_c, py_c);
+                        ctx.rotate(pa_angle * Math.PI / 180);
+                        ctx.translate(-px_c, -py_c);
+                    }
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(uploadedImg, pix, piy, piw, pih);
+                    ctx.restore();
+                }
+
+                ctx.restore(); // restore subject transitions
+                return;
+            }
+
+            // ── Tech Hexagon: Premium vertical hexagon shape with corner node connectors and bottom banner ──
+            if (animType === 'tech_hexagon') {
+                const animPreset = document.getElementById('photoAnimBgPreset').value;
+                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
+
+                const cx = INTERNAL_W / 2;
+                const cy = INTERNAL_H / 2 + 120;
+
+                ctx.save();
+                applySubjectTransitions(ctx, cx, cy);
+
+                // Get layout slider values
+                const pScale = parseInt(document.getElementById('polaroidScaleSlider').value);
+                const pX = parseInt(document.getElementById('polaroidXSlider').value);
+                const pY = parseInt(document.getElementById('polaroidYSlider').value);
+
+                // Hexagon radius
+                const R = pScale * 0.44;
+
+                // Center coordinates
+                const ccx = cx + pX;
+                const ccy = cy + pY;
+
+                // Get active palette for theme styling
+                let p;
+                const animPresetVal = document.getElementById('photoAnimBgPreset').value;
+                if (animPresetVal === 'custom') {
+                    const contrastSolid = getContrastColor(bgCol, 'solid');
+                    const contrastGrad = getContrastColor(bgCol, 'gradient');
+                    p = { acc: contrastSolid, c1: contrastGrad[0], c2: contrastGrad[1] };
+                } else {
+                    p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === animPresetVal) || PALETTES[0];
+                }
+
+                // Staggered Entry Transitions (0 to 30 frames)
+                let entryBanner = 1.0;
+                let entryNodes = 1.0;
+                let entryHex = 1.0;
+                if (currentFrame < 30) {
+                    // Banner slides down (earliest)
+                    const tb = Math.min(1.0, Math.max(0.0, currentFrame / 18));
+                    entryBanner = 1 - Math.pow(1 - tb, 3);
+                    
+                    // Hexagon fades and scales up
+                    const th = Math.min(1.0, Math.max(0.0, (currentFrame - 5) / 18));
+                    entryHex = 1 - Math.pow(1 - th, 3);
+                    
+                    // Node connectors draw in (latest)
+                    const tn = Math.min(1.0, Math.max(0.0, (currentFrame - 10) / 20));
+                    entryNodes = tn; // Linear reveal for line drawing
+                }
+
+                // 1. Draw Vertical Rounded Banner behind Hexagon (slides down/out from center)
+                if (entryBanner > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = entryBanner * 0.85;
+                    
+                    const bannerW = R * 0.9;
+                    const bannerH = R * 1.3;
+                    
+                    // Animate position slightly during entry
+                    const slideOffset = (1 - entryBanner) * 80;
+                    const bx = ccx + pa_x * 0.85 - bannerW / 2;
+                    const by = ccy + pa_y * 0.85 + R * 0.2 + slideOffset;
+
+                    // Create beautiful gradient for banner
+                    const bGrad = ctx.createLinearGradient(bx, by, bx, by + bannerH);
+                    bGrad.addColorStop(0, p.c1 || p.acc);
+                    bGrad.addColorStop(1, p.c2 || p.acc);
+
+                    ctx.fillStyle = bGrad;
+                    ctx.beginPath();
+                    ctx.roundRect(bx, by, bannerW, bannerH, 16);
+                    ctx.fill();
+                    
+                    // Soft white stripe accent inside banner
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.roundRect(bx + 6, by + 6, bannerW - 12, bannerH - 12, 12);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // 2. Draw Corner Node Connector Lines (Parallel to diagonal edges, ending in circles)
+                if (entryNodes > 0) {
+                    ctx.save();
+                    ctx.strokeStyle = p.acc;
+                    ctx.fillStyle = p.acc;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = p.acc;
+                    ctx.shadowBlur = 10;
+
+                    // Hexagon vertices function helper
+                    const getHexPoint = (radius, i) => {
+                        const angle = (i * Math.PI) / 3 - Math.PI / 6;
+                        return {
+                            x: ccx + pa_x * 0.9 + radius * Math.cos(angle),
+                            y: ccy + pa_y * 0.9 + radius * Math.sin(angle)
+                        };
+                    };
+
+                    // Draw 4 corner connectors symmetrically
+                    const offsetDistance = 16;
+                    const lineLength = R * 0.45;
+
+                    const connectors = [
+                        { startIdx: 5, endIdx: 0 }, // Top-Right (grows from top to right)
+                        { startIdx: 5, endIdx: 4 }, // Top-Left (grows from top to left)
+                        { startIdx: 2, endIdx: 1 }, // Bottom-Right (grows from bottom to right)
+                        { startIdx: 2, endIdx: 3 }  // Bottom-Left (grows from bottom to left)
+                    ];
+
+                    connectors.forEach((conn) => {
+                        const pStart = getHexPoint(R + offsetDistance, conn.startIdx);
+                        const pEnd = getHexPoint(R + offsetDistance, conn.endIdx);
+                        
+                        // Vector from start to end
+                        const vx = pEnd.x - pStart.x;
+                        const vy = pEnd.y - pStart.y;
+                        const d = Math.sqrt(vx * vx + vy * vy);
+                        const ux = vx / d;
+                        const uy = vy / d;
+
+                        // Draw line segment starting at start index and ending after lineLength
+                        const targetLen = lineLength * entryNodes;
+                        const lx1 = pStart.x;
+                        const ly1 = pStart.y;
+                        const lx2 = pStart.x + ux * targetLen;
+                        const ly2 = pStart.y + uy * targetLen;
+
+                        ctx.beginPath();
+                        ctx.moveTo(lx1, ly1);
+                        ctx.lineTo(lx2, ly2);
+                        ctx.stroke();
+
+                        // Node dot at the end
+                        if (entryNodes > 0.8) {
+                            const dotScale = (entryNodes - 0.8) / 0.2; // scale up dot
+                            ctx.beginPath();
+                            ctx.arc(lx2, ly2, 5 * dotScale, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    });
+                    ctx.restore();
+                }
+
+                // 3. Draw Hexagon Photo Box (Front)
+                if (entryHex > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = entryHex;
+
+                    const hx = ccx + pa_x;
+                    const hy = ccy + pa_y;
+                    const rHex = R * pa_zoom;
+
+                    // Hexagon helper
+                    const pathHexagon = (cContext, radius) => {
+                        cContext.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (i * Math.PI) / 3 - Math.PI / 6;
+                            const x = hx + radius * Math.cos(angle);
+                            const y = hy + radius * Math.sin(angle);
+                            if (i === 0) cContext.moveTo(x, y);
+                            else cContext.lineTo(x, y);
+                        }
+                        cContext.closePath();
+                    };
+
+                    // Draw outer glowing neon hexagon frame
+                    const grad = ctx.createLinearGradient(hx - rHex, hy - rHex, hx + rHex, hy + rHex);
+                    grad.addColorStop(0, p.c3 || p.acc);
+                    grad.addColorStop(0.5, p.c2 || p.acc);
+                    grad.addColorStop(1, p.acc);
+
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 6 * (pScale / 640);
+                    ctx.shadowColor = p.c2 || p.acc;
+                    ctx.shadowBlur = 15;
+                    pathHexagon(ctx, rHex);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0; // reset shadow for photo draw
+
+                    // Clip Photo inside hexagon
+                    pathHexagon(ctx, rHex - ctx.lineWidth/2);
+                    ctx.clip();
+
+                    // Draw Image
+                    const userScale = parseInt(document.getElementById('photoScale').value) / 100;
+                    const userX = parseInt(document.getElementById('photoXSlider').value);
+                    const userY = parseInt(document.getElementById('photoYSlider').value);
+
+                    // Cover-fit image inside vertical hexagon boundaries (approximate square bounding box)
+                    const imgCover = Math.max((rHex * 2) / (uploadedImg.videoWidth || uploadedImg.width), (rHex * 2) / (uploadedImg.videoHeight || uploadedImg.height)) * userScale;
+                    const piw = (uploadedImg.videoWidth || uploadedImg.width)  * imgCover;
+                    const pih = (uploadedImg.videoHeight || uploadedImg.height) * imgCover;
+                    const pix = hx - piw / 2 + userX;
+                    const piy = hy - pih / 2 + userY;
+
+                    if (Math.abs(pa_angle) > 0.01) {
+                        ctx.translate(hx, hy);
+                        ctx.rotate(pa_angle * Math.PI / 180);
+                        ctx.translate(-hx, -hy);
+                    }
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(uploadedImg, pix, piy, piw, pih);
+                    ctx.restore();
+                }
+
+                ctx.restore(); // restore subject transitions
+                return;
+            }
 
             // Draw background (non-polaroid modes)
             const animPreset = document.getElementById('photoAnimBgPreset').value;
@@ -2403,9 +3466,9 @@
             const userY = parseInt(document.getElementById('photoYSlider').value);
 
             // Scale photo to fill canvas (cover) combined with user scale
-            const cover = Math.max(INTERNAL_W / uploadedImg.width, INTERNAL_H / uploadedImg.height) * userScale;
-            const iw = uploadedImg.width  * cover * pa_zoom;
-            const ih = uploadedImg.height * cover * pa_zoom;
+            const cover = Math.max(INTERNAL_W / (uploadedImg.videoWidth || uploadedImg.width), INTERNAL_H / (uploadedImg.videoHeight || uploadedImg.height)) * userScale;
+            const iw = (uploadedImg.videoWidth || uploadedImg.width)  * cover * pa_zoom;
+            const ih = (uploadedImg.videoHeight || uploadedImg.height) * cover * pa_zoom;
             const bx = (INTERNAL_W - iw) / 2 + pa_x + userX;
             const by = (INTERNAL_H - ih) / 2 + pa_y + userY;
 
@@ -2477,8 +3540,15 @@
             ctx.setLineDash([]);
             ctx.shadowBlur = 0;
             ctx.shadowColor = 'transparent';
+            ctx.globalAlpha = 1.0;
+            ctx.filter = 'none';
             
             renderBackground(currentFrame);
+
+            // Draw background floating elements if 3d_rings shape is active
+            if (shapeType.value === '3d_rings') {
+                drawFloatingElements(ctx, 'back', currentFrame);
+            }
 
             // Calculation setups using fixed resolution
             const cx = (INTERNAL_W / 2) + parseInt(shapeXSlider.value);
@@ -2514,14 +3584,59 @@
                 }
 
                 // Render subject overlay
-                if (uploadedImg) {
+                if (uploadedImages.length > 0) {
+                    let horizonY = cy + 20; 
+                    if (shapeType.value === 'horizontal_strip') {
+                        horizonY = cy - (baseShapeSize / 2) + 20;
+                    } else if (shapeType.value === 'square' || shapeType.value === 'diamond') {
+                        horizonY = cy + (baseShapeSize * 0.15);
+                    } else if (shapeType.value === 'diagonal_split') {
+                        horizonY = INTERNAL_H + 10000;
+                    }
+
+                    const isIntroSideEntry = motionPhotoXOffset !== 0 && (entryDirection === 'left' || entryDirection === 'right') && document.getElementById('introTransitionType').value === 'none';
+
+                    ctx.save();
+                    defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
+                    if (!isIntroSideEntry) {
+                        ctx.rect(-10000, -10000, 20000, 10000 + horizonY);
+                    }
+                    ctx.clip();
+
+                    uploadedImages.forEach((img, idx) => {
+                        if (!img) return;
+                        const props = shapeImagesProps[idx] || { scale: 100, x: 0, y: 0 };
+                        const userScale = (props.scale / 100) * dynamicPhotoZoom;
+                        const baseScale = Math.min((INTERNAL_W * 0.85) / (img.videoWidth || img.width), (INTERNAL_H * 0.75) / (img.videoHeight || img.height));
+                        const iw = (img.videoWidth || img.width) * baseScale * userScale;
+                        const ih = (img.videoHeight || img.height) * baseScale * userScale;
+                        
+                        const actualXOffset = motionPhotoXOffset;
+                        const actualYOffset = motionPhotoYOffset;
+
+                        const px = (INTERNAL_W / 2) - iw / 2 + props.x + actualXOffset;
+                        const py = (INTERNAL_H / 2) + 120 + props.y - (ih * 0.45) + actualYOffset; 
+
+                        ctx.save();
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.shadowBlur = 0;
+                        ctx.shadowColor = 'transparent';
+                        ctx.setLineDash([]);
+                        ctx.globalAlpha *= photoEntryAlpha;
+                        ctx.drawImage(img, px, py, iw, ih);
+                        ctx.restore();
+                    });
+
+                    ctx.restore();
+                } else if (uploadedImg) {
                     const userScale = (parseInt(photoScale.value) / 100) * dynamicPhotoZoom;
-                    const baseScale = Math.min((INTERNAL_W * 0.85) / uploadedImg.width, (INTERNAL_H * 0.75) / uploadedImg.height);
-                    const iw = uploadedImg.width * baseScale * userScale;
-                    const ih = uploadedImg.height * baseScale * userScale;
+                    const baseScale = Math.min((INTERNAL_W * 0.85) / (uploadedImg.videoWidth || uploadedImg.width), (INTERNAL_H * 0.75) / (uploadedImg.videoHeight || uploadedImg.height));
+                    const iw = (uploadedImg.videoWidth || uploadedImg.width) * baseScale * userScale;
+                    const ih = (uploadedImg.videoHeight || uploadedImg.height) * baseScale * userScale;
                     
-                    const actualXOffset = currentFrame < 30 ? motionPhotoXOffset : 0;
-                    const actualYOffset = currentFrame < 30 ? motionPhotoYOffset : 0;
+                    const actualXOffset = motionPhotoXOffset;
+                    const actualYOffset = motionPhotoYOffset;
 
                     const px = (INTERNAL_W / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
                     const py = (INTERNAL_H / 2) + 120 + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
@@ -2543,9 +3658,11 @@
                         horizonY = cy - (baseShapeSize / 2) + 20;
                     } else if (shapeType.value === 'square' || shapeType.value === 'diamond') {
                         horizonY = cy + (baseShapeSize * 0.15);
+                    } else if (shapeType.value === 'diagonal_split') {
+                        horizonY = INTERNAL_H + 10000;
                     }
 
-                    const isIntroSideEntry = currentFrame < 30 && (entryDirection === 'left' || entryDirection === 'right') && document.getElementById('introTransitionType').value === 'none';
+                    const isIntroSideEntry = motionPhotoXOffset !== 0 && (entryDirection === 'left' || entryDirection === 'right') && document.getElementById('introTransitionType').value === 'none';
 
                     ctx.save();
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
@@ -2561,8 +3678,19 @@
                     ctx.setLineDash([15, 15]);
                     ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2 + 150, 150, 0, Math.PI * 2); ctx.stroke();
                 }
+
+                // Draw front rings of 3D Rings (moves with the subject)
+                if (shapeType.value === '3d_rings' && baseShapeSize > 0) {
+                    draw3DRings(ctx, cx, cy, baseShapeSize, 'front');
+                }
+
                 drawTextOverlay();
                 ctx.restore(); // restore subject transitions
+
+                // Draw foreground floating elements (floats independently)
+                if (shapeType.value === '3d_rings') {
+                    drawFloatingElements(ctx, 'front', currentFrame);
+                }
             } else {
                 // Float mode: separate transition pivots for shape, photo, and text to prevent orbiting
 
@@ -2588,14 +3716,88 @@
                 ctx.restore();
 
                 // 2. Draw photo with transitions around its own center (pcx, pcy)
-                if (uploadedImg) {
+                if (uploadedImages.length > 0) {
+                    uploadedImages.forEach((img, idx) => {
+                        if (!img) return;
+                        const props = shapeImagesProps[idx] || { scale: 100, x: 0, y: 0 };
+                        const userScale = (props.scale / 100) * dynamicPhotoZoom;
+                        const baseScale = Math.min((INTERNAL_W * 0.85) / (img.videoWidth || img.width), (INTERNAL_H * 0.75) / (img.videoHeight || img.height));
+                        const iw = (img.videoWidth || img.width) * baseScale * userScale;
+                        const ih = (img.videoHeight || img.height) * baseScale * userScale;
+                        
+                        const actualXOffset = motionPhotoXOffset;
+                        const actualYOffset = motionPhotoYOffset;
+
+                        const px = (INTERNAL_W / 2) - iw / 2 + props.x + actualXOffset;
+                        const py = (INTERNAL_H / 2) + 120 + props.y - (ih * 0.45) + actualYOffset; 
+
+                        const pcx = px + iw / 2;
+                        const pcy = py + ih / 2;
+
+                        ctx.save();
+                        applySubjectTransitions(ctx, pcx, pcy);
+
+                        // Float mode: soft edge fades using destination-in masks
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = INTERNAL_W;
+                        tempCanvas.height = INTERNAL_H;
+                        const tCtx = tempCanvas.getContext('2d');
+
+                        tCtx.imageSmoothingEnabled = true;
+                        tCtx.imageSmoothingQuality = 'high';
+                        tCtx.globalAlpha = photoEntryAlpha;
+                        tCtx.drawImage(img, px, py, iw, ih);
+
+                        // ── Bottom fade (cosine curve, toggleable) ──
+                        if (document.getElementById('fadeBottom').checked) {
+                            const fadeStartY = py + ih * 0.70;
+                            const fadeEndY   = py + ih;
+                            const bottomGrad = tCtx.createLinearGradient(0, fadeStartY, 0, fadeEndY);
+                            for (let i = 0; i <= 100; i++) {
+                                const t = i / 100;
+                                const alpha = parseFloat(Math.cos(t * Math.PI / 2).toFixed(4));
+                                bottomGrad.addColorStop(t, `rgba(0,0,0,${alpha})`);
+                            }
+                            tCtx.globalCompositeOperation = 'destination-in';
+                            tCtx.fillStyle = bottomGrad;
+                            tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                        }
+
+                        // ── Left fade (optional) ──
+                        if (document.getElementById('fadeLeft').checked) {
+                            const leftFadeEnd = px + iw * 0.28;
+                            const leftGrad = tCtx.createLinearGradient(px, 0, leftFadeEnd, 0);
+                            leftGrad.addColorStop(0.0, 'rgba(0,0,0,0)');
+                            leftGrad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                            leftGrad.addColorStop(1.0, 'rgba(0,0,0,1)');
+                            tCtx.globalCompositeOperation = 'destination-in';
+                            tCtx.fillStyle = leftGrad;
+                            tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                        }
+
+                        // ── Right fade (optional) ──
+                        if (document.getElementById('fadeRight').checked) {
+                            const rightFadeStart = px + iw * 0.72;
+                            const rightGrad = tCtx.createLinearGradient(rightFadeStart, 0, px + iw, 0);
+                            rightGrad.addColorStop(0.0, 'rgba(0,0,0,1)');
+                            rightGrad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                            rightGrad.addColorStop(1.0, 'rgba(0,0,0,0)');
+                            tCtx.globalCompositeOperation = 'destination-in';
+                            tCtx.fillStyle = rightGrad;
+                            tCtx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+                        }
+
+                        ctx.drawImage(tempCanvas, 0, 0);
+                        ctx.restore();
+                    });
+                } else if (uploadedImg) {
                     const userScale = (parseInt(photoScale.value) / 100) * dynamicPhotoZoom;
-                    const baseScale = Math.min((INTERNAL_W * 0.85) / uploadedImg.width, (INTERNAL_H * 0.75) / uploadedImg.height);
-                    const iw = uploadedImg.width * baseScale * userScale;
-                    const ih = uploadedImg.height * baseScale * userScale;
+                    const baseScale = Math.min((INTERNAL_W * 0.85) / (uploadedImg.videoWidth || uploadedImg.width), (INTERNAL_H * 0.75) / (uploadedImg.videoHeight || uploadedImg.height));
+                    const iw = (uploadedImg.videoWidth || uploadedImg.width) * baseScale * userScale;
+                    const ih = (uploadedImg.videoHeight || uploadedImg.height) * baseScale * userScale;
                     
-                    const actualXOffset = currentFrame < 30 ? motionPhotoXOffset : 0;
-                    const actualYOffset = currentFrame < 30 ? motionPhotoYOffset : 0;
+                    const actualXOffset = motionPhotoXOffset;
+                    const actualYOffset = motionPhotoYOffset;
 
                     const px = (INTERNAL_W / 2) - iw / 2 + parseInt(photoXSlider.value) + actualXOffset;
                     const py = (INTERNAL_H / 2) + 120 + parseInt(photoYSlider.value) - (ih * 0.45) + actualYOffset; 
@@ -2666,6 +3868,19 @@
                     ctx.setLineDash([15, 15]);
                     ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2 + 150, 150, 0, Math.PI * 2); ctx.stroke();
                     ctx.restore();
+                }
+
+                // Render front rings of 3D Rings
+                if (shapeType.value === '3d_rings' && baseShapeSize > 0) {
+                    ctx.save();
+                    applySubjectTransitions(ctx, cx, cy);
+                    draw3DRings(ctx, cx, cy, baseShapeSize, 'front');
+                    ctx.restore();
+                }
+
+                // Draw foreground floating elements
+                if (shapeType.value === '3d_rings') {
+                    drawFloatingElements(ctx, 'front', currentFrame);
                 }
 
                 // 3. Draw text overlay with transitions around its own center
@@ -2814,8 +4029,15 @@
                     if (f > 0) {
                         updatePhysics();
                     }
-                    if (appMode === 'long_form' && uploadedBgVideo) {
+                    if (uploadedBgVideo) {
                         await seekVideo(uploadedBgVideo, f / 30);
+                    }
+                    if (uploadedImages) {
+                        for (let vid of uploadedImages) {
+                            if (vid && vid.tagName === 'VIDEO') {
+                                await seekVideo(vid, f / 30);
+                            }
+                        }
                     }
                     drawFrame();
 
@@ -2857,6 +4079,95 @@
             } finally {
                 resetExportUI();
             }
+        }
+
+        // ── Dynamic shape mode images controllers ──
+        function renderShapeImageControllers() {
+            const container = document.getElementById('shapeImagesControlsContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            if (appMode !== 'shape' || uploadedImages.length === 0) {
+                container.style.display = 'none';
+                const photo1LayoutGroup = document.getElementById('photo1LayoutGroup');
+                if (appMode === 'shape' && photo1LayoutGroup) {
+                    photo1LayoutGroup.style.display = '';
+                }
+                return;
+            }
+
+            const photo1LayoutGroup = document.getElementById('photo1LayoutGroup');
+            if (photo1LayoutGroup) photo1LayoutGroup.style.display = 'none';
+
+            container.style.display = 'flex';
+
+            while (shapeImagesProps.length < uploadedImages.length) {
+                shapeImagesProps.push({ scale: 100, x: 0, y: 0 });
+            }
+            if (shapeImagesProps.length > uploadedImages.length) {
+                shapeImagesProps.length = uploadedImages.length;
+            }
+
+            uploadedImages.forEach((img, idx) => {
+                if (!img) return;
+                const props = shapeImagesProps[idx];
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'shape-img-control-card';
+                wrapper.style.padding = '8px';
+                wrapper.style.background = 'rgba(255,255,255,0.03)';
+                wrapper.style.borderRadius = '8px';
+                wrapper.style.border = '1px solid rgba(255,255,255,0.05)';
+                if (idx > 0) wrapper.style.marginTop = '8px';
+
+                wrapper.innerHTML = `
+                    <div class="card-title" style="font-size: 0.7rem; color: #fb7185; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; text-transform: uppercase;">
+                        <span>📷 Image ${idx + 1} Transform</span>
+                        <img src="${img.src}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
+                    </div>
+                    <div class="control-group">
+                        <label>Scale <span class="val" id="shapeImgScaleVal${idx}">${props.scale}%</span></label>
+                        <input type="range" id="shapeImgScale${idx}" min="10" max="500" value="${props.scale}">
+                    </div>
+                    <div class="row-group" style="margin-top: 5px;">
+                        <div class="control-group">
+                            <label>Pos X <span class="val" id="shapeImgXVal${idx}">${props.x}</span></label>
+                            <input type="range" id="shapeImgXSlider${idx}" min="-1500" max="1500" value="${props.x}">
+                        </div>
+                        <div class="control-group">
+                            <label>Pos Y <span class="val" id="shapeImgYVal${idx}">${props.y}</span></label>
+                            <input type="range" id="shapeImgYSlider${idx}" min="-1500" max="1500" value="${props.y}">
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(wrapper);
+
+                const scaleSlider = wrapper.querySelector('#shapeImgScale' + idx);
+                const xSlider = wrapper.querySelector('#shapeImgXSlider' + idx);
+                const ySlider = wrapper.querySelector('#shapeImgYSlider' + idx);
+
+                const scaleVal = wrapper.querySelector('#shapeImgScaleVal' + idx);
+                const xVal = wrapper.querySelector('#shapeImgXVal' + idx);
+                const yVal = wrapper.querySelector('#shapeImgYVal' + idx);
+
+                const updateProps = () => {
+                    props.scale = parseInt(scaleSlider.value);
+                    props.x = parseInt(xSlider.value);
+                    props.y = parseInt(ySlider.value);
+                    
+                    scaleVal.textContent = props.scale + '%';
+                    xVal.textContent = props.x;
+                    yVal.textContent = props.y;
+                    
+                    drawFrame();
+                };
+
+                scaleSlider.addEventListener('input', updateProps);
+                xSlider.addEventListener('input', updateProps);
+                ySlider.addEventListener('input', updateProps);
+            });
         }
 
         // ── Mode switcher logic ──
@@ -2975,11 +4286,12 @@
                 }
             }
             updateLabels();
+            renderShapeImageControllers();
 
             resetAnimation();
             isPlaying = true;
             playBtn.innerText = '⏸ Pause';
-            syncBgVideoPlayback();
+            syncVideoPlayback();
         }
 
         function updatePhotoAnimControlsVisibility(animType) {
@@ -3008,22 +4320,38 @@
                 ringsToggleCard.style.display = animType === 'polaroid_spin' ? 'flex' : 'none';
             }
             
-            // 2. Layout & Geometry Card (Polaroid and Bordered Card both use layout adjustments)
+            const isCustomLayout = animType === 'polaroid_spin' || 
+                                   animType.startsWith('bordered_card') || 
+                                   animType === 'polaroid_stack' ||
+                                   animType === 'concentric_circles' ||
+                                   animType === 'tech_hexagon';
+
+            // 2. Layout & Geometry Card
             if (layoutGeometryCard) {
-                if (animType === 'polaroid_spin' || animType.startsWith('bordered_card') || animType === 'polaroid_stack') {
+                if (isCustomLayout) {
                     layoutGeometryCard.style.display = 'flex';
                 } else {
-                    layoutGeometryCard.style.display = 'none'; // hide for ken_burns, drift_pan, fade_zoom
+                    layoutGeometryCard.style.display = 'none';
                 }
             }
             
             // 3. Polaroid Layout Group
             if (polaroidLayoutGroup) {
-                polaroidLayoutGroup.style.display = (animType === 'polaroid_spin' || animType.startsWith('bordered_card') || animType === 'polaroid_stack') ? 'block' : 'none';
+                polaroidLayoutGroup.style.display = isCustomLayout ? 'block' : 'none';
                 // Change title text depending on mode
                 const title = polaroidLayoutGroup.querySelector('.card-title');
                 if (title) {
-                    title.textContent = animType.startsWith('bordered_card') ? 'Bordered Card Layout' : (animType === 'polaroid_stack' ? 'Polaroid Stack Layout' : 'Polaroid / Photo');
+                    if (animType.startsWith('bordered_card')) {
+                        title.textContent = 'Bordered Card Layout';
+                    } else if (animType === 'polaroid_stack') {
+                        title.textContent = 'Polaroid Stack Layout';
+                    } else if (animType === 'concentric_circles') {
+                        title.textContent = 'Concentric Circles Layout';
+                    } else if (animType === 'tech_hexagon') {
+                        title.textContent = 'Tech Hexagon Layout';
+                    } else {
+                        title.textContent = 'Polaroid / Photo';
+                    }
                 }
             }
             
@@ -3034,7 +4362,7 @@
             
             // 5. Rotation Keyframe Block
             if (keyframeRotationBlock) {
-                keyframeRotationBlock.style.display = animType.startsWith('bordered_card') ? 'none' : 'block';
+                keyframeRotationBlock.style.display = (animType.startsWith('bordered_card') || animType === 'tech_hexagon') ? 'none' : 'block';
             }
         }
 
@@ -3065,26 +4393,64 @@
             const files = e.target.files;
             if (files.length === 0) return;
 
-            const targetCount = Math.min(3, files.length);
+            const targetCount = appMode === 'shape' ? files.length : Math.min(3, files.length);
+            
+            // Cleanup existing videos if any
+            if (uploadedImages) {
+                uploadedImages.forEach(item => {
+                    if (item && item.tagName === 'VIDEO') {
+                        item.pause();
+                        if (item.parentNode) item.parentNode.removeChild(item);
+                    }
+                });
+            }
+
             uploadedImages = new Array(targetCount);
             let loadedCount = 0;
 
+            const checkDone = () => {
+                loadedCount++;
+                if (loadedCount === targetCount) {
+                    uploadedImg = uploadedImages[0];
+                    if (appMode === 'shape') {
+                        shapeImagesProps = Array.from({ length: targetCount }, () => ({ scale: 100, x: 0, y: 0 }));
+                        renderShapeImageControllers();
+                    }
+                    resetAnimation();
+                }
+            };
+
             for (let i = 0; i < targetCount; i++) {
                 const index = i;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        uploadedImages[index] = img;
-                        loadedCount++;
-                        if (loadedCount === targetCount) {
-                            uploadedImg = uploadedImages[0];
-                            resetAnimation();
-                        }
+                const file = files[index];
+
+                if (file.type.startsWith('video/')) {
+                    const url = URL.createObjectURL(file);
+                    const video = document.createElement('video');
+                    video.src = url;
+                    video.muted = true;
+                    video.loop = true;
+                    video.playsInline = true;
+                    video.style.display = 'none';
+                    
+                    video.addEventListener('loadeddata', () => {
+                        uploadedImages[index] = video;
+                        document.body.appendChild(video);
+                        checkDone();
+                    });
+                    video.load();
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            uploadedImages[index] = img;
+                            checkDone();
+                        };
+                        img.src = event.target.result;
                     };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(files[index]);
+                    reader.readAsDataURL(file);
+                }
             }
         });
 
@@ -3146,7 +4512,7 @@
                     uploadedBgVideo = video;
                     resetAnimation();
                     if (isPlaying) {
-                        syncBgVideoPlayback();
+                        syncVideoPlayback();
                     }
                 });
             });
@@ -3238,7 +4604,7 @@
             resetAnimation();
             isPlaying = true;
             playBtn.innerText = '⏸ Pause';
-            syncBgVideoPlayback();
+            syncVideoPlayback();
         });
  
         // Keyframe triggers setup
@@ -3345,6 +4711,29 @@
             updateLabels();
             drawFrame();
         }));
+
+        function syncTextStartToTransition() {
+            const introType = document.getElementById('introTransitionType').value;
+            const transFrames = parseInt(document.getElementById('transFramesSlider').value);
+            
+            // If intro is 'none', text starts at 0. Otherwise, transFrames - 5.
+            const targetStartFrame = introType === 'none' ? 0 : Math.max(0, transFrames - 5);
+            
+            textStartSec = Math.floor(targetStartFrame / 30);
+            textStartFrameOffset = targetStartFrame % 30;
+            
+            document.getElementById('textStartSecSlider').value = textStartSec;
+            document.getElementById('textStartFrameSlider').value = textStartFrameOffset;
+            
+            if (typeof updateTextStartFrame === 'function') {
+                updateTextStartFrame();
+            }
+        }
+
+        document.getElementById('transFramesSlider').addEventListener('input', syncTextStartToTransition);
+        document.getElementById('introTransitionType').addEventListener('change', syncTextStartToTransition);
+        
+        // The initial sync call has been moved to the bottom of the script after all variables are initialized.
         inputTriggers.forEach(el => el.addEventListener('change', () => {
             updateLabels();
             drawFrame();
@@ -3355,7 +4744,7 @@
             if (currentFrame >= totalDuration) resetAnimation();
             isPlaying = !isPlaying;
             playBtn.innerText = isPlaying ? "⏸ Pause" : "▶ Play";
-            syncBgVideoPlayback();
+            syncVideoPlayback();
         });
 
         resetBtn.addEventListener('click', () => {
@@ -3378,6 +4767,12 @@
                 photoXSlider2.value = 0;
                 photoYSlider2.value = 0;
             }
+            shapeImagesProps.forEach(props => {
+                props.scale = 100;
+                props.x = 0;
+                props.y = 0;
+            });
+            renderShapeImageControllers();
             updateLabels();
             drawFrame();
         });
@@ -3466,12 +4861,22 @@
             return 0.2126 * r + 0.7152 * g + 0.0722 * b;
         }
 
+        let isCanvasTainted = false;
+
         function getBackgroundAverageColor(xPos, yPos) {
             // Support backwards compatibility for single-argument call
             if (yPos === undefined) {
                 yPos = xPos;
                 xPos = INTERNAL_W / 2;
             }
+
+            // If the canvas is tainted OR if we are currently playing,
+            // we bypass getImageData and use fast mathematical approximation.
+            // This prevents real-time playback lag from readback stalls or repeated SecurityError exceptions.
+            if (isCanvasTainted || (isPlaying && !isExporting) || appMode !== 'long_form') {
+                return getBackgroundAverageColorMath(xPos, yPos);
+            }
+
             try {
                 // Sample a box centered at (xPos, yPos)
                 const sampleW = 100;
@@ -3498,42 +4903,188 @@
                     b: bSum / count
                 };
             } catch (e) {
-                console.warn("Canvas reading error (possibly unrendered, clean canvas, or tainted over file://), using preset fallback:", e);
-                // Fallback to the preset background color
-                let hex = '#05050b';
-                if (appMode === 'shape') {
-                    // Check if xPos, yPos is inside the shape bounds
-                    const dx = xPos - currentShapeCX;
-                    const dy = yPos - currentShapeCY;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (currentShapeSize > 0 && dist < currentShapeSize / 2) {
-                        hex = currentShapeColor;
-                    } else {
-                        const preset = document.getElementById('bgPreset').value;
-                        if (preset === 'custom') {
-                            hex = bgColor.value;
-                        } else {
-                            const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
-                            if (p) hex = p.bg;
-                        }
-                    }
+                if (e.name === 'SecurityError' || e.message.includes('SecurityError')) {
+                    isCanvasTainted = true;
+                    console.warn("Canvas has been tainted (SecurityError under file:// protocol). Bypassing getImageData to restore 30 FPS playback performance.");
                 } else {
-                    const preset = document.getElementById('photoAnimBgPreset').value;
-                    if (preset === 'custom') {
-                        hex = document.getElementById('photoAnimBgColor').value;
-                    } else {
-                        const p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset);
-                        if (p) hex = p.bg;
-                    }
+                    console.warn("Canvas reading error:", e);
                 }
-                if (hex.startsWith('#')) hex = hex.slice(1);
-                if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-                return {
-                    r: parseInt(hex.slice(0, 2), 16),
-                    g: parseInt(hex.slice(2, 4), 16),
-                    b: parseInt(hex.slice(4, 6), 16)
-                };
+                return getBackgroundAverageColorMath(xPos, yPos);
             }
+        }
+
+        function getBackgroundAverageColorMath(xPos, yPos) {
+            let hex = '#05050b';
+            
+            if (appMode === 'shape') {
+                // Check if xPos, yPos is inside the shape bounds
+                const dx = xPos - currentShapeCX;
+                const dy = yPos - currentShapeCY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (currentShapeSize > 0 && dist < currentShapeSize / 2) {
+                    hex = currentShapeColor;
+                } else {
+                    return getBackgroundGradientColorAt(xPos, yPos);
+                }
+            } else if (appMode === 'photo_anim') {
+                // The photo takes up the whole screen and is moving. Safest is to assume dark background
+                // so text becomes light and legible with dark shadows.
+                hex = '#000000';
+            } else {
+                return getBackgroundGradientColorAt(xPos, yPos);
+            }
+            
+            if (hex.startsWith('#')) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            return {
+                r: parseInt(hex.slice(0, 2), 16),
+                g: parseInt(hex.slice(2, 4), 16),
+                b: parseInt(hex.slice(4, 6), 16)
+            };
+        }
+
+        function getBackgroundGradientColorAt(x, y) {
+            const W = INTERNAL_W;
+            const H = INTERNAL_H;
+            
+            let preset = document.getElementById('bgPreset').value;
+            let baseColor = bgColor.value;
+            let style = document.getElementById('bgStyle').value;
+            
+            if (appMode !== 'shape') {
+                preset = document.getElementById('photoAnimBgPreset').value;
+                baseColor = document.getElementById('photoAnimBgColor').value;
+                style = document.getElementById('photoAnimBgStyle').value;
+            }
+            
+            let p;
+            if (preset === 'custom') {
+                const contrastGrad = getContrastColor(baseColor, 'gradient');
+                const contrastSolid = getContrastColor(baseColor, 'solid');
+                p = {
+                    bg: baseColor,
+                    c1: contrastGrad[0],
+                    c2: contrastGrad[1],
+                    c3: contrastGrad[1],
+                    acc: contrastSolid
+                };
+            } else {
+                p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset) || PALETTES[0];
+            }
+            
+            const bg = p.bg, c1 = p.c1, c2 = p.c2, c3 = p.c3, acc = p.acc;
+            
+            // Default: Diagonal Linear Gradient with White highlight at bottom-right
+            const dotProduct = x * W + y * H;
+            const vMagSq = W * W + H * H;
+            let t = dotProduct / vMagSq;
+            t = Math.max(0, Math.min(1, t));
+            
+            function getGradientColorHSL(hex) {
+                const [h, s, l] = hexToHsl(hex);
+                return [h, Math.min(s, 70), Math.max(l, 55)];
+            }
+            const hslC1 = getGradientColorHSL(c1);
+            const hslC2 = getGradientColorHSL(c2);
+            
+            const midL = hslC2[2] + (100 - hslC2[2]) * 0.45;
+            const midS = hslC2[1] * 0.90;             
+            const hslMid = [hslC2[0], midS, midL];
+            const hslWhite = [0, 0, 100];
+            
+            let hsl;
+            if (t < 0.40) {
+                hsl = interpolateHslArray(hslC1, hslC2, t / 0.40);
+            } else if (t < 0.75) {
+                hsl = interpolateHslArray(hslC2, hslMid, (t - 0.40) / 0.35);
+            } else {
+                hsl = interpolateHslArray(hslMid, hslWhite, (t - 0.75) / 0.25);
+            }
+            
+            return hslToRgb(hsl[0], hsl[1], hsl[2]);
+        }
+
+        function hexToRgbObj(hex) {
+            if (hex.startsWith('#')) hex = hex.slice(1);
+            if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            return {
+                r: parseInt(hex.slice(0, 2), 16),
+                g: parseInt(hex.slice(2, 4), 16),
+                b: parseInt(hex.slice(4, 6), 16)
+            };
+        }
+
+        function interpolateRgb(hex1, hex2, ratio) {
+            const rgb1 = hexToRgbObj(hex1);
+            const rgb2 = hexToRgbObj(hex2);
+            return {
+                r: rgb1.r + (rgb2.r - rgb1.r) * ratio,
+                g: rgb1.g + (rgb2.g - rgb1.g) * ratio,
+                b: rgb1.b + (rgb2.b - rgb1.b) * ratio
+            };
+        }
+
+        function interpolateHslArray(hsl1, hsl2, ratio) {
+            let h1 = hsl1[0];
+            let h2 = hsl2[0];
+            let diff = h2 - h1;
+            if (diff > 180) h2 -= 360;
+            else if (diff < -180) h2 += 360;
+            let h = (h1 + (h2 - h1) * ratio) % 360;
+            if (h < 0) h += 360;
+            return [
+                h,
+                hsl1[1] + (hsl2[1] - hsl1[1]) * ratio,
+                hsl1[2] + (hsl2[2] - hsl1[2]) * ratio
+            ];
+        }
+
+        function interpolateHsl(hsl1, hsl2, ratio) {
+            let h1 = hsl1[0];
+            let h2 = hsl2[0];
+            
+            let diff = h2 - h1;
+            if (diff > 180) {
+                h2 -= 360;
+            } else if (diff < -180) {
+                h2 += 360;
+            }
+            
+            let h = (h1 + (h2 - h1) * ratio) % 360;
+            if (h < 0) h += 360;
+            
+            let s = hsl1[1] + (hsl2[1] - hsl1[1]) * ratio;
+            let l = hsl1[2] + (hsl2[2] - hsl1[2]) * ratio;
+            
+            return [h, s, l];
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l; // achromatic
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
         }
 
         function getBackgroundLuminance(xPos, yPos) {
@@ -3631,6 +5182,14 @@
                     ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
                 } else if (override.highlight === 'garamond') {
                     ctx.font = `italic bold ${baseFontSize * scaleMult}px 'EB Garamond', serif`;
+                } else if (override.highlight === 'pacifico_grad') {
+                    ctx.font = `${baseFontSize * scaleMult}px 'Pacifico', cursive`;
+                } else if (override.highlight === 'bangers_color') {
+                    ctx.font = `${baseFontSize * scaleMult}px 'Bangers', cursive`;
+                } else if (override.highlight === 'righteous_font') {
+                    ctx.font = `${baseFontSize * scaleMult}px 'Righteous', cursive`;
+                } else if (override.highlight === 'cinzel_grad') {
+                    ctx.font = `bold ${baseFontSize * scaleMult}px 'Cinzel', serif`;
                 } else {
                     ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
                 }
@@ -3766,6 +5325,8 @@
 
             wordBoundingBoxes = []; // Clear current bounding boxes before calculation
 
+            // Pass 1: Pre-calculate rendering data and sample background to prevent words from interfering with each other's color sampling
+            const wordsRenderData = [];
             words.forEach((word, idx) => {
                 const override = textWordsOverride[idx] || {
                     scale: 100,
@@ -3782,7 +5343,7 @@
 
                 // Staggered entry animation calculation (starts at textStartFrame)
                 const startFrame = textStartFrame + idx * 3;
-                const animDuration = 12;
+                const animDuration = 20;
 
                 // Default state if animation hasn't started
                 let opacity = 0;
@@ -3807,11 +5368,7 @@
                     }
                 }
 
-                // If word is visible
                 if (opacity > 0) {
-                    ctx.save();
-                    ctx.globalAlpha = opacity;
-
                     // Compute final coordinates using decoupled base anchor
                     const finalX = baseAnchor.x + userX + animX;
                     const finalY = textGlobalY + baseAnchor.y + userY + animY;
@@ -3821,16 +5378,38 @@
                     const wordCenterX = finalX + wordWidth / 2;
                     const wordCenterY = finalY - (baseFontSize * scaleMult) / 2;
                     const avgBgColor = getBackgroundAverageColor(wordCenterX, wordCenterY);
+                    
+                    wordsRenderData.push({
+                        word, idx, override, scaleMult, opacity, finalX, finalY, wordWidth, avgBgColor
+                    });
+                }
+            });
+
+            // Pass 2: Draw the text now that all background sampling is complete
+            wordsRenderData.forEach(data => {
+                const { word, idx, override, scaleMult, opacity, finalX, finalY, wordWidth, avgBgColor } = data;
+
+                // If word is visible
+                if (opacity > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = opacity;
+
                     const luminance = 0.2126 * (avgBgColor.r / 255) + 0.7152 * (avgBgColor.g / 255) + 0.0722 * (avgBgColor.b / 255);
                     const isDarkBg = luminance < 0.5;
                     
-                    // Dynamic Tinted Contrast via HSL Lightness Inversion
+                    // Premium Dynamic Analogous Contrast via HSL
                     const [bh, bs, bl] = rgbToHsl(avgBgColor.r, avgBgColor.g, avgBgColor.b);
                     let defaultColor;
-                    if (bl < 45) {
-                        defaultColor = hslToHex(bh, Math.min(bs, 35), 92);
+                    
+                    // Shift Hue by +40 for a beautiful analogous color (e.g., Purple -> Pink, Blue -> Purple, Red -> Orange)
+                    const textHue = (bh + 40) % 360; 
+                    
+                    if (isDarkBg) {
+                        // High lightness (85) for excellent readability, high saturation (85) for premium pastel vibrancy
+                        defaultColor = hslToHex(textHue, 85, 85); 
                     } else {
-                        defaultColor = hslToHex(bh, Math.min(bs, 40), 12);
+                        // Low lightness (20) for excellent contrast on light backgrounds, high saturation for deep rich tone
+                        defaultColor = hslToHex(textHue, 85, 20); 
                     }
                     const shadowColor = isDarkBg ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
 
@@ -3850,27 +5429,53 @@
                         ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
                     } else if (override.highlight === 'garamond') {
                         ctx.font = `italic bold ${baseFontSize * scaleMult}px 'EB Garamond', serif`;
+                    } else if (override.highlight === 'pacifico_grad') {
+                        ctx.font = `${baseFontSize * scaleMult}px 'Pacifico', cursive`;
+                    } else if (override.highlight === 'bangers_color') {
+                        ctx.font = `${baseFontSize * scaleMult}px 'Bangers', cursive`;
+                    } else if (override.highlight === 'righteous_font') {
+                        ctx.font = `${baseFontSize * scaleMult}px 'Righteous', cursive`;
+                    } else if (override.highlight === 'cinzel_grad') {
+                        ctx.font = `bold ${baseFontSize * scaleMult}px 'Cinzel', serif`;
                     } else {
                         ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
                     }
 
                     // Text shadow/glow for premium contrast readability
                     ctx.shadowColor = shadowColor;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = 15; // Increased blur slightly for better ambient glow
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 2;
 
                     // Fill style selection
                     let fillStyle = defaultColor;
+                    
+                    // If we're in Photo Animation mode, default base text to white for maximum contrast
+                    if (appMode === 'photo_anim' && override.highlight === 'none') {
+                        fillStyle = '#ffffff';
+                    }
+
                     if (override.highlight !== 'none') {
                         let activeStyle = textGradientStyle;
                         if (activeStyle === 'auto') {
                             activeStyle = getAutoGradientStyle(avgBgColor);
                         }
+                        
+                        let forceGradient = false;
+                        let forceColor = false;
+                        let forceFontOnly = false;
+                        
+                        if (override.highlight === 'pacifico_grad' || override.highlight === 'cinzel_grad') {
+                            forceGradient = true;
+                        } else if (override.highlight === 'bangers_color') {
+                            forceColor = true;
+                        } else if (override.highlight === 'righteous_font') {
+                            forceFontOnly = true;
+                        }
 
-                        if (activeStyle === 'default_color') {
+                        if (activeStyle === 'default_color' || forceFontOnly) {
                             fillStyle = defaultColor;
-                        } else if (textGradientEnabled) {
+                        } else if (textGradientEnabled && !forceColor || forceGradient) {
                             // Create gradient fill
                             let grad = ctx.createLinearGradient(finalX, finalY - (baseFontSize * scaleMult * 0.7), finalX + wordWidth, finalY);
                             const palette = gradientPalettes[activeStyle] || gradientPalettes.sunset;
@@ -3892,7 +5497,9 @@
                         }
                     }
 
+                    // Draw text shadow twice for a thicker, more legible shadow without using stroke
                     ctx.fillStyle = fillStyle;
+                    ctx.fillText(word, finalX, finalY);
                     ctx.fillText(word, finalX, finalY);
                     ctx.restore();
                 }
@@ -4219,20 +5826,16 @@
             drawFrame();
         });
 
-        // Initialize visibility
+        // Initialize visibility and text start time
         updateTextHighlightControlsVisibility();
+        syncTextStartToTransition();
 
         resetTextBtn.addEventListener('click', () => {
             textWordsOverride = {};
             textGlobalYSlider.value = 450;
             textGlobalY = 450;
             textGlobalYVal.textContent = '450';
-            textStartSecSlider.value = 0;
-            textStartSec = 0;
-            textStartFrameSlider.value = 5;
-            textStartFrameOffset = 5;
-            textStartFrame = 5;
-            textStartTimeDisplay.textContent = '0s 5f (Frame 5)';
+            syncTextStartToTransition();
             textGradientToggle.checked = true;
             textGradientEnabled = true;
             textGradientStyleSelect.value = 'auto';
@@ -4264,7 +5867,7 @@
                 }
 
                 const currentHighlight = textWordsOverride[wordIdx].highlight || 'none';
-                const highlightOptions = ['none', 'ashton', 'garamond'];
+                const highlightOptions = ['none', 'inter_highlight', 'ashton', 'garamond', 'pacifico_grad', 'bangers_color', 'righteous_font', 'cinzel_grad'];
                 const currentOptIdx = highlightOptions.indexOf(currentHighlight);
                 const nextIdx = (currentOptIdx === -1) ? 0 : (currentOptIdx + 1) % highlightOptions.length;
                 const nextHighlight = highlightOptions[nextIdx];
@@ -4564,7 +6167,7 @@
                 if (isPlaying) {
                     isPlaying = false;
                     playBtn.innerText = "▶ Play";
-                    syncBgVideoPlayback();
+                    syncVideoPlayback();
                 }
                 handleTimelineScrub(e);
             });
@@ -4578,8 +6181,10 @@
             });
         }
 
+        preRenderFloatingElements();
         populatePresetDropdowns();
         populateWordSelect();
+        renderShapeImageControllers();
         
         // Redraw canvas once fonts are fully loaded
         if (document.fonts) {
