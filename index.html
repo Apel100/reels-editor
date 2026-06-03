@@ -443,6 +443,84 @@
                 </div>
             </div>
 
+            <!-- Background Rotating Sparkle Stars Settings -->
+            <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="bgStarsToggle" style="display:flex; flex-direction:column; gap:2px; cursor: pointer; margin: 0; flex-grow: 1;">
+                        <span style="font-size:0.75rem; font-weight:700; color: var(--accent-color);">✨ Rotating Sparkle Stars</span>
+                        <span style="font-size:0.65rem; color:#94a3b8;">Slowly rotating 4-pointed stars in the background</span>
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="mini-btn" id="resetStarsBtn" style="font-size: 0.65rem; padding: 4px 8px; background: rgba(255, 255, 255, 0.05); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.1); margin: 0; display: none;">↺ Reset</button>
+                        <label class="switch" style="margin: 0;">
+                            <input type="checkbox" id="bgStarsToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="bgStarsControls" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                    <details open style="border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.15);">
+                        <summary style="font-size:0.75rem; font-weight:bold; cursor:pointer; color:var(--text-color); outline:none; user-select:none; margin-bottom: 4px;">⭐ Star 1 (Top-Left) Settings</summary>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                            <div class="row-group">
+                                <div class="control-group">
+                                    <label>Scale <span class="val" id="star1ScaleVal">100%</span></label>
+                                    <input type="range" id="star1ScaleSlider" min="20" max="300" value="100" style="width: 100%;">
+                                </div>
+                                <div class="control-group">
+                                    <label>Rotation Speed <span class="val" id="star1SpeedVal">100%</span></label>
+                                    <input type="range" id="star1SpeedSlider" min="-300" max="300" value="100" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="row-group">
+                                <div class="control-group">
+                                    <label>Pos X Offset <span class="val" id="star1XOffsetVal">0px</span></label>
+                                    <input type="range" id="star1XOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
+                                </div>
+                                <div class="control-group">
+                                    <label>Pos Y Offset <span class="val" id="star1YOffsetVal">0px</span></label>
+                                    <input type="range" id="star1YOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Start Angle <span class="val" id="star1StartAngleVal">0°</span></label>
+                                <input type="range" id="star1StartAngleSlider" min="0" max="360" value="0" style="width: 100%;">
+                            </div>
+                        </div>
+                    </details>
+                    <details open style="border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.15); margin-top: 4px;">
+                        <summary style="font-size:0.75rem; font-weight:bold; cursor:pointer; color:var(--text-color); outline:none; user-select:none; margin-bottom: 4px;">⭐ Star 2 (Bottom-Right) Settings</summary>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                            <div class="row-group">
+                                <div class="control-group">
+                                    <label>Scale <span class="val" id="star2ScaleVal">100%</span></label>
+                                    <input type="range" id="star2ScaleSlider" min="20" max="300" value="100" style="width: 100%;">
+                                </div>
+                                <div class="control-group">
+                                    <label>Rotation Speed <span class="val" id="star2SpeedVal">-100%</span></label>
+                                    <input type="range" id="star2SpeedSlider" min="-300" max="300" value="-100" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="row-group">
+                                <div class="control-group">
+                                    <label>Pos X Offset <span class="val" id="star2XOffsetVal">0px</span></label>
+                                    <input type="range" id="star2XOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
+                                </div>
+                                <div class="control-group">
+                                    <label>Pos Y Offset <span class="val" id="star2YOffsetVal">0px</span></label>
+                                    <input type="range" id="star2YOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Start Angle <span class="val" id="star2StartAngleVal">0°</span></label>
+                                <input type="range" id="star2StartAngleSlider" min="0" max="360" value="0" style="width: 100%;">
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
             <div class="control-group" id="bgImageLoaderGroup" style="display: none; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
                 <div class="control-group">
                     <label>🖼️ Upload Background Image</label>
@@ -465,6 +543,41 @@
             <div class="control-group">
                 <label>Text Caption</label>
                 <input type="text" id="textInput" value="Advanced Motion Engine" placeholder="Enter text here...">
+            </div>
+
+            <div class="control-group" style="margin-top: 4px;">
+                <label>Text Segment Mode</label>
+                <select id="textSegmentModeSelect">
+                    <option value="classic" selected>Standard (All Together)</option>
+                    <option value="sequential">Sequential (Replace Segments)</option>
+                    <option value="cumulative">Cumulative (Accumulate Segments)</option>
+                </select>
+                <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">
+                    Use <b>|</b> to separate segments (e.g. "Hello | World").
+                </div>
+            </div>
+
+            <!-- Default Segment Duration -->
+            <div id="defaultSegmentDurationCard" style="display: none; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 4px; flex-direction: column; gap: 8px; border: 1px solid var(--border-color);">
+                <div class="card-title" style="font-size: 0.75rem; color: #38bdf8; margin-bottom: 0;">Default Segment Duration</div>
+                <div class="row-group">
+                    <div class="control-group">
+                        <label>Seconds <span class="val" id="defaultSegSecVal">2s</span></label>
+                        <input type="range" id="defaultSegSecSlider" min="0" max="10" value="2">
+                    </div>
+                    <div class="control-group">
+                        <label>Frames <span class="val" id="defaultSegFrameVal">10f</span></label>
+                        <input type="range" id="defaultSegFrameSlider" min="0" max="29" value="10">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Segment Durations -->
+            <div id="segmentTimingCard" style="display: none; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 4px; flex-direction: column; gap: 8px; border: 1px solid var(--border-color);">
+                <div class="card-title" style="font-size: 0.75rem; color: #38bdf8; margin-bottom: 0;">Custom Segment Durations</div>
+                <div id="segmentTimingsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
 
             <div class="control-group">
@@ -593,6 +706,8 @@
                         <option value="default_color">⚪ Default Text Color (No Color)</option>
                     </select>
                 </div>
+
+
 
                 <label class="card toggle-card" style="padding: 6px 10px; background: rgba(255, 215, 0, 0.06); border: 1px solid rgba(255,215,0,0.25); margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                     <div style="display:flex; flex-direction:column; gap:2px;">
@@ -1210,6 +1325,10 @@
         let textGradientEnabled = true;
         let textGradientStyle = 'auto';
         let textRandomDirections = [];
+        let textSegmentMode = 'classic'; // 'classic' | 'sequential' | 'cumulative'
+        let defaultSegmentSec = 2;
+        let defaultSegmentFrame = 10;
+        let segmentDurations = {}; // Custom durations per segment index
 
         // Interactive Word Drag/Scale State
         let wordBoundingBoxes = [];
@@ -1383,6 +1502,91 @@
             ctx.restore();
         }
 
+        function drawFourPointedStar(ctx, cx, cy, size, angle, color) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            
+            // Premium soft drop shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 10;
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            // Top to Right (quadratic curve with control point 0,0)
+            ctx.quadraticCurveTo(0, 0, size, 0);
+            // Right to Bottom
+            ctx.quadraticCurveTo(0, 0, 0, size);
+            // Bottom to Left
+            ctx.quadraticCurveTo(0, 0, -size, 0);
+            // Left to Top
+            ctx.quadraticCurveTo(0, 0, 0, -size);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function drawRotatingStars(ctx, t) {
+            const bgStarsToggle = document.getElementById('bgStarsToggle');
+            const drawStars = bgStarsToggle ? bgStarsToggle.checked : true;
+            if (!drawStars) return;
+
+            let p;
+            let preset = 'custom';
+            let baseColor = '#0f172a';
+            if (appMode === 'shape') {
+                preset = document.getElementById('bgPreset').value;
+                baseColor = bgColor.value;
+            } else {
+                preset = document.getElementById('photoAnimBgPreset').value;
+                baseColor = document.getElementById('photoAnimBgColor').value;
+            }
+
+            if (preset === 'custom') {
+                const contrastGrad = getContrastColor(baseColor, 'gradient');
+                const contrastSolid = getContrastColor(baseColor, 'solid');
+                p = {
+                    bg: baseColor,
+                    c1: contrastGrad[0],
+                    acc: contrastSolid
+                };
+            } else {
+                p = PALETTES.find(item => item.n.toLowerCase().replace(/\s+/g, '_') === preset) || PALETTES[0];
+            }
+            const c1 = p.c1, acc = p.acc;
+
+            const s1Scale = parseInt(document.getElementById('star1ScaleSlider').value) / 100;
+            const s1XOffset = parseInt(document.getElementById('star1XOffsetSlider').value);
+            const s1YOffset = parseInt(document.getElementById('star1YOffsetSlider').value);
+            const s1Speed = parseInt(document.getElementById('star1SpeedSlider').value) / 100;
+            const s1StartAngle = parseInt(document.getElementById('star1StartAngleSlider').value) * Math.PI / 180;
+
+            const s2Scale = parseInt(document.getElementById('star2ScaleSlider').value) / 100;
+            const s2XOffset = parseInt(document.getElementById('star2XOffsetSlider').value);
+            const s2YOffset = parseInt(document.getElementById('star2YOffsetSlider').value);
+            const s2Speed = parseInt(document.getElementById('star2SpeedSlider').value) / 100;
+            const s2StartAngle = parseInt(document.getElementById('star2StartAngleSlider').value) * Math.PI / 180;
+
+            const starColor1 = acc;
+            const starColor2 = c1;
+
+            const angle1 = s1StartAngle + t * 0.005 * s1Speed;
+            const angle2 = s2StartAngle + t * 0.004 * s2Speed;
+
+            const W = INTERNAL_W;
+            const H = INTERNAL_H;
+
+            // Star 1 (Top-Left): Base at (120, 260), Size 200
+            drawFourPointedStar(ctx, 120 + s1XOffset, 260 + s1YOffset, 200 * s1Scale, angle1, starColor1);
+
+            // Star 2 (Bottom-Right): Base at (W-120, H-260), Size 320
+            drawFourPointedStar(ctx, W - 120 - s2XOffset, H - 260 - s2YOffset, 320 * s2Scale, angle2, starColor2);
+        }
+
 function drawUnifiedBackground(context, baseColor, style, preset, t) {
             const W = INTERNAL_W;
             const H = INTERNAL_H;
@@ -1471,6 +1675,11 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             context.fillStyle = bottomVg;
             context.fillRect(0, H * 0.82, W, H * 0.18);
             context.restore();
+
+            // 4.3 Draw Rotating Sparkle Stars if enabled (only if not in shape mode, since shape mode renders them on top of shapes)
+            if (appMode !== 'shape') {
+                drawRotatingStars(context, t);
+            }
 
             // 4.5 Draw Diagonal Slanted Stripe
             drawSlantedStripe(context, W, H);
@@ -1684,10 +1893,14 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             customColorGroup.style.display = shapeLayout.value === 'custom' ? 'flex' : 'none';
 
             updateLabels();
-            resetAnimation();
-            isPlaying = true;
-            playBtn.innerText = "⏸ Pause";
-            syncVideoPlayback();
+            // Don't reset animation frame to 0 so the new style is visible immediately at the current frame.
+            // If playing, sync playback; if paused, force draw current frame.
+            if (!isPlaying) {
+                updatePhysics(true);
+                drawFrame();
+            } else {
+                syncVideoPlayback();
+            }
         }
 
         function updateLabels() {
@@ -1762,6 +1975,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         function resetAnimation() {
             currentFrame = 0;
+            playedWordSounds.clear();
             dynamicScale = 0;
             dynamicRotation = 0;
             dynamicOpacity = 0;
@@ -1997,6 +2211,8 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     }
                 }
             }
+
+
         }
 
         // --- 3D Rings & Floating Bubble Particles Style ---
@@ -3583,11 +3799,14 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     }
                 }
 
+                // Draw rotating sparkle stars (on top of shape, under photo)
+                drawRotatingStars(ctx, currentFrame);
+
                 // Render subject overlay
                 if (uploadedImages.length > 0) {
-                    let horizonY = cy + 20; 
+                    let horizonY = cy + (baseShapeSize * 0.03); 
                     if (shapeType.value === 'horizontal_strip') {
-                        horizonY = cy - (baseShapeSize / 2) + 20;
+                        horizonY = cy - (baseShapeSize / 2) + (baseShapeSize * 0.03);
                     } else if (shapeType.value === 'square' || shapeType.value === 'diamond') {
                         horizonY = cy + (baseShapeSize * 0.15);
                     } else if (shapeType.value === 'diagonal_split') {
@@ -3598,8 +3817,11 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                     ctx.save();
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
-                    if (!isIntroSideEntry) {
-                        ctx.rect(-10000, -10000, 20000, 10000 + horizonY);
+                    const shapeSettled = !isPlaying || (currentFrame >= 22);
+                    if (!isIntroSideEntry && shapeSettled) {
+                        const topEdge = cy - baseShapeSize * 1.2;
+                        const clipHeight = horizonY - topEdge;
+                        ctx.rect(-10000, topEdge, 20000, Math.max(0, clipHeight));
                     }
                     ctx.clip();
 
@@ -3653,9 +3875,9 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         targetCtx.restore();
                     };
 
-                    let horizonY = cy + 20; 
+                    let horizonY = cy + (baseShapeSize * 0.03); 
                     if (shapeType.value === 'horizontal_strip') {
-                        horizonY = cy - (baseShapeSize / 2) + 20;
+                        horizonY = cy - (baseShapeSize / 2) + (baseShapeSize * 0.03);
                     } else if (shapeType.value === 'square' || shapeType.value === 'diamond') {
                         horizonY = cy + (baseShapeSize * 0.15);
                     } else if (shapeType.value === 'diagonal_split') {
@@ -3666,8 +3888,11 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                     ctx.save();
                     defineShapePath(ctx, cx, cy, baseShapeSize, shapeType.value);
-                    if (!isIntroSideEntry) {
-                        ctx.rect(-10000, -10000, 20000, 10000 + horizonY);
+                    const shapeSettled = !isPlaying || (currentFrame >= 22);
+                    if (!isIntroSideEntry && shapeSettled) {
+                        const topEdge = cy - baseShapeSize * 1.2;
+                        const clipHeight = horizonY - topEdge;
+                        ctx.rect(-10000, topEdge, 20000, Math.max(0, clipHeight));
                     }
                     ctx.clip();
                     drawSubject(ctx);
@@ -3714,6 +3939,9 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     }
                 }
                 ctx.restore();
+
+                // Draw rotating sparkle stars (on top of shape, under photo)
+                drawRotatingStars(ctx, currentFrame);
 
                 // 2. Draw photo with transitions around its own center (pcx, pcy)
                 if (uploadedImages.length > 0) {
@@ -4639,6 +4867,110 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         document.getElementById('bgPreset').addEventListener('change', drawFrame);
         document.getElementById('photoAnimBgPreset').addEventListener('change', drawFrame);
 
+        const bgStarsToggle = document.getElementById('bgStarsToggle');
+        const bgStarsControls = document.getElementById('bgStarsControls');
+        const resetStarsBtn = document.getElementById('resetStarsBtn');
+        
+        function updateBgStarsControlsVisibility() {
+            if (bgStarsToggle && bgStarsControls && resetStarsBtn) {
+                const isChecked = bgStarsToggle.checked;
+                bgStarsControls.style.display = isChecked ? 'flex' : 'none';
+                resetStarsBtn.style.display = isChecked ? 'inline-block' : 'none';
+            }
+        }
+        
+        if (bgStarsToggle) {
+            bgStarsToggle.addEventListener('change', () => {
+                updateBgStarsControlsVisibility();
+                drawFrame();
+            });
+            updateBgStarsControlsVisibility();
+        }
+
+        if (resetStarsBtn) {
+            resetStarsBtn.addEventListener('click', () => {
+                const s1Scale = document.getElementById('star1ScaleSlider');
+                const s1ScaleVal = document.getElementById('star1ScaleVal');
+                const s1Speed = document.getElementById('star1SpeedSlider');
+                const s1SpeedVal = document.getElementById('star1SpeedVal');
+                const s1X = document.getElementById('star1XOffsetSlider');
+                const s1XVal = document.getElementById('star1XOffsetVal');
+                const s1Y = document.getElementById('star1YOffsetSlider');
+                const s1YVal = document.getElementById('star1YOffsetVal');
+                const s1Angle = document.getElementById('star1StartAngleSlider');
+                const s1AngleVal = document.getElementById('star1StartAngleVal');
+
+                const s2Scale = document.getElementById('star2ScaleSlider');
+                const s2ScaleVal = document.getElementById('star2ScaleVal');
+                const s2Speed = document.getElementById('star2SpeedSlider');
+                const s2SpeedVal = document.getElementById('star2SpeedVal');
+                const s2X = document.getElementById('star2XOffsetSlider');
+                const s2XVal = document.getElementById('star2XOffsetVal');
+                const s2Y = document.getElementById('star2YOffsetSlider');
+                const s2YVal = document.getElementById('star2YOffsetVal');
+                const s2Angle = document.getElementById('star2StartAngleSlider');
+                const s2AngleVal = document.getElementById('star2StartAngleVal');
+
+                if (s1Scale) { s1Scale.value = 100; s1ScaleVal.innerText = "100%"; }
+                if (s1Speed) { s1Speed.value = 100; s1SpeedVal.innerText = "100%"; }
+                if (s1X) { s1X.value = 0; s1XVal.innerText = "0px"; }
+                if (s1Y) { s1Y.value = 0; s1YVal.innerText = "0px"; }
+                if (s1Angle) { s1Angle.value = 0; s1AngleVal.innerText = "0°"; }
+
+                if (s2Scale) { s2Scale.value = 100; s2ScaleVal.innerText = "100%"; }
+                if (s2Speed) { s2Speed.value = 100; s2SpeedVal.innerText = "100%"; }
+                if (s2X) { s2X.value = 0; s2XVal.innerText = "0px"; }
+                if (s2Y) { s2Y.value = 0; s2YVal.innerText = "0px"; }
+                if (s2Angle) { s2Angle.value = 0; s2AngleVal.innerText = "0°"; }
+
+                drawFrame();
+            });
+        }
+
+        const star1ScaleSlider = document.getElementById('star1ScaleSlider');
+        const star1ScaleVal = document.getElementById('star1ScaleVal');
+        const star1SpeedSlider = document.getElementById('star1SpeedSlider');
+        const star1SpeedVal = document.getElementById('star1SpeedVal');
+        const star1XOffsetSlider = document.getElementById('star1XOffsetSlider');
+        const star1XOffsetVal = document.getElementById('star1XOffsetVal');
+        const star1YOffsetSlider = document.getElementById('star1YOffsetSlider');
+        const star1YOffsetVal = document.getElementById('star1YOffsetVal');
+        const star1StartAngleSlider = document.getElementById('star1StartAngleSlider');
+        const star1StartAngleVal = document.getElementById('star1StartAngleVal');
+
+        const star2ScaleSlider = document.getElementById('star2ScaleSlider');
+        const star2ScaleVal = document.getElementById('star2ScaleVal');
+        const star2SpeedSlider = document.getElementById('star2SpeedSlider');
+        const star2SpeedVal = document.getElementById('star2SpeedVal');
+        const star2XOffsetSlider = document.getElementById('star2XOffsetSlider');
+        const star2XOffsetVal = document.getElementById('star2XOffsetVal');
+        const star2YOffsetSlider = document.getElementById('star2YOffsetSlider');
+        const star2YOffsetVal = document.getElementById('star2YOffsetVal');
+        const star2StartAngleSlider = document.getElementById('star2StartAngleSlider');
+        const star2StartAngleVal = document.getElementById('star2StartAngleVal');
+
+        const starSliders = [
+            { el: star1ScaleSlider, val: star1ScaleVal, suffix: '%' },
+            { el: star1SpeedSlider, val: star1SpeedVal, suffix: '%' },
+            { el: star1XOffsetSlider, val: star1XOffsetVal, suffix: 'px' },
+            { el: star1YOffsetSlider, val: star1YOffsetVal, suffix: 'px' },
+            { el: star1StartAngleSlider, val: star1StartAngleVal, suffix: '°' },
+            { el: star2ScaleSlider, val: star2ScaleVal, suffix: '%' },
+            { el: star2SpeedSlider, val: star2SpeedVal, suffix: '%' },
+            { el: star2XOffsetSlider, val: star2XOffsetVal, suffix: 'px' },
+            { el: star2YOffsetSlider, val: star2YOffsetVal, suffix: 'px' },
+            { el: star2StartAngleSlider, val: star2StartAngleVal, suffix: '°' }
+        ];
+
+        starSliders.forEach(item => {
+            if (item.el && item.val) {
+                item.el.addEventListener('input', () => {
+                    item.val.innerText = item.el.value + item.suffix;
+                    drawFrame();
+                });
+            }
+        });
+
         if (lockBGColorPhoto) {
             lockBGColorPhoto.addEventListener('change', () => {
                 lockBGColor.checked = lockBGColorPhoto.checked;
@@ -5127,8 +5459,29 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         }
 
         function drawTextOverlay() {
-            const words = getWordsList();
-            if (words.length === 0) return;
+            const allWordsMeta = getWordMetadata();
+            if (allWordsMeta.length === 0) return;
+
+            const segTimings = getSegmentTimings();
+
+            // Find active segment in sequential mode
+            let activeSegmentIdx = 0;
+            if (textSegmentMode === 'sequential') {
+                const activeSeg = segTimings.find(t => currentFrame >= t.startFrame && currentFrame < t.endFrame);
+                if (activeSeg) {
+                    activeSegmentIdx = activeSeg.index;
+                } else if (segTimings.length > 0) {
+                    activeSegmentIdx = segTimings[segTimings.length - 1].index;
+                }
+            }
+
+            // Filter words to layout and render
+            let wordsToLayout = [];
+            if (textSegmentMode === 'sequential') {
+                wordsToLayout = allWordsMeta.filter(w => w.segmentIdx === activeSegmentIdx);
+            } else {
+                wordsToLayout = allWordsMeta;
+            }
 
             const gradientPalettes = {
                 sunset: {
@@ -5153,9 +5506,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 }
             };
 
-            // Background-aware coloring is evaluated locally for each word based on its actual position
-
-            // Base font size
             const baseFontSize = 70;
 
             // 2. Measure widths and calculate total sentence width
@@ -5163,12 +5513,11 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             let wordWidths = [];
             let totalWidth = 0;
 
-            // Measure space width under default Inter font
             ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
             const spaceWidth = ctx.measureText(' ').width;
 
-            words.forEach((word, idx) => {
-                const override = textWordsOverride[idx] || {
+            wordsToLayout.forEach((wordData) => {
+                const override = textWordsOverride[wordData.globalIdx] || {
                     scale: 100,
                     x: 0,
                     y: 0,
@@ -5177,7 +5526,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 };
                 const scaleMult = override.scale / 100;
                 
-                // Set font to measure
                 if (override.highlight === 'ashton') {
                     ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
                 } else if (override.highlight === 'garamond') {
@@ -5194,31 +5542,29 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
                 }
 
-                const width = ctx.measureText(word).width;
+                const width = ctx.measureText(wordData.word).width;
                 wordWidths.push(width);
                 totalWidth += width;
             });
 
-            // Add spaces
-            totalWidth += spaceWidth * (words.length - 1);
+            totalWidth += spaceWidth * (wordsToLayout.length - 1);
             ctx.restore();
 
-            // 3. Calculate base (unscaled, 100% scale, using default font) anchors with auto-wrapping to decouple word positions
+            // 3. Calculate base anchors with auto-wrapping
             let baseWordWidths = [];
             ctx.save();
             ctx.font = `900 ${baseFontSize}px 'Inter', sans-serif`;
-            words.forEach((word) => {
-                const w = ctx.measureText(word).width;
+            wordsToLayout.forEach((wordData) => {
+                const w = ctx.measureText(wordData.word).width;
                 baseWordWidths.push(w);
             });
             
-            // Wrap words into lines based on canvas width constraints
-            const maxLineWidth = INTERNAL_W - 160; // 80px padding on left/right sides
-            let lines = []; // array of lines, each line is an array of word indices
+            const maxLineWidth = INTERNAL_W - 160;
+            let lines = [];
             let currentLine = [];
             let currentLineWidth = 0;
             
-            words.forEach((word, idx) => {
+            wordsToLayout.forEach((wordData, idx) => {
                 const wordW = baseWordWidths[idx];
                 const spaceW = (currentLine.length > 0) ? spaceWidth : 0;
                 
@@ -5235,11 +5581,10 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 lines.push(currentLine);
             }
             
-            // Calculate base anchors (X and Y offsets) for each word
             let baseWordAnchors = [];
-            const lineHeight = baseFontSize * 1.35; // standard spacing
+            const lineHeight = baseFontSize * 1.35;
             const totalLinesHeight = (lines.length - 1) * lineHeight;
-            const startYOffset = -totalLinesHeight / 2; // Center the line block vertically around textGlobalY
+            const startYOffset = -totalLinesHeight / 2;
             
             lines.forEach((line, lineIdx) => {
                 let lineW = 0;
@@ -5265,22 +5610,20 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
             // Build resolved directions for all words to prevent overlaps
             let resolvedDirs = [];
-            words.forEach((word, idx) => {
-                const override = textWordsOverride[idx] || { anim: 'default' };
+            wordsToLayout.forEach((wordData, idx) => {
+                const override = textWordsOverride[wordData.globalIdx] || { anim: 'default' };
                 let dir = override.anim;
                 if (dir === 'default') {
-                    dir = textRandomDirections[idx] || 'bottom_to_up';
+                    dir = textRandomDirections[wordData.globalIdx] || 'bottom_to_up';
                 }
                 resolvedDirs[idx] = dir;
             });
 
-            // Iterate 3 times to propagate resolution fixes across multi-word lines
             for (let k = 0; k < 3; k++) {
                 lines.forEach((line) => {
-                    // Sort words on this line by their actual current horizontal positions
                     const spatialLine = [...line].sort((a, b) => {
-                        const xA = baseWordAnchors[a].x + (textWordsOverride[a]?.x || 0);
-                        const xB = baseWordAnchors[b].x + (textWordsOverride[b]?.x || 0);
+                        const xA = baseWordAnchors[a].x + (textWordsOverride[wordsToLayout[a].globalIdx]?.x || 0);
+                        const xB = baseWordAnchors[b].x + (textWordsOverride[wordsToLayout[b].globalIdx]?.x || 0);
                         return xA - xB;
                     });
                     
@@ -5288,34 +5631,27 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         const left_idx = spatialLine[i-1];
                         const right_idx = spatialLine[i];
                         
-                        const xA = baseWordAnchors[left_idx].x + (textWordsOverride[left_idx]?.x || 0);
-                        const xB = baseWordAnchors[right_idx].x + (textWordsOverride[right_idx]?.x || 0);
-                        const yA = baseWordAnchors[left_idx].y + (textWordsOverride[left_idx]?.y || 0);
-                        const yB = baseWordAnchors[right_idx].y + (textWordsOverride[right_idx]?.y || 0);
+                        const xA = baseWordAnchors[left_idx].x + (textWordsOverride[wordsToLayout[left_idx].globalIdx]?.x || 0);
+                        const xB = baseWordAnchors[right_idx].x + (textWordsOverride[wordsToLayout[right_idx].globalIdx]?.x || 0);
+                        const yA = baseWordAnchors[left_idx].y + (textWordsOverride[wordsToLayout[left_idx].globalIdx]?.y || 0);
+                        const yB = baseWordAnchors[right_idx].y + (textWordsOverride[wordsToLayout[right_idx].globalIdx]?.y || 0);
                         
-                        // Check if they are in the same vertical lane (within 50px)
                         if (Math.abs(yA - yB) <= 50) {
                             const gap = xB - (xA + wordWidths[left_idx]);
-                            
                             const dir_left = resolvedDirs[left_idx];
                             const dir_right = resolvedDirs[right_idx];
                             
-                            // Conflict 1: left shifts right (right_to_left) & right shifts left (left_to_right)
                             if (dir_left === 'right_to_left' && dir_right === 'left_to_right') {
                                 if (gap < 120) {
-                                    resolvedDirs[right_idx] = dir_left; // make right match left
+                                    resolvedDirs[right_idx] = dir_left;
                                 }
-                            }
-                            // Conflict 2: left shifts right & right shifts vertically (bottom_to_up)
-                            else if (dir_left === 'right_to_left' && dir_right === 'bottom_to_up') {
+                            } else if (dir_left === 'right_to_left' && dir_right === 'bottom_to_up') {
                                 if (gap < 60) {
-                                    resolvedDirs[left_idx] = 'bottom_to_up'; // make left match right
+                                    resolvedDirs[left_idx] = 'bottom_to_up';
                                 }
-                            }
-                            // Conflict 3: left shifts vertically & right shifts left
-                            else if (dir_left === 'bottom_to_up' && dir_right === 'left_to_right') {
+                            } else if (dir_left === 'bottom_to_up' && dir_right === 'left_to_right') {
                                 if (gap < 60) {
-                                    resolvedDirs[right_idx] = dir_left; // make right match left
+                                    resolvedDirs[right_idx] = dir_left;
                                 }
                             }
                         }
@@ -5323,12 +5659,12 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 });
             }
 
-            wordBoundingBoxes = []; // Clear current bounding boxes before calculation
+            wordBoundingBoxes = [];
 
-            // Pass 1: Pre-calculate rendering data and sample background to prevent words from interfering with each other's color sampling
+            // Pass 1: Pre-calculate rendering data and sample background
             const wordsRenderData = [];
-            words.forEach((word, idx) => {
-                const override = textWordsOverride[idx] || {
+            wordsToLayout.forEach((wordData, idx) => {
+                const override = textWordsOverride[wordData.globalIdx] || {
                     scale: 100,
                     x: 0,
                     y: 0,
@@ -5338,27 +5674,28 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 const scaleMult = override.scale / 100;
                 const userX = override.x;
                 const userY = override.y;
-
                 const baseAnchor = baseWordAnchors[idx];
 
-                // Staggered entry animation calculation (starts at textStartFrame)
-                const startFrame = textStartFrame + idx * 3;
+                // Timing / Start frame calculation
+                let startFrame = textStartFrame + wordData.globalIdx * 3;
+                if (textSegmentMode !== 'classic') {
+                    const timing = segTimings[wordData.segmentIdx];
+                    if (timing) {
+                        startFrame = timing.startFrame + wordData.wordIdxInSegment * 3;
+                    }
+                }
                 const animDuration = 20;
 
-                // Default state if animation hasn't started
                 let opacity = 0;
                 let animX = 0;
                 let animY = 0;
 
                 if (currentFrame >= startFrame) {
                     const t = Math.min(1.0, (currentFrame - startFrame) / animDuration);
-                    const ease = 1 - Math.pow(1 - t, 3); // Cubic Ease-Out
+                    const ease = 1 - Math.pow(1 - t, 3);
                     opacity = ease;
 
-                    // Get pre-resolved direction to avoid overlaps
                     let dir = resolvedDirs[idx] || 'bottom_to_up';
-
-                    // Calculate animated position offsets
                     if (dir === 'left_to_right') {
                         animX = -60 * (1 - ease);
                     } else if (dir === 'right_to_left') {
@@ -5368,28 +5705,39 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     }
                 }
 
+                if (textSegmentMode === 'sequential') {
+                    const timing = segTimings[wordData.segmentIdx];
+                    if (timing && currentFrame >= timing.endFrame) {
+                        opacity = 0;
+                    }
+                }
+
+                if (textSegmentMode === 'cumulative') {
+                    const timing = segTimings[wordData.segmentIdx];
+                    if (timing && currentFrame < timing.startFrame) {
+                        opacity = 0;
+                    }
+                }
+
                 if (opacity > 0) {
-                    // Compute final coordinates using decoupled base anchor
                     const finalX = baseAnchor.x + userX + animX;
                     const finalY = textGlobalY + baseAnchor.y + userY + animY;
                     const wordWidth = wordWidths[idx];
 
-                    // Determine background-aware coloring under this specific word's actual position
                     const wordCenterX = finalX + wordWidth / 2;
                     const wordCenterY = finalY - (baseFontSize * scaleMult) / 2;
                     const avgBgColor = getBackgroundAverageColor(wordCenterX, wordCenterY);
                     
                     wordsRenderData.push({
-                        word, idx, override, scaleMult, opacity, finalX, finalY, wordWidth, avgBgColor
+                        word: wordData.word, idx: wordData.globalIdx, override, scaleMult, opacity, finalX, finalY, wordWidth, avgBgColor
                     });
                 }
             });
 
-            // Pass 2: Draw the text now that all background sampling is complete
+            // Pass 2: Draw the text
             wordsRenderData.forEach(data => {
                 const { word, idx, override, scaleMult, opacity, finalX, finalY, wordWidth, avgBgColor } = data;
 
-                // If word is visible
                 if (opacity > 0) {
                     ctx.save();
                     ctx.globalAlpha = opacity;
@@ -5397,23 +5745,17 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     const luminance = 0.2126 * (avgBgColor.r / 255) + 0.7152 * (avgBgColor.g / 255) + 0.0722 * (avgBgColor.b / 255);
                     const isDarkBg = luminance < 0.5;
                     
-                    // Premium Dynamic Analogous Contrast via HSL
                     const [bh, bs, bl] = rgbToHsl(avgBgColor.r, avgBgColor.g, avgBgColor.b);
                     let defaultColor;
-                    
-                    // Shift Hue by +40 for a beautiful analogous color (e.g., Purple -> Pink, Blue -> Purple, Red -> Orange)
                     const textHue = (bh + 40) % 360; 
                     
                     if (isDarkBg) {
-                        // High lightness (85) for excellent readability, high saturation (85) for premium pastel vibrancy
                         defaultColor = hslToHex(textHue, 85, 85); 
                     } else {
-                        // Low lightness (20) for excellent contrast on light backgrounds, high saturation for deep rich tone
                         defaultColor = hslToHex(textHue, 85, 20); 
                     }
                     const shadowColor = isDarkBg ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
 
-                    // Store bounding box in internal canvas resolution
                     const textHeight = baseFontSize * scaleMult;
                     wordBoundingBoxes.push({
                         idx: idx,
@@ -5424,7 +5766,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         y2: finalY + (textHeight * 0.15)
                     });
 
-                    // Set font style
                     if (override.highlight === 'ashton') {
                         ctx.font = `${baseFontSize * scaleMult}px 'Satisfy', cursive`;
                     } else if (override.highlight === 'garamond') {
@@ -5441,16 +5782,13 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         ctx.font = `900 ${baseFontSize * scaleMult}px 'Inter', sans-serif`;
                     }
 
-                    // Text shadow/glow for premium contrast readability
                     ctx.shadowColor = shadowColor;
-                    ctx.shadowBlur = 15; // Increased blur slightly for better ambient glow
+                    ctx.shadowBlur = 15;
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 2;
 
-                    // Fill style selection
                     let fillStyle = defaultColor;
                     
-                    // If we're in Photo Animation mode, default base text to white for maximum contrast
                     if (appMode === 'photo_anim' && override.highlight === 'none') {
                         fillStyle = '#ffffff';
                     }
@@ -5476,7 +5814,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         if (activeStyle === 'default_color' || forceFontOnly) {
                             fillStyle = defaultColor;
                         } else if (textGradientEnabled && !forceColor || forceGradient) {
-                            // Create gradient fill
                             let grad = ctx.createLinearGradient(finalX, finalY - (baseFontSize * scaleMult * 0.7), finalX + wordWidth, finalY);
                             const palette = gradientPalettes[activeStyle] || gradientPalettes.sunset;
                             const colors = isDarkBg ? palette.dark : palette.light;
@@ -5484,7 +5821,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                             grad.addColorStop(1, colors[1]);
                             fillStyle = grad;
                         } else {
-                            // Solid accent fill matching the chosen color scheme
                             const solidAccents = {
                                 sunset: { dark: '#ffd200', light: '#e65100' },
                                 cyber: { dark: '#e100ff', light: '#880e4f' },
@@ -5497,7 +5833,6 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         }
                     }
 
-                    // Draw text shadow twice for a thicker, more legible shadow without using stroke
                     ctx.fillStyle = fillStyle;
                     ctx.fillText(word, finalX, finalY);
                     ctx.fillText(word, finalX, finalY);
@@ -5628,7 +5963,144 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         }
 
         function getWordsList() {
-            return textInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+            return textInput.value.replace(/\|/g, ' ').trim().split(/\s+/).filter(w => w.length > 0);
+        }
+
+        function getWordMetadata() {
+            const rawText = textInput.value;
+            const segments = rawText.split('|');
+            const wordsMetadata = [];
+            let globalIdx = 0;
+            
+            segments.forEach((segText, segIdx) => {
+                const segWords = segText.trim().split(/\s+/).filter(w => w.length > 0);
+                segWords.forEach((word, wordIdxInSeg) => {
+                    wordsMetadata.push({
+                        word: word,
+                        globalIdx: globalIdx,
+                        segmentIdx: segIdx,
+                        wordIdxInSegment: wordIdxInSeg
+                    });
+                    globalIdx++;
+                });
+            });
+            return wordsMetadata;
+        }
+
+        function getDefaultSegmentDuration() {
+            return (defaultSegmentSec * 30) + defaultSegmentFrame;
+        }
+
+        function getSegmentTimings() {
+            const rawText = textInput.value;
+            const segments = rawText.split('|').map(s => s.trim()).filter(s => s.length > 0);
+            const timings = [];
+            let currentStart = textStartFrame;
+            
+            segments.forEach((segText, idx) => {
+                const duration = segmentDurations[idx] !== undefined ? segmentDurations[idx] : getDefaultSegmentDuration();
+                const start = currentStart;
+                let end = start + duration;
+                
+                if (textSegmentMode === 'sequential' && idx === segments.length - 1) {
+                    end = Math.max(end, totalDuration);
+                }
+                
+                timings.push({
+                    index: idx,
+                    text: segText,
+                    duration: duration,
+                    startFrame: start,
+                    endFrame: end
+                });
+                currentStart = end;
+            });
+            return timings;
+        }
+
+        function updateSegmentTimingsUI() {
+            const container = document.getElementById('segmentTimingsContainer');
+            const timingCard = document.getElementById('segmentTimingCard');
+            const defaultCard = document.getElementById('defaultSegmentDurationCard');
+            if (!container || !timingCard || !defaultCard) return;
+            
+            if (textSegmentMode === 'classic') {
+                timingCard.style.display = 'none';
+                defaultCard.style.display = 'none';
+                return;
+            }
+            
+            timingCard.style.display = 'flex';
+            defaultCard.style.display = 'flex';
+            container.innerHTML = '';
+            
+            const timings = getSegmentTimings();
+            timings.forEach((t) => {
+                const segIdx = t.index;
+                const totalFrames = t.duration;
+                const secs = Math.floor(totalFrames / 30);
+                const frames = totalFrames % 30;
+                
+                const item = document.createElement('div');
+                item.className = 'segment-timing-item';
+                item.style.padding = '8px';
+                item.style.background = 'rgba(255, 255, 255, 0.02)';
+                item.style.border = '1px solid var(--border-color)';
+                item.style.borderRadius = '8px';
+                item.style.display = 'flex';
+                item.style.flexDirection = 'column';
+                item.style.gap = '6px';
+                item.style.marginTop = '6px';
+                
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.75rem; font-weight:700; color:var(--accent-color);">Segment ${segIdx + 1}: "${t.text}"</span>
+                        <span style="font-size:0.7rem; color:var(--text-dim);" id="segFrameRange${segIdx}">Frames: ${t.startFrame} - ${t.endFrame}</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                        <div class="control-group">
+                            <label style="font-size:0.65rem;">Duration (Sec) <span class="val" id="segSecVal${segIdx}">${secs}s</span></label>
+                            <input type="range" id="segSecSlider${segIdx}" min="0" max="10" value="${secs}" style="margin-top:2px;">
+                        </div>
+                        <div class="control-group">
+                            <label style="font-size:0.65rem;">Duration (Frames) <span class="val" id="segFrameVal${segIdx}">${frames}f</span></label>
+                            <input type="range" id="segFrameSlider${segIdx}" min="0" max="29" value="${frames}" style="margin-top:2px;">
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+                
+                const secSlider = item.querySelector(`#segSecSlider${segIdx}`);
+                const frameSlider = item.querySelector(`#segFrameSlider${segIdx}`);
+                const secVal = item.querySelector(`#segSecVal${segIdx}`);
+                const frameVal = item.querySelector(`#segFrameVal${segIdx}`);
+                
+                const onInput = () => {
+                    const s = parseInt(secSlider.value);
+                    const f = parseInt(frameSlider.value);
+                    secVal.textContent = s + 's';
+                    frameVal.textContent = f + 'f';
+                    
+                    segmentDurations[segIdx] = (s * 30) + f;
+                    
+                    refreshTimingsDisplay();
+                    drawFrame();
+                };
+                
+                secSlider.addEventListener('input', onInput);
+                frameSlider.addEventListener('input', onInput);
+            });
+        }
+        
+        function refreshTimingsDisplay() {
+            const timings = getSegmentTimings();
+            timings.forEach((t) => {
+                const rangeSpan = document.getElementById(`segFrameRange${t.index}`);
+                if (rangeSpan) {
+                    rangeSpan.textContent = `Frames: ${t.startFrame} - ${t.endFrame}`;
+                }
+            });
         }
 
         function populateWordSelect() {
@@ -5779,8 +6251,33 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         textInput.addEventListener('input', () => {
             populateWordSelect();
+            updateSegmentTimingsUI();
             drawFrame();
         });
+
+        const textSegmentModeSelect = document.getElementById('textSegmentModeSelect');
+        const defaultSegSecSlider = document.getElementById('defaultSegSecSlider');
+        const defaultSegFrameSlider = document.getElementById('defaultSegFrameSlider');
+        const defaultSegSecVal = document.getElementById('defaultSegSecVal');
+        const defaultSegFrameVal = document.getElementById('defaultSegFrameVal');
+
+        textSegmentModeSelect.addEventListener('change', () => {
+            textSegmentMode = textSegmentModeSelect.value;
+            updateSegmentTimingsUI();
+            drawFrame();
+        });
+
+        const onDefaultSegInput = () => {
+            defaultSegmentSec = parseInt(defaultSegSecSlider.value);
+            defaultSegmentFrame = parseInt(defaultSegFrameSlider.value);
+            defaultSegSecVal.textContent = defaultSegmentSec + 's';
+            defaultSegFrameVal.textContent = defaultSegmentFrame + 'f';
+            updateSegmentTimingsUI();
+            drawFrame();
+        };
+
+        defaultSegSecSlider.addEventListener('input', onDefaultSegInput);
+        defaultSegFrameSlider.addEventListener('input', onDefaultSegInput);
 
         const textStartSecSlider = document.getElementById('textStartSecSlider');
         const textStartFrameSlider = document.getElementById('textStartFrameSlider');
@@ -5829,6 +6326,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         // Initialize visibility and text start time
         updateTextHighlightControlsVisibility();
         syncTextStartToTransition();
+        updateSegmentTimingsUI();
 
         resetTextBtn.addEventListener('click', () => {
             textWordsOverride = {};
@@ -5840,7 +6338,17 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             textGradientEnabled = true;
             textGradientStyleSelect.value = 'auto';
             textGradientStyle = 'auto';
+            textSegmentMode = 'classic';
+            textSegmentModeSelect.value = 'classic';
+            segmentDurations = {};
+            defaultSegSecSlider.value = 2;
+            defaultSegFrameSlider.value = 10;
+            defaultSegSecVal.textContent = '2s';
+            defaultSegFrameVal.textContent = '10f';
+            defaultSegmentSec = 2;
+            defaultSegmentFrame = 10;
             updateTextHighlightControlsVisibility();
+            updateSegmentTimingsUI();
             setMatchMode(false);
             populateWordSelect();
             drawFrame();
@@ -5875,6 +6383,40 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 wordHighlightSelect.value = nextHighlight;
                 saveSelectedWordSettings();
                 e.preventDefault();
+            }
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                const wordIdx = parseInt(textWordSelect.value);
+                if (isNaN(wordIdx)) return;
+
+                if (!textWordsOverride[wordIdx]) {
+                    textWordsOverride[wordIdx] = {
+                        scale: 100,
+                        x: 0,
+                        y: 0,
+                        highlight: 'none',
+                        anim: 'default'
+                    };
+                }
+
+                const step = e.shiftKey ? 10 : 2;
+                if (e.key === 'ArrowLeft') textWordsOverride[wordIdx].x -= step;
+                if (e.key === 'ArrowRight') textWordsOverride[wordIdx].x += step;
+                if (e.key === 'ArrowUp') textWordsOverride[wordIdx].y -= step;
+                if (e.key === 'ArrowDown') textWordsOverride[wordIdx].y += step;
+
+                // Clamp to slider bounds
+                textWordsOverride[wordIdx].x = Math.max(-1500, Math.min(1500, textWordsOverride[wordIdx].x));
+                textWordsOverride[wordIdx].y = Math.max(-1500, Math.min(1500, textWordsOverride[wordIdx].y));
+
+                // Sync sidebar controls
+                wordXSlider.value = textWordsOverride[wordIdx].x;
+                wordXVal.textContent = textWordsOverride[wordIdx].x;
+                wordYSlider.value = textWordsOverride[wordIdx].y;
+                wordYVal.textContent = textWordsOverride[wordIdx].y;
+
+                e.preventDefault();
+                drawFrame();
             }
         });
 
