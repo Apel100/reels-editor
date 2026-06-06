@@ -460,64 +460,90 @@
                 </div>
                 
                 <div id="bgStarsControls" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
-                    <details open style="border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.15);">
-                        <summary style="font-size:0.75rem; font-weight:bold; cursor:pointer; color:var(--text-color); outline:none; user-select:none; margin-bottom: 4px;">⭐ Star 1 (Top-Left) Settings</summary>
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
-                            <div class="row-group">
-                                <div class="control-group">
-                                    <label>Scale <span class="val" id="star1ScaleVal">100%</span></label>
-                                    <input type="range" id="star1ScaleSlider" min="20" max="300" value="100" style="width: 100%;">
-                                </div>
-                                <div class="control-group">
-                                    <label>Rotation Speed <span class="val" id="star1SpeedVal">100%</span></label>
-                                    <input type="range" id="star1SpeedSlider" min="-300" max="300" value="100" style="width: 100%;">
-                                </div>
-                            </div>
-                            <div class="row-group">
-                                <div class="control-group">
-                                    <label>Pos X Offset <span class="val" id="star1XOffsetVal">0px</span></label>
-                                    <input type="range" id="star1XOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
-                                </div>
-                                <div class="control-group">
-                                    <label>Pos Y Offset <span class="val" id="star1YOffsetVal">0px</span></label>
-                                    <input type="range" id="star1YOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
-                                </div>
+                    <!-- Global Star Style & Path Settings -->
+                    <div style="border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 8px;">
+                        <div class="row-group">
+                            <div class="control-group">
+                                <label>Star Style</label>
+                                <select id="bgStarsStyle">
+                                    <option value="sparkle4" selected>⭐ 4-Pointed Sparkle</option>
+                                    <option value="rounded5">🌟 5-Pointed Cute (Flower)</option>
+                                    <option value="classic5">⭐ 5-Pointed Classic</option>
+                                    <option value="sakura">🌸 Sakura Blossom</option>
+                                </select>
                             </div>
                             <div class="control-group">
-                                <label>Start Angle <span class="val" id="star1StartAngleVal">0°</span></label>
-                                <input type="range" id="star1StartAngleSlider" min="0" max="360" value="0" style="width: 100%;">
+                                <label>Star Fill Style</label>
+                                <select id="bgStarsFill">
+                                    <option value="solid" selected>🎨 Solid Color</option>
+                                    <option value="gradient">🌈 Theme Gradient</option>
+                                </select>
                             </div>
                         </div>
-                    </details>
-                    <details open style="border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.15); margin-top: 4px;">
-                        <summary style="font-size:0.75rem; font-weight:bold; cursor:pointer; color:var(--text-color); outline:none; user-select:none; margin-bottom: 4px;">⭐ Star 2 (Bottom-Right) Settings</summary>
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
-                            <div class="row-group">
-                                <div class="control-group">
-                                    <label>Scale <span class="val" id="star2ScaleVal">100%</span></label>
-                                    <input type="range" id="star2ScaleSlider" min="20" max="300" value="100" style="width: 100%;">
-                                </div>
-                                <div class="control-group">
-                                    <label>Rotation Speed <span class="val" id="star2SpeedVal">-100%</span></label>
-                                    <input type="range" id="star2SpeedSlider" min="-300" max="300" value="-100" style="width: 100%;">
-                                </div>
+                        <div class="row-group">
+                            <div class="control-group" style="grid-column: span 2;">
+                                <label>Path Type</label>
+                                <select id="bgStarsPath">
+                                    <option value="top_right_bottom_left" selected>↗ Top-Right & ↙ Bottom-Left Arcs</option>
+                                    <option value="top_left_bottom_right">↖ Top-Left & ↘ Bottom-Right Arcs</option>
+                                    <option value="random_corners">🎲 Random Corners</option>
+                                    <option value="static_spin">🔄 Static Position (Spin only)</option>
+                                </select>
                             </div>
-                            <div class="row-group">
-                                <div class="control-group">
-                                    <label>Pos X Offset <span class="val" id="star2XOffsetVal">0px</span></label>
-                                    <input type="range" id="star2XOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
-                                </div>
-                                <div class="control-group">
-                                    <label>Pos Y Offset <span class="val" id="star2YOffsetVal">0px</span></label>
-                                    <input type="range" id="star2YOffsetSlider" min="-500" max="500" value="0" style="width: 100%;">
-                                </div>
+                        </div>
+                        <label class="toggle-card" style="padding: 4px 0; background: transparent; border: none; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                            <span style="font-size:0.75rem; font-weight:500; color: var(--text-color);">Draw Path Lines</span>
+                            <span class="switch">
+                                <input type="checkbox" id="bgStarsShowPath" checked>
+                                <span class="slider"></span>
+                            </span>
+                        </label>
+                        <div class="row-group">
+                            <div class="control-group">
+                                <label>Path Radius <span class="val" id="bgStarsPathRadiusVal">280px</span></label>
+                                <input type="range" id="bgStarsPathRadius" min="100" max="800" value="280" style="width: 100%;">
                             </div>
                             <div class="control-group">
-                                <label>Start Angle <span class="val" id="star2StartAngleVal">0°</span></label>
-                                <input type="range" id="star2StartAngleSlider" min="0" max="360" value="0" style="width: 100%;">
+                                <label>Path Stroke <span class="val" id="bgStarsPathWidthVal">3px</span></label>
+                                <input type="range" id="bgStarsPathWidth" min="1" max="10" value="3" style="width: 100%;">
                             </div>
                         </div>
-                    </details>
+                        <div class="row-group">
+                            <div class="control-group" style="grid-column: span 2;">
+                                <label>Path Opacity <span class="val" id="bgStarsPathOpacityVal">25%</span></label>
+                                <input type="range" id="bgStarsPathOpacity" min="0" max="100" value="25" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ⭐ Unified Star Settings -->
+                    <div style="border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 8px;">
+                        <div class="card-title" style="font-size:0.75rem; font-weight:bold; color:var(--text-color); margin-bottom: 4px;">⭐ Star Controls (Symmetric)</div>
+                        <div class="row-group">
+                            <div class="control-group">
+                                <label>Star Size <span class="val" id="bgStarsScaleVal">70%</span></label>
+                                <input type="range" id="bgStarsScaleSlider" min="20" max="300" value="70" style="width: 100%;">
+                            </div>
+                            <div class="control-group">
+                                <label>Rotation Speed <span class="val" id="bgStarsSpeedVal">100%</span></label>
+                                <input type="range" id="bgStarsSpeedSlider" min="0" max="300" value="100" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div class="row-group">
+                            <div class="control-group">
+                                <label>Symmetric X Offset <span class="val" id="bgStarsXOffsetVal">0px</span></label>
+                                <input type="range" id="bgStarsXOffsetSlider" min="-200" max="200" value="0" style="width: 100%;">
+                            </div>
+                            <div class="control-group">
+                                <label>Symmetric Y Offset <span class="val" id="bgStarsYOffsetVal">0px</span></label>
+                                <input type="range" id="bgStarsYOffsetSlider" min="-200" max="200" value="0" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>Start Angle Offset <span class="val" id="bgStarsStartAngleVal">0°</span></label>
+                            <input type="range" id="bgStarsStartAngleSlider" min="0" max="360" value="0" style="width: 100%;">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -553,7 +579,7 @@
                     <option value="cumulative">Cumulative (Accumulate Segments)</option>
                 </select>
                 <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">
-                    Use <b>|</b> to separate segments (e.g. "Hello | World").
+                    Use <b>&gt;</b> to separate segments (e.g. "Hello &gt; World").
                 </div>
             </div>
 
@@ -572,12 +598,13 @@
                 </div>
             </div>
 
-            <!-- Custom Segment Durations -->
+            <!-- Custom Segment Start Times -->
             <div id="segmentTimingCard" style="display: none; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 4px; flex-direction: column; gap: 8px; border: 1px solid var(--border-color);">
-                <div class="card-title" style="font-size: 0.75rem; color: #38bdf8; margin-bottom: 0;">Custom Segment Durations</div>
+                <div class="card-title" style="font-size: 0.75rem; color: #38bdf8; margin-bottom: 0;">Custom Segment Start Times</div>
                 <div id="segmentTimingsContainer" style="display: flex; flex-direction: column; gap: 8px;">
                     <!-- Populated dynamically -->
                 </div>
+                <div id="segmentValidationErrors" style="color: #f87171; font-size: 0.7rem; margin-top: 4px; display: none; flex-direction: column; gap: 4px; padding: 8px; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); border-radius: 6px;"></div>
             </div>
 
             <div class="control-group">
@@ -884,6 +911,13 @@
                             <input type="range" id="polaroidYSlider" min="-300" max="300" value="0">
                         </div>
                     </div>
+                    <div class="control-group" id="polaroidStackOrderGroup" style="margin-top: 5px; display: none;">
+                        <label>Stack Order</label>
+                        <select id="polaroidStackOrder" style="width: 100%;">
+                            <option value="right_top" selected>Photo 2 (Right) on Top</option>
+                            <option value="left_top">Photo 1 (Left) on Top</option>
+                        </select>
+                    </div>
                 </div>
  
                 <div id="circlesLayoutGroup" style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-top: 10px;">
@@ -931,11 +965,11 @@
                     <div class="row-group">
                         <div class="control-group">
                             <label>Start <span class="val" id="paXStartVal">0</span></label>
-                            <input type="range" id="paXStartSlider" min="-500" max="500" value="0">
+                            <input type="range" id="paXStartSlider" min="-1500" max="1500" value="0">
                         </div>
                         <div class="control-group">
                             <label>End <span class="val" id="paXEndVal">0</span></label>
-                            <input type="range" id="paXEndSlider" min="-500" max="500" value="0">
+                            <input type="range" id="paXEndSlider" min="-1500" max="1500" value="0">
                         </div>
                     </div>
                 </div>
@@ -945,11 +979,11 @@
                     <div class="row-group">
                         <div class="control-group">
                             <label>Start <span class="val" id="paYStartVal">0</span></label>
-                            <input type="range" id="paYStartSlider" min="-500" max="500" value="0">
+                            <input type="range" id="paYStartSlider" min="-1500" max="1500" value="0">
                         </div>
                         <div class="control-group">
                             <label>End <span class="val" id="paYEndVal">0</span></label>
-                            <input type="range" id="paYEndSlider" min="-500" max="500" value="0">
+                            <input type="range" id="paYEndSlider" min="-1500" max="1500" value="0">
                         </div>
                     </div>
                 </div>
@@ -1235,6 +1269,7 @@
         let uploadedImg = null;
         let uploadedBgImg = null;
         let uploadedBgVideo = null;
+        let uploadedBgVideoStartOffset = 0;
         let uploadedImages = [];
         let shapeImagesProps = [];
         let playedWordSounds = new Set();
@@ -1242,19 +1277,23 @@
 
 
         function syncVideoPlayback() {
-            const syncVid = (vid) => {
+            const syncVid = (vid, idx) => {
                 if (vid && vid.tagName === 'VIDEO') {
                     if (isPlaying && !isExporting) {
+                        const offset = (idx !== undefined && shapeImagesProps[idx]) ? (shapeImagesProps[idx].startOffset || 0) : (vid === uploadedBgVideo ? (uploadedBgVideoStartOffset || 0) : 0);
+                        vid.currentTime = offset + (currentFrame / 30);
                         vid.play().catch(err => console.log("Video play failed:", err));
                     } else {
                         vid.pause();
+                        const offset = (idx !== undefined && shapeImagesProps[idx]) ? (shapeImagesProps[idx].startOffset || 0) : (vid === uploadedBgVideo ? (uploadedBgVideoStartOffset || 0) : 0);
+                        vid.currentTime = offset + (currentFrame / 30);
                     }
                 }
             };
             
             syncVid(uploadedBgVideo);
             if (uploadedImages) {
-                uploadedImages.forEach(syncVid);
+                uploadedImages.forEach((vid, idx) => syncVid(vid, idx));
             }
         }
 
@@ -1316,6 +1355,8 @@
         let entryDirection = 'bottom';
         let photoEntryAlpha = 1.0;
         let colorVariationSeed = Math.random();
+        let bgVariationSeed = Math.random();
+        let currentRandomStarsPath = Math.random() > 0.5 ? 'top_right_bottom_left' : 'top_left_bottom_right';
 
         // Text Engine State
         let textWordsOverride = {};
@@ -1329,13 +1370,18 @@
         let textSegmentMode = 'classic'; // 'classic' | 'sequential' | 'cumulative'
         let defaultSegmentSec = 2;
         let defaultSegmentFrame = 10;
-        let segmentDurations = {}; // Custom durations per segment index
+        let segmentStartFrames = {}; // Custom start frames per segment index
 
         // Interactive Word Drag/Scale State
         let wordBoundingBoxes = [];
         let hoveredWordIdx = null;
         let draggedWordIdx = null;
         let isDraggingWord = false;
+        let isWordSnappedY = false;
+        let wordSnappedYVal = 0;
+        let isWordSnappedX = false;
+        let wordSnappedXVal = 0;
+        let isDraggingSlider = false;
         let dragStartOffsetX = 0;
         let dragStartOffsetY = 0;
         let isMatchMode = false;
@@ -1435,16 +1481,16 @@
             return `#${f(0)}${f(8)}${f(4)}`;
         }
 
-        function getContrastColor(hex, type = 'solid') {
+        function getContrastColor(hex, type = 'solid', seed = colorVariationSeed) {
             const [h, s, l] = hexToHsl(hex);
             
             // Logic: Variety via Hue Offsets (Complementary, Triadic, Split-Comp)
             const offsets = [180, 150, 210, 120, 240, 90, 270];
-            const chosenOffset = offsets[Math.floor(colorVariationSeed * offsets.length)];
+            const chosenOffset = offsets[Math.floor(seed * offsets.length)];
             const targetHue = (h + chosenOffset) % 360;
             
             // Contrast logic: If BG is dark, make shape very bright/neon. If light, make it dark/vivid.
-            const targetLightness = l < 50 ? (70 + colorVariationSeed * 20) : (10 + colorVariationSeed * 20);
+            const targetLightness = l < 50 ? (70 + seed * 20) : (10 + seed * 20);
             const targetSaturation = 95; 
 
             if (type === 'gradient') {
@@ -1503,32 +1549,152 @@
             ctx.restore();
         }
 
-        function drawFourPointedStar(ctx, cx, cy, size, angle, color) {
+        function getStarFill(ctx, size, fillType, color1, color2) {
+            if (fillType === 'gradient') {
+                const grad = ctx.createLinearGradient(-size, -size, size, size);
+                grad.addColorStop(0, color1);
+                grad.addColorStop(1, color2);
+                return grad;
+            }
+            return color1;
+        }
+
+        function drawFourPointedStar(ctx, cx, cy, size, angle, fillType, color1, color2) {
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(angle);
             
-            // Premium soft drop shadow
             ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
             ctx.shadowBlur = 30;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 10;
             
-            ctx.fillStyle = color;
+            ctx.fillStyle = getStarFill(ctx, size, fillType, color1, color2);
             ctx.beginPath();
             ctx.moveTo(0, -size);
-            // Top to Right (quadratic curve with control point 0,0)
             ctx.quadraticCurveTo(0, 0, size, 0);
-            // Right to Bottom
             ctx.quadraticCurveTo(0, 0, 0, size);
-            // Bottom to Left
             ctx.quadraticCurveTo(0, 0, -size, 0);
-            // Left to Top
             ctx.quadraticCurveTo(0, 0, 0, -size);
             ctx.closePath();
             ctx.fill();
             
             ctx.restore();
+        }
+
+        function drawFivePointedCuteStar(ctx, cx, cy, size, angle, fillType, color1, color2) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 10;
+            
+            ctx.fillStyle = getStarFill(ctx, size, fillType, color1, color2);
+            ctx.beginPath();
+            const rAvg = size * 0.65;
+            const rAmp = size * 0.35;
+            const steps = 100;
+            for (let i = 0; i <= steps; i++) {
+                const theta = (i / steps) * Math.PI * 2;
+                const r = rAvg + rAmp * Math.cos(5 * theta);
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawFivePointedClassicStar(ctx, cx, cy, size, angle, fillType, color1, color2) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 10;
+            
+            ctx.fillStyle = getStarFill(ctx, size, fillType, color1, color2);
+            ctx.beginPath();
+            const R = size;
+            const r = size * 0.45;
+            for (let i = 0; i < 10; i++) {
+                const radius = (i % 2 === 0) ? R : r;
+                const theta = i * Math.PI / 5;
+                const x = radius * Math.cos(theta);
+                const y = radius * Math.sin(theta);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawSakuraBlossom(ctx, cx, cy, size, angle, fillType, color1, color2) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 10;
+            
+            ctx.fillStyle = getStarFill(ctx, size, fillType, color1, color2);
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const baseAngle = i * Math.PI * 2 / 5;
+                const rMax = size;
+                const rIndent = size * 0.82;
+                const rWidth = size * 0.42;
+                
+                const aCenter = baseAngle;
+                const aLeft = baseAngle - 0.25;
+                const aRight = baseAngle + 0.25;
+                
+                const tipLeftX = rMax * Math.cos(aLeft - 0.05);
+                const tipLeftY = rMax * Math.sin(aLeft - 0.05);
+                const tipRightX = rMax * Math.cos(aRight + 0.05);
+                const tipRightY = rMax * Math.sin(aRight + 0.05);
+                
+                const indentX = rIndent * Math.cos(aCenter);
+                const indentY = rIndent * Math.sin(aCenter);
+                
+                const leftCtrlX = rWidth * Math.cos(aLeft - 0.35);
+                const leftCtrlY = rWidth * Math.sin(aLeft - 0.35);
+                const rightCtrlX = rWidth * Math.cos(aRight + 0.35);
+                const rightCtrlY = rWidth * Math.sin(aRight + 0.35);
+                
+                if (i === 0) {
+                    ctx.moveTo(0, 0);
+                }
+                ctx.quadraticCurveTo(leftCtrlX, leftCtrlY, tipLeftX, tipLeftY);
+                ctx.quadraticCurveTo(tipLeftX + (indentX - tipLeftX)*0.5, tipLeftY + (indentY - tipLeftY)*0.5, indentX, indentY);
+                ctx.quadraticCurveTo(tipRightX + (indentX - tipRightX)*0.5, tipRightY + (indentY - tipRightY)*0.5, tipRightX, tipRightY);
+                ctx.quadraticCurveTo(rightCtrlX, rightCtrlY, 0, 0);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawDecorShape(ctx, type, fillType, cx, cy, size, angle, color1, color2) {
+            if (type === 'rounded5') {
+                drawFivePointedCuteStar(ctx, cx, cy, size, angle, fillType, color1, color2);
+            } else if (type === 'classic5') {
+                drawFivePointedClassicStar(ctx, cx, cy, size, angle, fillType, color1, color2);
+            } else if (type === 'sakura') {
+                drawSakuraBlossom(ctx, cx, cy, size, angle, fillType, color1, color2);
+            } else {
+                drawFourPointedStar(ctx, cx, cy, size, angle, fillType, color1, color2);
+            }
         }
 
         function drawRotatingStars(ctx, t) {
@@ -1548,8 +1714,8 @@
             }
 
             if (preset === 'custom') {
-                const contrastGrad = getContrastColor(baseColor, 'gradient');
-                const contrastSolid = getContrastColor(baseColor, 'solid');
+                const contrastGrad = getContrastColor(baseColor, 'gradient', bgVariationSeed);
+                const contrastSolid = getContrastColor(baseColor, 'solid', bgVariationSeed);
                 p = {
                     bg: baseColor,
                     c1: contrastGrad[0],
@@ -1560,32 +1726,154 @@
             }
             const c1 = p.c1, acc = p.acc;
 
-            const s1Scale = parseInt(document.getElementById('star1ScaleSlider').value) / 100;
-            const s1XOffset = parseInt(document.getElementById('star1XOffsetSlider').value);
-            const s1YOffset = parseInt(document.getElementById('star1YOffsetSlider').value);
-            const s1Speed = parseInt(document.getElementById('star1SpeedSlider').value) / 100;
-            const s1StartAngle = parseInt(document.getElementById('star1StartAngleSlider').value) * Math.PI / 180;
+            // Global Star Settings
+            const bgSStyle = document.getElementById('bgStarsStyle');
+            const starStyle = bgSStyle ? bgSStyle.value : 'sparkle4';
 
-            const s2Scale = parseInt(document.getElementById('star2ScaleSlider').value) / 100;
-            const s2XOffset = parseInt(document.getElementById('star2XOffsetSlider').value);
-            const s2YOffset = parseInt(document.getElementById('star2YOffsetSlider').value);
-            const s2Speed = parseInt(document.getElementById('star2SpeedSlider').value) / 100;
-            const s2StartAngle = parseInt(document.getElementById('star2StartAngleSlider').value) * Math.PI / 180;
+            const bgSFill = document.getElementById('bgStarsFill');
+            const fillStyle = bgSFill ? bgSFill.value : 'solid';
+
+            const bgSPath = document.getElementById('bgStarsPath');
+            let pathStyle = bgSPath ? bgSPath.value : 'top_right_bottom_left';
+            if (pathStyle === 'random_corners') {
+                pathStyle = currentRandomStarsPath;
+            }
+
+            const bgSShowPath = document.getElementById('bgStarsShowPath');
+            const showPath = bgSShowPath ? bgSShowPath.checked : true;
+
+            const bgSPathRad = document.getElementById('bgStarsPathRadius');
+            const pathRadius = bgSPathRad ? parseInt(bgSPathRad.value) : 280;
+
+            const bgSPathWidth = document.getElementById('bgStarsPathWidth');
+            const pathWidth = bgSPathWidth ? parseInt(bgSPathWidth.value) : 3;
+
+            const bgSPathOp = document.getElementById('bgStarsPathOpacity');
+            const pathOpacity = bgSPathOp ? (parseInt(bgSPathOp.value) / 100) : 0.25;
+
+            const bgScaleVal = parseInt(document.getElementById('bgStarsScaleSlider').value) / 100;
+            const bgSpeedVal = parseInt(document.getElementById('bgStarsSpeedSlider').value) / 100;
+            const bgXOffsetVal = parseInt(document.getElementById('bgStarsXOffsetSlider').value);
+            const bgYOffsetVal = parseInt(document.getElementById('bgStarsYOffsetSlider').value);
+            const bgStartAngleVal = parseInt(document.getElementById('bgStarsStartAngleSlider').value) * Math.PI / 180;
+
+            const s1Scale = bgScaleVal;
+            const s1XOffset = bgXOffsetVal;
+            const s1YOffset = bgYOffsetVal;
+            const s1Speed = bgSpeedVal;
+            const s1StartAngle = bgStartAngleVal;
+
+            const s2Scale = bgScaleVal;
+            const s2XOffset = -bgXOffsetVal;
+            const s2YOffset = -bgYOffsetVal;
+            const s2Speed = -bgSpeedVal;
+            const s2StartAngle = bgStartAngleVal;
 
             const starColor1 = acc;
             const starColor2 = c1;
 
-            const angle1 = s1StartAngle + t * 0.005 * s1Speed;
-            const angle2 = s2StartAngle + t * 0.004 * s2Speed;
-
             const W = INTERNAL_W;
             const H = INTERNAL_H;
 
-            // Star 1 (Top-Left): Base at (120, 260), Size 200
-            drawFourPointedStar(ctx, 120 + s1XOffset, 260 + s1YOffset, 200 * s1Scale, angle1, starColor1);
+            // Calculate progress using a constant speed triangle wave (ping-pong)
+            // Completely independent of clip duration.
+            const absSpeed1 = Math.abs(s1Speed);
+            const speedFactor1 = (1 / 150) * absSpeed1;
+            const phase1 = (t * speedFactor1) % 2.0;
+            const progress1 = phase1 > 1.0 ? (2.0 - phase1) : phase1;
 
-            // Star 2 (Bottom-Right): Base at (W-120, H-260), Size 320
-            drawFourPointedStar(ctx, W - 120 - s2XOffset, H - 260 - s2YOffset, 320 * s2Scale, angle2, starColor2);
+            const absSpeed2 = Math.abs(s2Speed);
+            const speedFactor2 = (1 / 150) * absSpeed2;
+            const phase2 = (t * speedFactor2) % 2.0;
+            const progress2 = 1.0 - (phase2 > 1.0 ? (2.0 - phase2) : phase2);
+
+            // Calculate self-rotation angles (completely independent of clip duration)
+            const selfAngle1 = s1StartAngle + t * (2 * Math.PI / 150) * s1Speed;
+            const selfAngle2 = s2StartAngle + t * (2 * Math.PI / 150) * s2Speed;
+
+            const drawOnePath = (cx1, cy1, cx2, cy2, isTLBR) => {
+                let x1, y1, x2, y2;
+                let orbitAngle1, orbitAngle2;
+
+                const startAngleRad1 = s1StartAngle;
+                const startAngleRad2 = s2StartAngle;
+
+                if (!isTLBR) {
+                    // top_right_bottom_left
+                    const dir1 = Math.sign(s1Speed) || 1;
+                    if (dir1 >= 0) {
+                        orbitAngle1 = (Math.PI - startAngleRad1) - progress1 * (Math.PI * 0.5);
+                    } else {
+                        orbitAngle1 = (Math.PI * 0.5 - startAngleRad1) + progress1 * (Math.PI * 0.5);
+                    }
+
+                    const dir2 = Math.sign(s2Speed) || 1;
+                    if (dir2 >= 0) {
+                        orbitAngle2 = (Math.PI * 2.0 - startAngleRad2) - progress2 * (Math.PI * 0.5);
+                    } else {
+                        orbitAngle2 = (Math.PI * 1.5 - startAngleRad2) + progress2 * (Math.PI * 0.5);
+                    }
+                } else {
+                    // top_left_bottom_right
+                    const dir1 = Math.sign(s1Speed) || 1;
+                    if (dir1 >= 0) {
+                        orbitAngle1 = (0 + startAngleRad1) + progress1 * (Math.PI * 0.5);
+                    } else {
+                        orbitAngle1 = (Math.PI * 0.5 + startAngleRad1) - progress1 * (Math.PI * 0.5);
+                    }
+
+                    const dir2 = Math.sign(s2Speed) || 1;
+                    if (dir2 >= 0) {
+                        orbitAngle2 = (Math.PI + startAngleRad2) + progress2 * (Math.PI * 0.5);
+                    } else {
+                        orbitAngle2 = (Math.PI * 1.5 - startAngleRad2) - progress2 * (Math.PI * 0.5);
+                    }
+                }
+
+                x1 = cx1 + pathRadius * Math.cos(orbitAngle1);
+                y1 = cy1 + pathRadius * Math.sin(orbitAngle1);
+                x2 = cx2 + pathRadius * Math.cos(orbitAngle2);
+                y2 = cy2 + pathRadius * Math.sin(orbitAngle2);
+
+                // Draw orbit paths
+                if (showPath) {
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${pathOpacity})`;
+                    ctx.lineWidth = pathWidth;
+                    ctx.shadowColor = `rgba(255, 255, 255, ${pathOpacity * 1.5})`;
+                    ctx.shadowBlur = 12;
+
+                    ctx.beginPath();
+                    ctx.arc(cx1, cy1, pathRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(cx2, cy2, pathRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.restore();
+                }
+
+                // Draw Star 1 (Size 200 base)
+                drawDecorShape(ctx, starStyle, fillStyle, x1, y1, 200 * s1Scale, selfAngle1, starColor1, starColor2);
+
+                // Draw Star 2 (Size 240 base for better fit on path)
+                drawDecorShape(ctx, starStyle, fillStyle, x2, y2, 240 * s2Scale, selfAngle2, starColor1, starColor2);
+            };
+
+            if (pathStyle === 'top_right_bottom_left') {
+                drawOnePath(W + s1XOffset, 0 + s1YOffset, 0 + s2XOffset, H + s2YOffset, false);
+            } else if (pathStyle === 'top_left_bottom_right') {
+                drawOnePath(0 + s1XOffset, 0 + s1YOffset, W + s2XOffset, H + s2YOffset, true);
+            } else {
+                // static_spin (no orbit paths)
+                const x1 = 120 + s1XOffset;
+                const y1 = 260 + s1YOffset;
+                const x2 = W - 120 - s2XOffset;
+                const y2 = H - 260 - s2YOffset;
+                drawDecorShape(ctx, starStyle, fillStyle, x1, y1, 200 * s1Scale, selfAngle1, starColor1, starColor2);
+                drawDecorShape(ctx, starStyle, fillStyle, x2, y2, 240 * s2Scale, selfAngle2, starColor1, starColor2);
+            }
         }
 
 function drawUnifiedBackground(context, baseColor, style, preset, t) {
@@ -1782,7 +2070,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         if (!uploadedBgVideo.paused) {
                             uploadedBgVideo.pause();
                         }
-                        const targetTime = currentFrame / 30;
+                        const targetTime = (uploadedBgVideoStartOffset || 0) + (currentFrame / 30);
                         if (Math.abs(uploadedBgVideo.currentTime - targetTime) > 0.03) {
                             uploadedBgVideo.currentTime = targetTime;
                         }
@@ -1837,7 +2125,10 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         function generateRandomStyle() {
             // Randomize color variation seed for different harmonious results
-            colorVariationSeed = Math.random();
+            if (!lockBGColor.checked) {
+                colorVariationSeed = Math.random();
+                bgVariationSeed = Math.random();
+            }
 
             const shapes = ['circle', '3d_rings', 'vertical_strip', 'horizontal_strip', 'square', 'diamond', 'diagonal_split'];
             const layouts = [
@@ -1892,6 +2183,82 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             shapeColor.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
 
             customColorGroup.style.display = shapeLayout.value === 'custom' ? 'flex' : 'none';
+
+            // Star randomization logic:
+            // 40% chance of NO stars, 60% chance of stars
+            const bgStarsToggle = document.getElementById('bgStarsToggle');
+            const bgStarsControls = document.getElementById('bgStarsControls');
+            const resetStarsBtn = document.getElementById('resetStarsBtn');
+            
+            if (bgStarsToggle) {
+                const enableStars = Math.random() > 0.40;
+                bgStarsToggle.checked = enableStars;
+                if (bgStarsControls && resetStarsBtn) {
+                    bgStarsControls.style.display = enableStars ? 'flex' : 'none';
+                    resetStarsBtn.style.display = enableStars ? 'inline-block' : 'none';
+                }
+                
+                if (enableStars) {
+                    const starStyles = ['sparkle4', 'rounded5', 'classic5', 'sakura'];
+                    const starFills = ['solid', 'gradient'];
+                    const pathStyles = ['top_right_bottom_left', 'top_left_bottom_right', 'random_corners', 'static_spin'];
+                    
+                    const chosenStarStyle = starStyles[Math.floor(Math.random() * starStyles.length)];
+                    const chosenStarFill = starFills[Math.floor(Math.random() * starFills.length)];
+                    const chosenPathStyle = pathStyles[Math.floor(Math.random() * pathStyles.length)];
+                    if (chosenPathStyle === 'random_corners') {
+                        currentRandomStarsPath = Math.random() > 0.5 ? 'top_right_bottom_left' : 'top_left_bottom_right';
+                    }
+                    const chosenShowPath = Math.random() > 0.25; 
+                    
+                    const pathRadiusVal = Math.floor(Math.random() * (550 - 200 + 1)) + 200; 
+                    const pathWidthVal = Math.floor(Math.random() * (6 - 2 + 1)) + 2; 
+                    const pathOpacityVal = Math.floor(Math.random() * (45 - 15 + 1)) + 15; 
+                    
+                    const bgSStyle = document.getElementById('bgStarsStyle');
+                    const bgSFill = document.getElementById('bgStarsFill');
+                    const bgSPath = document.getElementById('bgStarsPath');
+                    const bgSShowPath = document.getElementById('bgStarsShowPath');
+                    const bgSPathRad = document.getElementById('bgStarsPathRadius');
+                    const bgSPathRadVal = document.getElementById('bgStarsPathRadiusVal');
+                    const bgSPathWidth = document.getElementById('bgStarsPathWidth');
+                    const bgSPathWidthVal = document.getElementById('bgStarsPathWidthVal');
+                    const bgSPathOp = document.getElementById('bgStarsPathOpacity');
+                    const bgSPathOpVal = document.getElementById('bgStarsPathOpacityVal');
+                    
+                    if (bgSStyle) bgSStyle.value = chosenStarStyle;
+                    if (bgSFill) bgSFill.value = chosenStarFill;
+                    if (bgSPath) bgSPath.value = chosenPathStyle;
+                    if (bgSShowPath) bgSShowPath.checked = chosenShowPath;
+                    if (bgSPathRad) { bgSPathRad.value = pathRadiusVal; bgSPathRadVal.innerText = pathRadiusVal + "px"; }
+                    if (bgSPathWidth) { bgSPathWidth.value = pathWidthVal; bgSPathWidthVal.innerText = pathWidthVal + "px"; }
+                    if (bgSPathOp) { bgSPathOp.value = pathOpacityVal; bgSPathOpVal.innerText = pathOpacityVal + "%"; }
+                    
+                    const bgScale = document.getElementById('bgStarsScaleSlider');
+                    const bgScaleValEl = document.getElementById('bgStarsScaleVal');
+                    const bgSpeed = document.getElementById('bgStarsSpeedSlider');
+                    const bgSpeedValEl = document.getElementById('bgStarsSpeedVal');
+                    const bgX = document.getElementById('bgStarsXOffsetSlider');
+                    const bgXValEl = document.getElementById('bgStarsXOffsetVal');
+                    const bgY = document.getElementById('bgStarsYOffsetSlider');
+                    const bgYValEl = document.getElementById('bgStarsYOffsetVal');
+                    const bgAngle = document.getElementById('bgStarsStartAngleSlider');
+                    const bgAngleValEl = document.getElementById('bgStarsStartAngleVal');
+                    
+                    const rScale = Math.floor(Math.random() * (100 - 65 + 1)) + 65; // 65% to 100%
+                    const speeds = [70, 90, 120, 160];
+                    const rSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+                    const rAngle = Math.floor(Math.random() * 360);
+                    const rX = Math.floor(Math.random() * 80) - 40; // -40px to 40px
+                    const rY = Math.floor(Math.random() * 80) - 40;
+
+                    if (bgScale) { bgScale.value = rScale; bgScaleValEl.innerText = rScale + "%"; }
+                    if (bgSpeed) { bgSpeed.value = rSpeed; bgSpeedValEl.innerText = rSpeed + "%"; }
+                    if (bgX) { bgX.value = rX; bgXValEl.innerText = rX + "px"; }
+                    if (bgY) { bgY.value = rY; bgYValEl.innerText = rY + "px"; }
+                    if (bgAngle) { bgAngle.value = rAngle; bgAngleValEl.innerText = rAngle + "°"; }
+                }
+            }
 
             updateLabels();
             // Don't reset animation frame to 0 so the new style is visible immediately at the current frame.
@@ -1985,20 +2352,22 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
             if (uploadedBgVideo) {
                 uploadedBgVideo.pause();
-                uploadedBgVideo.currentTime = 0;
+                uploadedBgVideo.currentTime = uploadedBgVideoStartOffset || 0;
             }
             if (uploadedImages) {
-                for (let vid of uploadedImages) {
+                uploadedImages.forEach((vid, idx) => {
                     if (vid && vid.tagName === 'VIDEO') {
                         vid.pause();
-                        vid.currentTime = 0;
+                        const offset = shapeImagesProps[idx]?.startOffset || 0;
+                        vid.currentTime = offset;
                     }
-                }
+                });
             }
 
             // Reset photo anim state
             pa_zoom = 1.0; pa_x = 0; pa_y = 0;
             pa_angle = 0; pa_alpha = 0;
+            currentRandomStarsPath = Math.random() > 0.5 ? 'top_right_bottom_left' : 'top_left_bottom_right';
             pa_wipe = 0; pa_bounce = 0;
             
             // In 'clip' mode, it always starts from 'bottom' for a clean entry.
@@ -2053,7 +2422,13 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     dynamicRotation = shapeEase * (360 * Math.PI / 180);
                     dynamicOpacity = shapeEase;
                 } else {
-                    dynamicScale = 1.0;
+                    // Settle at 1.0, then slowly zoom up to 4% at totalDuration (only if motionStyle is classic)
+                    const globalT = Math.min(1.0, currentFrame / totalDuration);
+                    const settleT = shapeSettleFrame / totalDuration;
+                    const progressAfterSettle = (globalT - settleT) / (1.0 - settleT);
+                    const slowZoom = motionStyle.value === 'classic' ? 0.04 : 0.0;
+                    
+                    dynamicScale = 1.0 + progressAfterSettle * slowZoom;
                     dynamicRotation = 360 * Math.PI / 180;
                     dynamicOpacity = 1.0;
                 }
@@ -2070,7 +2445,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     
                     const globalT = currentFrame / totalDuration;
                     const globalEase = 1 - Math.pow(1 - globalT, 3);
-                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalT * 0.10 : 1.0;
                     dynamicPhotoZoom = continuousZoom;
                     dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
                 } else if (currentFrame < photoSettleFrame) {
@@ -2081,7 +2456,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     
                     const globalT = currentFrame / totalDuration;
                     const globalEase = 1 - Math.pow(1 - globalT, 3);
-                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalT * 0.10 : 1.0;
                     
                     dynamicPhotoZoom = continuousZoom; 
                     dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
@@ -2099,7 +2474,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     
                     const globalT = Math.min(1.0, currentFrame / totalDuration);
                     const globalEase = 1 - Math.pow(1 - globalT, 3);
-                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalEase * 0.10 : 1.0;
+                    const continuousZoom = motionStyle.value === 'classic' ? 1.0 + globalT * 0.10 : 1.0;
                     
                     dynamicPhotoZoom = continuousZoom;
                     dynamicPulse = motionStyle.value === 'fade_pulse' ? 1.0 + Math.sin(currentFrame * 0.05) * 0.03 : 1.0;
@@ -2949,19 +3324,21 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         // ── Photo Animation Renderer ──
         function drawPhotoAnimFrame() {
-            if (!uploadedImg) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
-                ctx.strokeStyle = 'rgba(245,158,11,0.3)';
-                ctx.lineWidth = 4;
-                ctx.setLineDash([15, 15]);
-                ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2, 150, 0, Math.PI*2); ctx.stroke();
-                return;
-            }
-
             const bgCol    = document.getElementById('photoAnimBgColor').value;
             const bgStyle  = document.getElementById('photoAnimBgStyle').value;
             const animType = document.getElementById('photoAnimType').value;
+
+            if (!uploadedImg) {
+                const animPreset = document.getElementById('photoAnimBgPreset').value;
+                drawUnifiedBackground(ctx, bgCol, bgStyle, animPreset, currentFrame);
+                
+                ctx.strokeStyle = 'rgba(245,158,11,0.4)';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([15, 15]);
+                ctx.beginPath(); ctx.arc(INTERNAL_W/2, INTERNAL_H/2, 150, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([]);
+                return;
+            }
 
             // ── Polaroid Spin: special full renderer ──
             if (animType === 'polaroid_spin') {
@@ -3219,10 +3596,19 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 const pY = parseInt(document.getElementById('polaroidYSlider').value);
 
                 // Two cards side-by-side, wider dx offset so both are clearly visible
-                const cardConfigs = [
+                let cardConfigs = [
                     { dx: -pScale * 0.32, dy: -20, angle: -8, scale: 0.94, stagger: 0, img: imgs[0], isPhoto2: false },
                     { dx: pScale * 0.32, dy: 20, angle: 6, scale: 1.0, stagger: 10, img: imgs[1], isPhoto2: true }
                 ];
+
+                const stackOrderEl = document.getElementById('polaroidStackOrder');
+                if (stackOrderEl && stackOrderEl.value === 'left_top') {
+                    // Draw Photo 2 (right) first, then Photo 1 (left) so Photo 1 is on top
+                    cardConfigs = [
+                        { dx: pScale * 0.32, dy: 20, angle: 6, scale: 1.0, stagger: 10, img: imgs[1], isPhoto2: true },
+                        { dx: -pScale * 0.32, dy: -20, angle: -8, scale: 0.94, stagger: 0, img: imgs[0], isPhoto2: false }
+                    ];
+                }
 
                 cardConfigs.forEach((cfg) => {
                     const cardStartFrame = cfg.stagger;
@@ -3722,6 +4108,19 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         function drawFrame() {
             ctx.clearRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+            // Sync subject videos if not playing
+            if (!isPlaying && !isExporting && uploadedImages) {
+                uploadedImages.forEach((img, idx) => {
+                    if (img && img.tagName === 'VIDEO') {
+                        const offset = shapeImagesProps[idx]?.startOffset || 0;
+                        const targetTime = offset + (currentFrame / 30);
+                        if (Math.abs(img.currentTime - targetTime) > 0.03) {
+                            img.currentTime = targetTime;
+                        }
+                    }
+                });
+            }
 
             // ── Photo Animation mode ──
             if (appMode === 'photo_anim') {
@@ -4287,12 +4686,14 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         updatePhysics();
                     }
                     if (uploadedBgVideo) {
-                        await seekVideo(uploadedBgVideo, f / 30);
+                        await seekVideo(uploadedBgVideo, (uploadedBgVideoStartOffset || 0) + f / 30);
                     }
                     if (uploadedImages) {
-                        for (let vid of uploadedImages) {
+                        for (let idx = 0; idx < uploadedImages.length; idx++) {
+                            const vid = uploadedImages[idx];
                             if (vid && vid.tagName === 'VIDEO') {
-                                await seekVideo(vid, f / 30);
+                                const offset = shapeImagesProps[idx]?.startOffset || 0;
+                                await seekVideo(vid, offset + f / 30);
                             }
                         }
                     }
@@ -4338,6 +4739,85 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             }
         }
 
+        // Helper function for Photo Animation Mode video start position sliders
+        function renderPhotoVideoSliders() {
+            // Remove existing ones if any
+            const existing1 = document.getElementById('photo1VideoStartGroup');
+            if (existing1) existing1.remove();
+            const existing2 = document.getElementById('photo2VideoStartGroup');
+            if (existing2) existing2.remove();
+
+            if (appMode === 'shape') return; // Handled by renderShapeImageControllers
+
+            if (uploadedImages && uploadedImages[0] && uploadedImages[0].tagName === 'VIDEO') {
+                const img = uploadedImages[0];
+                const container = document.getElementById('photo1LayoutGroup');
+                if (container) {
+                    const startGroup = document.createElement('div');
+                    startGroup.id = 'photo1VideoStartGroup';
+                    startGroup.className = 'control-group';
+                    startGroup.style.marginTop = '8px';
+                    
+                    const offsetVal = (shapeImagesProps[0] && shapeImagesProps[0].startOffset !== undefined) ? shapeImagesProps[0].startOffset : 0;
+                    startGroup.innerHTML = `
+                        <label>Video Start Position <span class="val" id="photo1VideoStartVal">${offsetVal}s</span></label>
+                        <input type="range" id="photo1VideoStartSlider" min="0" max="${img.duration || 60}" step="0.1" value="${offsetVal}">
+                    `;
+                    container.appendChild(startGroup);
+                    
+                    const slider = startGroup.querySelector('#photo1VideoStartSlider');
+                    const valSpan = startGroup.querySelector('#photo1VideoStartVal');
+                    slider.addEventListener('input', () => {
+                        const val = parseFloat(slider.value);
+                        valSpan.textContent = val.toFixed(1) + 's';
+                        if (!shapeImagesProps[0]) shapeImagesProps[0] = { scale: 100, x: 0, y: 0 };
+                        shapeImagesProps[0].startOffset = val;
+                        // Seek preview to the correct frame
+                        if (!isPlaying) {
+                            img.currentTime = val + (currentFrame / 30);
+                            drawFrame();
+                        }
+                    });
+                }
+            }
+
+            if (uploadedImages && uploadedImages[1] && uploadedImages[1].tagName === 'VIDEO') {
+                const img = uploadedImages[1];
+                const container = document.getElementById('photo2LayoutGroup');
+                if (container) {
+                    // Check if photo2LayoutGroup is visible (for polaroid stack)
+                    const animType = document.getElementById('photoAnimType').value;
+                    if (animType === 'polaroid_stack') {
+                        const startGroup = document.createElement('div');
+                        startGroup.id = 'photo2VideoStartGroup';
+                        startGroup.className = 'control-group';
+                        startGroup.style.marginTop = '8px';
+                        
+                        const offsetVal = (shapeImagesProps[1] && shapeImagesProps[1].startOffset !== undefined) ? shapeImagesProps[1].startOffset : 0;
+                        startGroup.innerHTML = `
+                            <label>Video 2 Start Position <span class="val" id="photo2VideoStartVal">${offsetVal}s</span></label>
+                            <input type="range" id="photo2VideoStartSlider" min="0" max="${img.duration || 60}" step="0.1" value="${offsetVal}">
+                        `;
+                        container.appendChild(startGroup);
+                        
+                        const slider = startGroup.querySelector('#photo2VideoStartSlider');
+                        const valSpan = startGroup.querySelector('#photo2VideoStartVal');
+                        slider.addEventListener('input', () => {
+                            const val = parseFloat(slider.value);
+                            valSpan.textContent = val.toFixed(1) + 's';
+                            if (!shapeImagesProps[1]) shapeImagesProps[1] = { scale: 100, x: 0, y: 0 };
+                            shapeImagesProps[1].startOffset = val;
+                            // Seek preview to the correct frame
+                            if (!isPlaying) {
+                                img.currentTime = val + (currentFrame / 30);
+                                drawFrame();
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
         // ── Dynamic shape mode images controllers ──
         function renderShapeImageControllers() {
             const container = document.getElementById('shapeImagesControlsContainer');
@@ -4360,7 +4840,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             container.style.display = 'flex';
 
             while (shapeImagesProps.length < uploadedImages.length) {
-                shapeImagesProps.push({ scale: 100, x: 0, y: 0 });
+                shapeImagesProps.push({ scale: 100, x: 0, y: 0, startOffset: 0 });
             }
             if (shapeImagesProps.length > uploadedImages.length) {
                 shapeImagesProps.length = uploadedImages.length;
@@ -4369,7 +4849,26 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             uploadedImages.forEach((img, idx) => {
                 if (!img) return;
                 const props = shapeImagesProps[idx];
+                const isVideo = img.tagName === 'VIDEO';
+                const labelText = isVideo ? `🎥 Video ${idx + 1} Transform` : `📷 Image ${idx + 1} Transform`;
                 
+                let thumbnailHtml = '';
+                if (isVideo) {
+                    thumbnailHtml = `<div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.6rem;">🎥</div>`;
+                } else {
+                    thumbnailHtml = `<img src="${img.src}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">`;
+                }
+
+                let startOffsetHtml = '';
+                if (isVideo) {
+                    startOffsetHtml = `
+                    <div class="control-group" style="margin-top: 5px;">
+                        <label>Start Position <span class="val" id="shapeImgStartVal${idx}">${props.startOffset || 0}s</span></label>
+                        <input type="range" id="shapeImgStart${idx}" min="0" max="${img.duration || 60}" step="0.1" value="${props.startOffset || 0}">
+                    </div>
+                    `;
+                }
+
                 const wrapper = document.createElement('div');
                 wrapper.className = 'shape-img-control-card';
                 wrapper.style.padding = '8px';
@@ -4380,8 +4879,8 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
                 wrapper.innerHTML = `
                     <div class="card-title" style="font-size: 0.7rem; color: #fb7185; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; text-transform: uppercase;">
-                        <span>📷 Image ${idx + 1} Transform</span>
-                        <img src="${img.src}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
+                        <span>${labelText}</span>
+                        ${thumbnailHtml}
                     </div>
                     <div class="control-group">
                         <label>Scale <span class="val" id="shapeImgScaleVal${idx}">${props.scale}%</span></label>
@@ -4397,6 +4896,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                             <input type="range" id="shapeImgYSlider${idx}" min="-1500" max="1500" value="${props.y}">
                         </div>
                     </div>
+                    ${startOffsetHtml}
                 `;
                 
                 container.appendChild(wrapper);
@@ -4404,10 +4904,12 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 const scaleSlider = wrapper.querySelector('#shapeImgScale' + idx);
                 const xSlider = wrapper.querySelector('#shapeImgXSlider' + idx);
                 const ySlider = wrapper.querySelector('#shapeImgYSlider' + idx);
+                const startSlider = isVideo ? wrapper.querySelector('#shapeImgStart' + idx) : null;
 
                 const scaleVal = wrapper.querySelector('#shapeImgScaleVal' + idx);
                 const xVal = wrapper.querySelector('#shapeImgXVal' + idx);
                 const yVal = wrapper.querySelector('#shapeImgYVal' + idx);
+                const startVal = isVideo ? wrapper.querySelector('#shapeImgStartVal' + idx) : null;
 
                 const updateProps = () => {
                     props.scale = parseInt(scaleSlider.value);
@@ -4417,6 +4919,14 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                     scaleVal.textContent = props.scale + '%';
                     xVal.textContent = props.x;
                     yVal.textContent = props.y;
+
+                    if (isVideo && startSlider) {
+                        props.startOffset = parseFloat(startSlider.value);
+                        startVal.textContent = props.startOffset.toFixed(1) + 's';
+                        if (!isPlaying) {
+                            img.currentTime = props.startOffset + (currentFrame / 30);
+                        }
+                    }
                     
                     drawFrame();
                 };
@@ -4424,11 +4934,41 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 scaleSlider.addEventListener('input', updateProps);
                 xSlider.addEventListener('input', updateProps);
                 ySlider.addEventListener('input', updateProps);
+                if (isVideo && startSlider) {
+                    startSlider.addEventListener('input', updateProps);
+                }
             });
+        }
+
+        function syncBackgroundSettings(fromMode) {
+            if (fromMode === 'shape') {
+                const presetVal = document.getElementById('bgPreset').value;
+                const styleVal = document.getElementById('bgStyle').value;
+                const colorVal = document.getElementById('bgColor').value;
+                
+                document.getElementById('photoAnimBgPreset').value = presetVal;
+                document.getElementById('photoAnimBgStyle').value = styleVal;
+                document.getElementById('photoAnimBgColor').value = colorVal;
+            } else if (fromMode === 'photo_anim') {
+                const presetVal = document.getElementById('photoAnimBgPreset').value;
+                const styleVal = document.getElementById('photoAnimBgStyle').value;
+                const colorVal = document.getElementById('photoAnimBgColor').value;
+                
+                document.getElementById('bgPreset').value = presetVal;
+                document.getElementById('bgStyle').value = styleVal;
+                document.getElementById('bgColor').value = colorVal;
+            }
         }
 
         // ── Mode switcher logic ──
         function setAppMode(mode) {
+            if (lockBGColor && lockBGColor.checked) {
+                if (mode === 'photo_anim') {
+                    syncBackgroundSettings('shape');
+                } else if (mode === 'shape') {
+                    syncBackgroundSettings('photo_anim');
+                }
+            }
             appMode = mode;
             if (mode === 'shape') {
                 INTERNAL_W = 1080;
@@ -4544,6 +5084,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             }
             updateLabels();
             renderShapeImageControllers();
+            renderPhotoVideoSliders();
 
             resetAnimation();
             isPlaying = true;
@@ -4610,6 +5151,10 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         title.textContent = 'Polaroid / Photo';
                     }
                 }
+                const polaroidStackOrderGroup = document.getElementById('polaroidStackOrderGroup');
+                if (polaroidStackOrderGroup) {
+                    polaroidStackOrderGroup.style.display = animType === 'polaroid_stack' ? 'block' : 'none';
+                }
             }
             
             // 4. Circles Layout Group
@@ -4621,6 +5166,9 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             if (keyframeRotationBlock) {
                 keyframeRotationBlock.style.display = (animType.startsWith('bordered_card') || animType === 'tech_hexagon') ? 'none' : 'block';
             }
+            
+            // Render photo video sliders
+            renderPhotoVideoSliders();
         }
 
         modeShapeBtn.addEventListener('click', () => setAppMode('shape'));
@@ -4669,9 +5217,19 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 loadedCount++;
                 if (loadedCount === targetCount) {
                     uploadedImg = uploadedImages[0];
+                    shapeImagesProps = Array.from({ length: targetCount }, (_, i) => {
+                        const existing = shapeImagesProps[i];
+                        return {
+                            scale: existing ? existing.scale : 100,
+                            x: existing ? existing.x : 0,
+                            y: existing ? existing.y : 0,
+                            startOffset: existing ? (existing.startOffset || 0) : 0
+                        };
+                    });
                     if (appMode === 'shape') {
-                        shapeImagesProps = Array.from({ length: targetCount }, () => ({ scale: 100, x: 0, y: 0 }));
                         renderShapeImageControllers();
+                    } else {
+                        renderPhotoVideoSliders();
                     }
                     resetAnimation();
                 }
@@ -4711,12 +5269,51 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             }
         });
 
+        function resetBgVideoSlider() {
+            // Remove existing slider if any
+            const existing = document.getElementById('bgVideoStartGroup');
+            if (existing) existing.remove();
+
+            if (uploadedBgVideo) {
+                const parent = document.getElementById('bgVideoLoader').parentNode;
+                if (parent) {
+                    const startGroup = document.createElement('div');
+                    startGroup.id = 'bgVideoStartGroup';
+                    startGroup.className = 'control-group';
+                    startGroup.style.marginTop = '8px';
+                    
+                    startGroup.innerHTML = `
+                        <label>BG Video Start Position <span class="val" id="bgVideoStartVal">${uploadedBgVideoStartOffset}s</span></label>
+                        <input type="range" id="bgVideoStartSlider" min="0" max="${uploadedBgVideo.duration || 60}" step="0.1" value="${uploadedBgVideoStartOffset}">
+                    `;
+                    parent.appendChild(startGroup);
+                    
+                    const slider = startGroup.querySelector('#bgVideoStartSlider');
+                    const valSpan = startGroup.querySelector('#bgVideoStartVal');
+                    slider.addEventListener('input', () => {
+                        const val = parseFloat(slider.value);
+                        valSpan.textContent = val.toFixed(1) + 's';
+                        uploadedBgVideoStartOffset = val;
+                        if (!isPlaying) {
+                            uploadedBgVideo.currentTime = val + (currentFrame / 30);
+                            drawFrame();
+                        }
+                    });
+                }
+            }
+        }
+
         const bgImageLoader = document.getElementById('bgImageLoader');
         const bgVideoLoader = document.getElementById('bgVideoLoader');
         if (bgImageLoader) {
             bgImageLoader.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
+                // Remove bg video start offset slider
+                const existing = document.getElementById('bgVideoStartGroup');
+                if (existing) existing.remove();
+                uploadedBgVideoStartOffset = 0;
+
                 if (uploadedBgVideo) {
                     uploadedBgVideo.pause();
                     if (uploadedBgVideo.parentNode) {
@@ -4743,6 +5340,11 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 if (!file) return;
                 uploadedBgImg = null;
                 if (bgImageLoader) bgImageLoader.value = '';
+                // Remove bg video start offset slider
+                const existing = document.getElementById('bgVideoStartGroup');
+                if (existing) existing.remove();
+                uploadedBgVideoStartOffset = 0;
+
                 if (uploadedBgVideo) {
                     uploadedBgVideo.pause();
                     if (uploadedBgVideo.parentNode) {
@@ -4767,6 +5369,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 video.playsInline = true;
                 video.addEventListener('loadeddata', () => {
                     uploadedBgVideo = video;
+                    resetBgVideoSlider();
                     resetAnimation();
                     if (isPlaying) {
                         syncVideoPlayback();
@@ -4893,6 +5496,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         document.getElementById('photoAnimBgColor').addEventListener('input', drawFrame);
         document.getElementById('photoAnimBgStyle').addEventListener('change', drawFrame);
         document.getElementById('polaroidRingsToggle').addEventListener('change', drawFrame);
+        document.getElementById('bgStyle').addEventListener('change', drawFrame);
         document.getElementById('bgPreset').addEventListener('change', drawFrame);
         document.getElementById('photoAnimBgPreset').addEventListener('change', drawFrame);
 
@@ -4918,77 +5522,82 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         if (resetStarsBtn) {
             resetStarsBtn.addEventListener('click', () => {
-                const s1Scale = document.getElementById('star1ScaleSlider');
-                const s1ScaleVal = document.getElementById('star1ScaleVal');
-                const s1Speed = document.getElementById('star1SpeedSlider');
-                const s1SpeedVal = document.getElementById('star1SpeedVal');
-                const s1X = document.getElementById('star1XOffsetSlider');
-                const s1XVal = document.getElementById('star1XOffsetVal');
-                const s1Y = document.getElementById('star1YOffsetSlider');
-                const s1YVal = document.getElementById('star1YOffsetVal');
-                const s1Angle = document.getElementById('star1StartAngleSlider');
-                const s1AngleVal = document.getElementById('star1StartAngleVal');
+                const bgScale = document.getElementById('bgStarsScaleSlider');
+                const bgScaleVal = document.getElementById('bgStarsScaleVal');
+                const bgSpeed = document.getElementById('bgStarsSpeedSlider');
+                const bgSpeedVal = document.getElementById('bgStarsSpeedVal');
+                const bgX = document.getElementById('bgStarsXOffsetSlider');
+                const bgXVal = document.getElementById('bgStarsXOffsetVal');
+                const bgY = document.getElementById('bgStarsYOffsetSlider');
+                const bgYVal = document.getElementById('bgStarsYOffsetVal');
+                const bgAngle = document.getElementById('bgStarsStartAngleSlider');
+                const bgAngleVal = document.getElementById('bgStarsStartAngleVal');
 
-                const s2Scale = document.getElementById('star2ScaleSlider');
-                const s2ScaleVal = document.getElementById('star2ScaleVal');
-                const s2Speed = document.getElementById('star2SpeedSlider');
-                const s2SpeedVal = document.getElementById('star2SpeedVal');
-                const s2X = document.getElementById('star2XOffsetSlider');
-                const s2XVal = document.getElementById('star2XOffsetVal');
-                const s2Y = document.getElementById('star2YOffsetSlider');
-                const s2YVal = document.getElementById('star2YOffsetVal');
-                const s2Angle = document.getElementById('star2StartAngleSlider');
-                const s2AngleVal = document.getElementById('star2StartAngleVal');
+                if (bgScale) { bgScale.value = 70; bgScaleVal.innerText = "70%"; }
+                if (bgSpeed) { bgSpeed.value = 100; bgSpeedVal.innerText = "100%"; }
+                if (bgX) { bgX.value = 0; bgXVal.innerText = "0px"; }
+                if (bgY) { bgY.value = 0; bgYVal.innerText = "0px"; }
+                if (bgAngle) { bgAngle.value = 0; bgAngleVal.innerText = "0°"; }
 
-                if (s1Scale) { s1Scale.value = 100; s1ScaleVal.innerText = "100%"; }
-                if (s1Speed) { s1Speed.value = 100; s1SpeedVal.innerText = "100%"; }
-                if (s1X) { s1X.value = 0; s1XVal.innerText = "0px"; }
-                if (s1Y) { s1Y.value = 0; s1YVal.innerText = "0px"; }
-                if (s1Angle) { s1Angle.value = 0; s1AngleVal.innerText = "0°"; }
+                const bgSStyle = document.getElementById('bgStarsStyle');
+                const bgSFill = document.getElementById('bgStarsFill');
+                const bgSPath = document.getElementById('bgStarsPath');
+                const bgSShowPath = document.getElementById('bgStarsShowPath');
+                const bgSPathRad = document.getElementById('bgStarsPathRadius');
+                const bgSPathRadVal = document.getElementById('bgStarsPathRadiusVal');
+                const bgSPathWidth = document.getElementById('bgStarsPathWidth');
+                const bgSPathWidthVal = document.getElementById('bgStarsPathWidthVal');
+                const bgSPathOp = document.getElementById('bgStarsPathOpacity');
+                const bgSPathOpVal = document.getElementById('bgStarsPathOpacityVal');
 
-                if (s2Scale) { s2Scale.value = 100; s2ScaleVal.innerText = "100%"; }
-                if (s2Speed) { s2Speed.value = 100; s2SpeedVal.innerText = "100%"; }
-                if (s2X) { s2X.value = 0; s2XVal.innerText = "0px"; }
-                if (s2Y) { s2Y.value = 0; s2YVal.innerText = "0px"; }
-                if (s2Angle) { s2Angle.value = 0; s2AngleVal.innerText = "0°"; }
+                if (bgSStyle) bgSStyle.value = 'sparkle4';
+                if (bgSFill) bgSFill.value = 'solid';
+                if (bgSPath) bgSPath.value = 'top_right_bottom_left';
+                if (bgSShowPath) bgSShowPath.checked = true;
+                if (bgSPathRad) { bgSPathRad.value = 280; bgSPathRadVal.innerText = "280px"; }
+                if (bgSPathWidth) { bgSPathWidth.value = 3; bgSPathWidthVal.innerText = "3px"; }
+                if (bgSPathOp) { bgSPathOp.value = 25; bgSPathOpVal.innerText = "25%"; }
 
                 drawFrame();
             });
         }
 
-        const star1ScaleSlider = document.getElementById('star1ScaleSlider');
-        const star1ScaleVal = document.getElementById('star1ScaleVal');
-        const star1SpeedSlider = document.getElementById('star1SpeedSlider');
-        const star1SpeedVal = document.getElementById('star1SpeedVal');
-        const star1XOffsetSlider = document.getElementById('star1XOffsetSlider');
-        const star1XOffsetVal = document.getElementById('star1XOffsetVal');
-        const star1YOffsetSlider = document.getElementById('star1YOffsetSlider');
-        const star1YOffsetVal = document.getElementById('star1YOffsetVal');
-        const star1StartAngleSlider = document.getElementById('star1StartAngleSlider');
-        const star1StartAngleVal = document.getElementById('star1StartAngleVal');
+        const bgStarsScaleSlider = document.getElementById('bgStarsScaleSlider');
+        const bgStarsScaleVal = document.getElementById('bgStarsScaleVal');
+        const bgStarsSpeedSlider = document.getElementById('bgStarsSpeedSlider');
+        const bgStarsSpeedVal = document.getElementById('bgStarsSpeedVal');
+        const bgStarsXOffsetSlider = document.getElementById('bgStarsXOffsetSlider');
+        const bgStarsXOffsetVal = document.getElementById('bgStarsXOffsetVal');
+        const bgStarsYOffsetSlider = document.getElementById('bgStarsYOffsetSlider');
+        const bgStarsYOffsetVal = document.getElementById('bgStarsYOffsetVal');
+        const bgStarsStartAngleSlider = document.getElementById('bgStarsStartAngleSlider');
+        const bgStarsStartAngleVal = document.getElementById('bgStarsStartAngleVal');
 
-        const star2ScaleSlider = document.getElementById('star2ScaleSlider');
-        const star2ScaleVal = document.getElementById('star2ScaleVal');
-        const star2SpeedSlider = document.getElementById('star2SpeedSlider');
-        const star2SpeedVal = document.getElementById('star2SpeedVal');
-        const star2XOffsetSlider = document.getElementById('star2XOffsetSlider');
-        const star2XOffsetVal = document.getElementById('star2XOffsetVal');
-        const star2YOffsetSlider = document.getElementById('star2YOffsetSlider');
-        const star2YOffsetVal = document.getElementById('star2YOffsetVal');
-        const star2StartAngleSlider = document.getElementById('star2StartAngleSlider');
-        const star2StartAngleVal = document.getElementById('star2StartAngleVal');
+        const bgStarsStyle = document.getElementById('bgStarsStyle');
+        const bgStarsFill = document.getElementById('bgStarsFill');
+        const bgStarsPath = document.getElementById('bgStarsPath');
+        const bgStarsShowPath = document.getElementById('bgStarsShowPath');
+        const bgStarsPathRadius = document.getElementById('bgStarsPathRadius');
+        const bgStarsPathRadiusVal = document.getElementById('bgStarsPathRadiusVal');
+        const bgStarsPathWidth = document.getElementById('bgStarsPathWidth');
+        const bgStarsPathWidthVal = document.getElementById('bgStarsPathWidthVal');
+        const bgStarsPathOpacity = document.getElementById('bgStarsPathOpacity');
+        const bgStarsPathOpacityVal = document.getElementById('bgStarsPathOpacityVal');
+
+        if (bgStarsStyle) bgStarsStyle.addEventListener('change', drawFrame);
+        if (bgStarsFill) bgStarsFill.addEventListener('change', drawFrame);
+        if (bgStarsPath) bgStarsPath.addEventListener('change', drawFrame);
+        if (bgStarsShowPath) bgStarsShowPath.addEventListener('change', drawFrame);
 
         const starSliders = [
-            { el: star1ScaleSlider, val: star1ScaleVal, suffix: '%' },
-            { el: star1SpeedSlider, val: star1SpeedVal, suffix: '%' },
-            { el: star1XOffsetSlider, val: star1XOffsetVal, suffix: 'px' },
-            { el: star1YOffsetSlider, val: star1YOffsetVal, suffix: 'px' },
-            { el: star1StartAngleSlider, val: star1StartAngleVal, suffix: '°' },
-            { el: star2ScaleSlider, val: star2ScaleVal, suffix: '%' },
-            { el: star2SpeedSlider, val: star2SpeedVal, suffix: '%' },
-            { el: star2XOffsetSlider, val: star2XOffsetVal, suffix: 'px' },
-            { el: star2YOffsetSlider, val: star2YOffsetVal, suffix: 'px' },
-            { el: star2StartAngleSlider, val: star2StartAngleVal, suffix: '°' }
+            { el: bgStarsScaleSlider, val: bgStarsScaleVal, suffix: '%' },
+            { el: bgStarsSpeedSlider, val: bgStarsSpeedVal, suffix: '%' },
+            { el: bgStarsXOffsetSlider, val: bgStarsXOffsetVal, suffix: 'px' },
+            { el: bgStarsYOffsetSlider, val: bgStarsYOffsetVal, suffix: 'px' },
+            { el: bgStarsStartAngleSlider, val: bgStarsStartAngleVal, suffix: '°' },
+            { el: bgStarsPathRadius, val: bgStarsPathRadiusVal, suffix: 'px' },
+            { el: bgStarsPathWidth, val: bgStarsPathWidthVal, suffix: 'px' },
+            { el: bgStarsPathOpacity, val: bgStarsPathOpacityVal, suffix: '%' }
         ];
 
         starSliders.forEach(item => {
@@ -5003,16 +5612,52 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         if (lockBGColorPhoto) {
             lockBGColorPhoto.addEventListener('change', () => {
                 lockBGColor.checked = lockBGColorPhoto.checked;
+                if (lockBGColorPhoto.checked) {
+                    syncBackgroundSettings('photo_anim');
+                    drawFrame();
+                }
             });
             lockBGColor.addEventListener('change', () => {
                 lockBGColorPhoto.checked = lockBGColor.checked;
+                if (lockBGColor.checked) {
+                    syncBackgroundSettings('shape');
+                    drawFrame();
+                }
             });
         }
+
+        // Keep background inputs synced in real-time if locked
+        ['bgPreset', 'bgStyle', 'bgColor'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const handler = () => {
+                    if (lockBGColor && lockBGColor.checked) {
+                        syncBackgroundSettings('shape');
+                    }
+                };
+                el.addEventListener('input', handler);
+                el.addEventListener('change', handler);
+            }
+        });
+
+        ['photoAnimBgPreset', 'photoAnimBgStyle', 'photoAnimBgColor'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const handler = () => {
+                    if (lockBGColor && lockBGColor.checked) {
+                        syncBackgroundSettings('photo_anim');
+                    }
+                };
+                el.addEventListener('input', handler);
+                el.addEventListener('change', handler);
+            }
+        });
 
         // Polaroid & Circle layout geometry triggers
         const photoAnimLayoutTriggers = [
             'polaroidScaleSlider', 'polaroidXSlider', 'polaroidYSlider',
-            'circleScaleSlider', 'circleXSlider', 'circleYSlider'
+            'circleScaleSlider', 'circleXSlider', 'circleYSlider',
+            'polaroidStackOrder'
         ];
         photoAnimLayoutTriggers.forEach(id => {
             const el = document.getElementById(id);
@@ -5037,6 +5682,8 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 document.getElementById('circleScaleSlider').value = 420;
                 document.getElementById('circleXSlider').value = 30;
                 document.getElementById('circleYSlider').value = 0;
+                const polaroidStackOrder = document.getElementById('polaroidStackOrder');
+                if (polaroidStackOrder) polaroidStackOrder.value = 'right_top';
                 // Dispatch change event to trigger keyframe presets reset
                 document.getElementById('photoAnimType').dispatchEvent(new Event('change'));
             });
@@ -5688,6 +6335,142 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 });
             }
 
+            // Y-Snapping & X-Snapping Logic
+            isWordSnappedY = false;
+            wordSnappedYVal = 0;
+            isWordSnappedX = false;
+            wordSnappedXVal = 0;
+
+            let activeWordIdx = null;
+            let threshold = 0;
+            if (isDraggingWord) {
+                activeWordIdx = draggedWordIdx;
+                threshold = 15;
+            } else if (isDraggingSlider) {
+                const wordIdx = parseInt(textWordSelect.value);
+                if (!isNaN(wordIdx)) {
+                    activeWordIdx = wordIdx;
+                    threshold = 8;
+                }
+            }
+
+            if (activeWordIdx !== null) {
+                const activeLayoutIdx = wordsToLayout.findIndex(w => w.globalIdx === activeWordIdx);
+                if (activeLayoutIdx !== -1) {
+                    const activeBaseAnchor = baseWordAnchors[activeLayoutIdx];
+                    const override = textWordsOverride[activeWordIdx] || { scale: 100, x: 0, y: 0, highlight: 'none', anim: 'default' };
+                    const currentBaselineY = textGlobalY + activeBaseAnchor.y + override.y;
+                    const activeWordWidth = wordWidths[activeLayoutIdx] || 0;
+                    const activeScaleMult = (override.scale || 100) / 100;
+                    const activeTextH = baseFontSize * activeScaleMult;
+                    // Edge points for active word (top, center, baseline/bottom)
+                    const activeTop = currentBaselineY - activeTextH;
+                    const activeMid = currentBaselineY - activeTextH / 2;
+                    const activeBottom = currentBaselineY + activeTextH * 0.15;
+
+                    let closestTargetY = null;
+                    let minDistY = Infinity;
+                    let closestSnapX = null; // { guideY, delta } for edge alignment
+                    let minDistX = Infinity;
+
+                    wordsToLayout.forEach((wData, otherLayoutIdx) => {
+                        if (wData.globalIdx !== activeWordIdx) {
+                            // Determine visibility of the target word using frame timings
+                            let startFrame = textStartFrame + wData.globalIdx * 3;
+                            if (textSegmentMode !== 'classic') {
+                                const timing = segTimings[wData.segmentIdx];
+                                if (timing) {
+                                    startFrame = timing.startFrame + wData.wordIdxInSegment * 3;
+                                }
+                            }
+                            let opacity = 0;
+                            if (currentFrame >= startFrame) {
+                                opacity = 1.0;
+                            }
+                            if (textSegmentMode === 'sequential') {
+                                const timing = segTimings[wData.segmentIdx];
+                                if (timing && currentFrame >= timing.endFrame) {
+                                    opacity = 0;
+                                }
+                            }
+                            if (textSegmentMode === 'cumulative') {
+                                const timing = segTimings[wData.segmentIdx];
+                                if (timing && currentFrame < timing.startFrame) {
+                                    opacity = 0;
+                                }
+                            }
+
+                            if (opacity > 0) {
+                                const otherOverride = textWordsOverride[wData.globalIdx] || { y: 0 };
+                                const targetBaselineY = textGlobalY + baseWordAnchors[otherLayoutIdx].y + (otherOverride.y || 0);
+                                const otherScaleMult = (otherOverride.scale || 100) / 100;
+                                const otherTextH = baseFontSize * otherScaleMult;
+
+                                // --- Y-Snap: align baselines ---
+                                const distY = Math.abs(currentBaselineY - targetBaselineY);
+                                if (distY < minDistY) {
+                                    minDistY = distY;
+                                    closestTargetY = targetBaselineY;
+                                }
+
+                                // --- X-Snap: align top / center / bottom edges ---
+                                const otherTop    = targetBaselineY - otherTextH;
+                                const otherMid    = targetBaselineY - otherTextH / 2;
+                                const otherBottom = targetBaselineY + otherTextH * 0.15;
+
+                                const edgeCandidates = [
+                                    { activeEdge: activeTop,    targetEdge: otherTop,    label: 'top' },
+                                    { activeEdge: activeTop,    targetEdge: otherMid,    label: 'top-otherMid' },
+                                    { activeEdge: activeMid,    targetEdge: otherTop,    label: 'mid-otherTop' },
+                                    { activeEdge: activeMid,    targetEdge: otherMid,    label: 'center' },
+                                    { activeEdge: activeMid,    targetEdge: otherBottom, label: 'mid-otherBot' },
+                                    { activeEdge: activeBottom, targetEdge: otherMid,    label: 'bot-otherMid' },
+                                    { activeEdge: activeBottom, targetEdge: otherBottom, label: 'bottom' },
+                                ];
+
+                                edgeCandidates.forEach(({ activeEdge, targetEdge }) => {
+                                    const distX = Math.abs(activeEdge - targetEdge);
+                                    if (distX < minDistX) {
+                                        minDistX = distX;
+                                        closestSnapX = { guideY: targetEdge, delta: targetEdge - activeEdge };
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    // Apply Y-snap
+                    if (closestTargetY !== null && minDistY <= threshold) {
+                        const snappedOverrideY = closestTargetY - textGlobalY - activeBaseAnchor.y;
+                        override.y = snappedOverrideY;
+                        textWordsOverride[activeWordIdx] = override;
+                        isWordSnappedY = true;
+                        wordSnappedYVal = closestTargetY;
+
+                        // Sync UI
+                        const ySlider = document.getElementById('wordYSlider');
+                        const yVal = document.getElementById('wordYVal');
+                        if (ySlider) ySlider.value = snappedOverrideY;
+                        if (yVal) yVal.textContent = snappedOverrideY;
+                    }
+
+                    // Apply X-snap (vertical alignment – top/mid/bottom)
+                    if (!isWordSnappedY && closestSnapX !== null && minDistX <= threshold) {
+                        const snappedOverrideY = (override.y || 0) + closestSnapX.delta;
+                        override.y = snappedOverrideY;
+                        textWordsOverride[activeWordIdx] = override;
+                        isWordSnappedX = true;
+                        wordSnappedXVal = closestSnapX.guideY; // Y-position of the guide line
+
+                        // Sync UI
+                        const ySlider = document.getElementById('wordYSlider');
+                        const yVal = document.getElementById('wordYVal');
+                        if (ySlider) ySlider.value = snappedOverrideY;
+                        if (yVal) yVal.textContent = snappedOverrideY;
+                    }
+                }
+            }
+
             wordBoundingBoxes = [];
 
             // Pass 1: Pre-calculate rendering data and sample background
@@ -5988,16 +6771,42 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                         ctx.restore();
                     }
                 });
+
+                // Draw snapping guidelines if active
+                if (isWordSnappedY) {
+                    // Horizontal guide – baseline alignment
+                    ctx.save();
+                    ctx.strokeStyle = '#ec4899'; // Pink
+                    ctx.lineWidth = 2.5;
+                    ctx.setLineDash([8, 8]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, wordSnappedYVal);
+                    ctx.lineTo(INTERNAL_W, wordSnappedYVal);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                if (isWordSnappedX) {
+                    // Horizontal guide – top/mid/bottom edge alignment
+                    ctx.save();
+                    ctx.strokeStyle = '#38bdf8'; // Cyan/blue
+                    ctx.lineWidth = 2.5;
+                    ctx.setLineDash([6, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, wordSnappedXVal);
+                    ctx.lineTo(INTERNAL_W, wordSnappedXVal);
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
         }
 
         function getWordsList() {
-            return textInput.value.replace(/\|/g, ' ').trim().split(/\s+/).filter(w => w.length > 0);
+            return textInput.value.replace(/>/g, ' ').trim().split(/\s+/).filter(w => w.length > 0);
         }
 
         function getWordMetadata() {
             const rawText = textInput.value;
-            const segments = rawText.split('|');
+            const segments = rawText.split('>');
             const wordsMetadata = [];
             let globalIdx = 0;
             
@@ -6022,29 +6831,170 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
 
         function getSegmentTimings() {
             const rawText = textInput.value;
-            const segments = rawText.split('|').map(s => s.trim()).filter(s => s.length > 0);
-            const timings = [];
-            let currentStart = textStartFrame;
+            const segments = rawText.split('>').map(s => s.trim()).filter(s => s.length > 0);
             
+            // Clean up obsolete custom start times
+            for (const key in segmentStartFrames) {
+                if (parseInt(key) >= segments.length) {
+                    delete segmentStartFrames[key];
+                }
+            }
+            
+            const timings = [];
+            
+            // First pass: compute start frames
             segments.forEach((segText, idx) => {
-                const duration = segmentDurations[idx] !== undefined ? segmentDurations[idx] : getDefaultSegmentDuration();
-                const start = currentStart;
-                let end = start + duration;
-                
-                if (textSegmentMode === 'sequential' && idx === segments.length - 1) {
-                    end = Math.max(end, totalDuration);
+                let start;
+                if (idx === 0) {
+                    start = textStartFrame;
+                } else {
+                    if (segmentStartFrames[idx] !== undefined) {
+                        start = segmentStartFrames[idx];
+                    } else {
+                        // Default to previous segment start + default duration
+                        start = timings[idx - 1].startFrame + getDefaultSegmentDuration();
+                    }
                 }
                 
                 timings.push({
                     index: idx,
                     text: segText,
-                    duration: duration,
                     startFrame: start,
-                    endFrame: end
+                    duration: 0,
+                    endFrame: start
                 });
-                currentStart = end;
             });
+            
+            // Second pass: compute end frames and durations
+            timings.forEach((t, idx) => {
+                let end;
+                if (idx < timings.length - 1) {
+                    end = timings[idx + 1].startFrame;
+                } else {
+                    end = Math.max(t.startFrame + 1, totalDuration);
+                }
+                
+                t.endFrame = end;
+                t.duration = Math.max(0, end - t.startFrame);
+            });
+            
             return timings;
+        }
+
+        function validateSegmentTimings(timings) {
+            const errors = [];
+            
+            // Check textStartFrame relative to totalDuration
+            if (textStartFrame >= totalDuration) {
+                errors.push(`⚠️ Error: Global Text Start Time (Frame ${textStartFrame}) cannot be after or equal to the total video duration (${totalDuration} frames).`);
+            }
+            
+            for (let i = 1; i < timings.length; i++) {
+                const prev = timings[i - 1];
+                const curr = timings[i];
+                
+                if (curr.startFrame <= prev.startFrame) {
+                    errors.push(`⚠️ Error: Segment ${i + 1} start time (Frame ${curr.startFrame}) must be after Segment ${i} start time (Frame ${prev.startFrame}).`);
+                }
+                
+                if (curr.startFrame >= totalDuration) {
+                    errors.push(`⚠️ Error: Segment ${i + 1} start time (Frame ${curr.startFrame}) must be before the total video duration (${totalDuration} frames).`);
+                }
+            }
+            
+            return errors;
+        }
+
+        function validateAndRefreshTimingsUI() {
+            const timings = getSegmentTimings();
+            
+            // Reset borders, update ranges, update slider max & values dynamically
+            const maxSec = Math.floor((totalDuration - 1) / 30);
+            timings.forEach((t) => {
+                const itemEl = document.getElementById(`segmentTimingItem${t.index}`);
+                if (itemEl) {
+                    itemEl.style.borderColor = 'var(--border-color)';
+                }
+                const rangeSpan = document.getElementById(`segFrameRange${t.index}`);
+                if (rangeSpan) {
+                    rangeSpan.textContent = `Frames: ${t.startFrame} - ${t.endFrame}`;
+                }
+                
+                if (t.index > 0) {
+                    const secSlider = document.getElementById(`segSecSlider${t.index}`);
+                    const frameSlider = document.getElementById(`segFrameSlider${t.index}`);
+                    const secVal = document.getElementById(`segSecVal${t.index}`);
+                    const frameVal = document.getElementById(`segFrameVal${t.index}`);
+                    
+                    if (secSlider) {
+                        secSlider.max = maxSec;
+                        const s = Math.floor(t.startFrame / 30);
+                        if (document.activeElement !== secSlider) {
+                            secSlider.value = s;
+                        }
+                        if (secVal) secVal.textContent = secSlider.value + 's';
+                    }
+                    if (frameSlider) {
+                        const curSec = secSlider ? parseInt(secSlider.value) : Math.floor(t.startFrame / 30);
+                        if (curSec === maxSec) {
+                            frameSlider.max = (totalDuration - 1) % 30;
+                        } else {
+                            frameSlider.max = 29;
+                        }
+                        
+                        const f = t.startFrame % 30;
+                        if (document.activeElement !== frameSlider) {
+                            frameSlider.value = f;
+                        }
+                        if (frameVal) frameVal.textContent = frameSlider.value + 'f';
+                    }
+                }
+            });
+            
+            // Run validation
+            const errors = [];
+            
+            if (textStartFrame >= totalDuration) {
+                errors.push(`⚠️ Error: Global Text Start Time (Frame ${textStartFrame}) cannot be after or equal to the total video duration (${totalDuration} frames).`);
+                const itemEl = document.getElementById(`segmentTimingItem0`);
+                if (itemEl) {
+                    itemEl.style.borderColor = '#ef4444';
+                }
+            }
+            
+            for (let i = 1; i < timings.length; i++) {
+                const prev = timings[i - 1];
+                const curr = timings[i];
+                let hasError = false;
+                
+                if (curr.startFrame <= prev.startFrame) {
+                    errors.push(`⚠️ Error: Segment ${i + 1} start time (Frame ${curr.startFrame}) must be after Segment ${i} start time (Frame ${prev.startFrame}).`);
+                    hasError = true;
+                }
+                
+                if (curr.startFrame >= totalDuration) {
+                    errors.push(`⚠️ Error: Segment ${i + 1} start time (Frame ${curr.startFrame}) must be before the total video duration (${totalDuration} frames).`);
+                    hasError = true;
+                }
+                
+                if (hasError) {
+                    const itemEl = document.getElementById(`segmentTimingItem${i}`);
+                    if (itemEl) {
+                        itemEl.style.borderColor = '#ef4444';
+                    }
+                }
+            }
+            
+            const errorDiv = document.getElementById('segmentValidationErrors');
+            if (errorDiv) {
+                if (errors.length > 0) {
+                    errorDiv.innerHTML = errors.map(err => `<div>${err}</div>`).join('');
+                    errorDiv.style.display = 'flex';
+                } else {
+                    errorDiv.style.display = 'none';
+                    errorDiv.innerHTML = '';
+                }
+            }
         }
 
         function updateSegmentTimingsUI() {
@@ -6066,12 +7016,10 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             const timings = getSegmentTimings();
             timings.forEach((t) => {
                 const segIdx = t.index;
-                const totalFrames = t.duration;
-                const secs = Math.floor(totalFrames / 30);
-                const frames = totalFrames % 30;
                 
                 const item = document.createElement('div');
                 item.className = 'segment-timing-item';
+                item.id = `segmentTimingItem${segIdx}`;
                 item.style.padding = '8px';
                 item.style.background = 'rgba(255, 255, 255, 0.02)';
                 item.style.border = '1px solid var(--border-color)';
@@ -6080,56 +7028,66 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
                 item.style.flexDirection = 'column';
                 item.style.gap = '6px';
                 item.style.marginTop = '6px';
+                item.style.transition = 'border-color 0.25s';
                 
-                item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:0.75rem; font-weight:700; color:var(--accent-color);">Segment ${segIdx + 1}: "${t.text}"</span>
-                        <span style="font-size:0.7rem; color:var(--text-dim);" id="segFrameRange${segIdx}">Frames: ${t.startFrame} - ${t.endFrame}</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                        <div class="control-group">
-                            <label style="font-size:0.65rem;">Duration (Sec) <span class="val" id="segSecVal${segIdx}">${secs}s</span></label>
-                            <input type="range" id="segSecSlider${segIdx}" min="0" max="10" value="${secs}" style="margin-top:2px;">
+                if (segIdx === 0) {
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.75rem; font-weight:700; color:var(--accent-color);">Segment 1: "${t.text}"</span>
+                            <span style="font-size:0.7rem; color:var(--text-dim);" id="segFrameRange${segIdx}">Frames: ${t.startFrame} - ${t.endFrame}</span>
                         </div>
-                        <div class="control-group">
-                            <label style="font-size:0.65rem;">Duration (Frames) <span class="val" id="segFrameVal${segIdx}">${frames}f</span></label>
-                            <input type="range" id="segFrameSlider${segIdx}" min="0" max="29" value="${frames}" style="margin-top:2px;">
+                        <div style="font-size:0.7rem; color:var(--text-dim); margin-top:2px; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 4px; border: 1px dashed rgba(255,255,255,0.05);">
+                            ℹ️ Starts automatically at global <b>Text Start Time</b> (Frame ${t.startFrame}). Edit via the Global Text Settings slider above.
                         </div>
-                    </div>
-                `;
-                
-                container.appendChild(item);
-                
-                const secSlider = item.querySelector(`#segSecSlider${segIdx}`);
-                const frameSlider = item.querySelector(`#segFrameSlider${segIdx}`);
-                const secVal = item.querySelector(`#segSecVal${segIdx}`);
-                const frameVal = item.querySelector(`#segFrameVal${segIdx}`);
-                
-                const onInput = () => {
-                    const s = parseInt(secSlider.value);
-                    const f = parseInt(frameSlider.value);
-                    secVal.textContent = s + 's';
-                    frameVal.textContent = f + 'f';
+                    `;
+                    container.appendChild(item);
+                } else {
+                    const startFramesVal = t.startFrame;
+                    const startSec = Math.floor(startFramesVal / 30);
+                    const startFrameOffset = startFramesVal % 30;
                     
-                    segmentDurations[segIdx] = (s * 30) + f;
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.75rem; font-weight:700; color:var(--accent-color);">Segment ${segIdx + 1}: "${t.text}"</span>
+                            <span style="font-size:0.7rem; color:var(--text-dim);" id="segFrameRange${segIdx}">Frames: ${t.startFrame} - ${t.endFrame}</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                            <div class="control-group">
+                                <label style="font-size:0.65rem;">Start Time (Sec) <span class="val" id="segSecVal${segIdx}">${startSec}s</span></label>
+                                <input type="range" id="segSecSlider${segIdx}" min="0" max="${Math.floor(totalDuration / 30)}" value="${startSec}" style="margin-top:2px;">
+                            </div>
+                            <div class="control-group">
+                                <label style="font-size:0.65rem;">Start Time (Frames) <span class="val" id="segFrameVal${segIdx}">${startFrameOffset}f</span></label>
+                                <input type="range" id="segFrameSlider${segIdx}" min="0" max="29" value="${startFrameOffset}" style="margin-top:2px;">
+                            </div>
+                        </div>
+                    `;
                     
-                    refreshTimingsDisplay();
-                    drawFrame();
-                };
-                
-                secSlider.addEventListener('input', onInput);
-                frameSlider.addEventListener('input', onInput);
-            });
-        }
-        
-        function refreshTimingsDisplay() {
-            const timings = getSegmentTimings();
-            timings.forEach((t) => {
-                const rangeSpan = document.getElementById(`segFrameRange${t.index}`);
-                if (rangeSpan) {
-                    rangeSpan.textContent = `Frames: ${t.startFrame} - ${t.endFrame}`;
+                    container.appendChild(item);
+                    
+                    const secSlider = item.querySelector(`#segSecSlider${segIdx}`);
+                    const frameSlider = item.querySelector(`#segFrameSlider${segIdx}`);
+                    const secVal = item.querySelector(`#segSecVal${segIdx}`);
+                    const frameVal = item.querySelector(`#segFrameVal${segIdx}`);
+                    
+                    const onInput = () => {
+                        const s = parseInt(secSlider.value);
+                        const f = parseInt(frameSlider.value);
+                        secVal.textContent = s + 's';
+                        frameVal.textContent = f + 'f';
+                        
+                        segmentStartFrames[segIdx] = (s * 30) + f;
+                        
+                        validateAndRefreshTimingsUI();
+                        drawFrame();
+                    };
+                    
+                    secSlider.addEventListener('input', onInput);
+                    frameSlider.addEventListener('input', onInput);
                 }
             });
+            
+            validateAndRefreshTimingsUI();
         }
 
         function populateWordSelect() {
@@ -6276,6 +7234,13 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             }
         });
 
+        if (wordYSlider) {
+            wordYSlider.addEventListener('mousedown', () => { isDraggingSlider = true; });
+            wordYSlider.addEventListener('touchstart', () => { isDraggingSlider = true; });
+            window.addEventListener('mouseup', () => { isDraggingSlider = false; });
+            window.addEventListener('touchend', () => { isDraggingSlider = false; });
+        }
+
         textWordSelect.addEventListener('change', loadSelectedWordSettings);
 
         textInput.addEventListener('input', () => {
@@ -6315,6 +7280,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         function updateTextStartFrame() {
             textStartFrame = (textStartSec * 30) + textStartFrameOffset;
             textStartTimeDisplay.textContent = `${textStartSec}s ${textStartFrameOffset}f (Frame ${textStartFrame})`;
+            if (typeof validateAndRefreshTimingsUI === 'function') validateAndRefreshTimingsUI();
             drawFrame();
         }
 
@@ -6369,7 +7335,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
             textGradientStyle = 'auto';
             textSegmentMode = 'classic';
             textSegmentModeSelect.value = 'classic';
-            segmentDurations = {};
+            segmentStartFrames = {};
             defaultSegSecSlider.value = 2;
             defaultSegFrameSlider.value = 10;
             defaultSegSecVal.textContent = '2s';
@@ -6756,6 +7722,7 @@ function drawUnifiedBackground(context, baseColor, style, preset, t) {
         populatePresetDropdowns();
         populateWordSelect();
         renderShapeImageControllers();
+        renderPhotoVideoSliders();
         
         // Redraw canvas once fonts are fully loaded
         if (document.fonts) {
